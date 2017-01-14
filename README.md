@@ -23,7 +23,7 @@ This repo will provide the following:
 npm install --save-dev nytm/tracking-schema
 ```
 
-> You can optionally specify a specific like so: `npm install --save nytm/tracking-schema#v0.1.2`
+> You can optionally specify a specific version like so: `npm install --save nytm/tracking-schema#v0.1.2`
 
 ## Usage
 
