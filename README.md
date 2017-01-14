@@ -4,6 +4,8 @@ Tracking schema for NYT apps, based off [this Google Doc by DS&E](https://docs.g
 
 > ### ⚠️ STILL BEING DEVELOPED. DON'T USE THIS YET. ⚠️
 
+### *PRO TIP:* Best used with [nyt-react-tracking](https://github.com/nytm/nyt-react-tracking).
+
 ## Motivation
 
 The goal of this repo is to define a structured schema for all tracking data flowing through NYT apps.
