@@ -97,9 +97,13 @@ module.exports = {
     slug: { type: 'string' },
 
     /**
+     * The current number of characters in the context asset's body text
+     */
+    characterCount: { type: 'number' },
+
+    /**
      * Number of words in content asset's body text.
      */
     wordCount: { type: 'number' },
-
   },
 };
