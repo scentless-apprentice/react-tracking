@@ -1,16 +1,37 @@
 /* eslint-disable no-console */
+const _ = require('lodash');
 const Ajv = require('ajv');
-const schema = require('./schema');
-const errorLogger = require('./utils/error-logger');
+const schemaGenerator = require('./schema');
+const logger = require('./utils/logger');
 const ajv = new Ajv({
   allErrors: true,
 });
-const validate = ajv.compile(schema);
 
-module.exports = example => {
-  validate(example);
+const getValidate = (individualEvents) => {
+  const schema = schemaGenerator.get(individualEvents);
+  
+  return ajv.compile(schema);
+}
 
-  errorLogger(validate.errors);
+const validation = (data, individualEvents) => {
+  const validate = getValidate(individualEvents);
 
-  return validate.errors;
+  validate(data);
+
+  logger.error(validate.errors);
+
+  return validate.errors || [];
+}
+
+
+module.exports = ({ data = {}, individualEvents = false } = {}) => {
+
+  if (!_.size(data)) {
+    let error = logger.emptyDataError;
+    logger.error(error);
+
+    return error;
+  }
+
+  return validation(data, individualEvents);
 };

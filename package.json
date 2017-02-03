@@ -23,7 +23,8 @@
   },
   "homepage": "https://github.com/nytm/tracking-schema#readme",
   "dependencies": {
-    "ajv": "^4.10.4"
+    "ajv": "^4.10.4",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "eslint": "^3.13.1",
