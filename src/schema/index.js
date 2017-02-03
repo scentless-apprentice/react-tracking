@@ -18,28 +18,40 @@ const viewport = require('./viewport');
 const session = require('./session');
 const video = require('./video');
 
+
+const allProps = { // main "dataLayer" starts here
+  event,
+  application,
+  user,
+  referrer,
+  interaction,
+  asset,
+  presentation,
+  marketing,
+  viewport,
+  video,
+  
+  // TODO: this is mostly empty
+  session,
+  
+};
+
 module.exports = {
 
-  // This disallows properties not explicitly listed
-  additionalProperties: false,
+  get: (individualEvents) => {
 
-  // required top-level properties
-  required: ['event', 'application', 'user', 'referrer'],
+    const schema = {
+      additionalProperties: false,
+      // top-level properties
+      properties: allProps,
+    };
 
-  // top-level properties
-  properties: { // main "dataLayer" starts here
-    event,
-    application,
-    user,
-    referrer,
-    interaction,
-    asset,
-    presentation,
+    if (!individualEvents) {
+      // required top-level properties
+      schema.required = ['event', 'application', 'user', 'referrer'];
+    }
 
-    // TODO: These are mostly empty
-    marketing,
-    viewport,
-    session,
-    video,
+    return schema;
   },
+
 };
