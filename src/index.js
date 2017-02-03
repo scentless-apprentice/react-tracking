@@ -7,14 +7,14 @@ const ajv = new Ajv({
   allErrors: true,
 });
 
-const getValidate = (individualEvents) => {
+const getValidator = (individualEvents) => {
   const schema = schemaGenerator.get(individualEvents);
-  
-  return ajv.compile(schema);
+  const validator = ajv.compile(schema);
+  return validator;
 }
 
 const validation = (data, individualEvents) => {
-  const validate = getValidate(individualEvents);
+  const validate = getValidator(individualEvents);
 
   validate(data);
 
