@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-const _ = require('lodash');
 const Ajv = require('ajv');
 const schemaGenerator = require('./schema');
 const logger = require('./utils/logger');
@@ -26,7 +25,7 @@ const validation = (data, individualEvents) => {
 
 module.exports = ({ data = {}, individualEvents = false } = {}) => {
 
-  if (!_.size(data)) {
+  if (!Object.keys(data).length) {
     let error = logger.emptyDataError;
     logger.error(error);
 
