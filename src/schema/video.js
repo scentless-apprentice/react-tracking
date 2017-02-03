@@ -55,7 +55,7 @@ module.exports = {
       additionalProperties: false,
 
       properties: {
-        Device: {
+        device: {
           enum: ['desktop', 'mobile']
         },
 

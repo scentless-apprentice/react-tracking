@@ -16,11 +16,11 @@ const getValidator = (individualEvents) => {
 const validation = (data, individualEvents) => {
   const validate = getValidator(individualEvents);
 
-  validate(data);
+  validate.isValid = validate(data); // returns a boolean for convinience
 
   logger.error(validate.errors);
 
-  return validate.errors || [];
+  return validate; // validate.errors contains the errors list
 }
 
 
