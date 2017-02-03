@@ -40,7 +40,9 @@ import myAppsTrackingData from '../trackingData';
 
 describe('MyApp tracking data', () => {
   it('should validate against the tracking-schema', () => {
-    expect(validator(myAppsTrackingData)).toBe(true);
+    var result = validator({data: myAppsTrackingData});
+
+    expect(!result.errors).toBe(true);
   });
 });
 ```
