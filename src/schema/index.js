@@ -29,10 +29,11 @@ const allProps = { // main "dataLayer" starts here
   presentation,
   marketing,
   viewport,
-
-  // TODO: These are mostly empty
-  session,
   video,
+  
+  // TODO: this is mostly empty
+  session,
+  
 };
 
 module.exports = {

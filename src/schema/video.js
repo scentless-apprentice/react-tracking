@@ -52,78 +52,81 @@ module.exports = {
     },
 
     mData: {
+      additionalProperties: false,
 
-      Device: {
-        enum: ['desktop', 'mobile']
-      },
+      properties: {
+        Device: {
+          enum: ['desktop', 'mobile']
+        },
 
-      playerMode: {
-        type: 'string'
-      },
+        playerMode: {
+          type: 'string'
+        },
 
-      playerType: {
-        type: 'string'
-      },
+        playerType: {
+          type: 'string'
+        },
 
-      playerUsage: {
-        type: 'string'
-      },
+        playerUsage: {
+          type: 'string'
+        },
 
-      playerVersion: {
-        type: 'string'
-      },
+        playerVersion: {
+          type: 'string'
+        },
 
-      tech: {
-        type: 'string'
-      },
+        tech: {
+          type: 'string'
+        },
 
-      videoDeliveryMethod: {
-        enum: ['vod', 'live']
-      },
+        videoDeliveryMethod: {
+          enum: ['vod', 'live']
+        },
 
-      // duration in seconds
-      videoDuration: {
-        type: 'number'
-      },
+        // duration in seconds
+        videoDuration: {
+          type: 'number'
+        },
 
-      // series
-      videoFranchise: {
-        type: 'string'
-      },
+        // series
+        videoFranchise: {
+          type: 'string'
+        },
 
-      // headline
-      videoName: {
-        type: 'string'
-      },
+        // headline
+        videoName: {
+          type: 'string'
+        },
 
-      // scoop playlist
-      videoPrimaryPlaylistId: {
-        type: 'number'
-      },
+        // scoop playlist
+        videoPrimaryPlaylistId: {
+          type: 'number'
+        },
 
-      videoPrimaryPlaylistName: {
-        type: 'string'
-      },
+        videoPrimaryPlaylistName: {
+          type: 'string'
+        },
 
-      // section
-      videoSection: {
-        type: 'string'
-      },
+        // section
+        videoSection: {
+          type: 'string'
+        },
 
-      // subsection
-      videoSubSection: {
-        type: 'string'
-      },
+        // subsection
+        videoSubSection: {
+          type: 'string'
+        },
 
-      // timecode of event
-      videoTimeOfEvent: {
-        type: 'number'
-      },
+        // timecode of event
+        videoTimeOfEvent: {
+          type: 'number'
+        },
 
-      // video || ad || 360video
-      videoType: {
-        enum: ['video', 'ad', '360video']
-      },
+        // video || ad || 360video
+        videoType: {
+          enum: ['video', 'ad', '360video']
+        },
+      }      
     }
   }
 };
