@@ -2,8 +2,6 @@
 
 Tracking schema for NYT apps, based off [this Google Doc by DS&E](https://docs.google.com/document/d/1o0zbXibJlqmqk9ScYZGx0iq4jZ6IR8H_OdLU-8gZRlI/edit) with [JSON Schema v5 semantics via ajv](https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md).
 
-> ### ⚠️ STILL BEING DEVELOPED. DON'T USE THIS YET. ⚠️
-
 ### *PRO TIP:* Best used with [nyt-react-tracking](https://github.com/nytm/nyt-react-tracking).
 
 ## Motivation
@@ -29,8 +27,6 @@ npm install --save-dev nytm/tracking-schema
 
 Use in your tests to validate your app's tracking data against the schema.
 
-> NOTE: This hasn't actually been written yet, but the API will look something like this.
-
 ```js
 // import the validator provided by this module.
 import validator from 'tracking-schema';
@@ -46,17 +42,37 @@ describe('MyApp tracking data', () => {
   });
 });
 ```
+## Parameters
+
+The validator expects an object with a `data` property and an optional `individualEvents` flag.
+
+* {Property} data (required):
+The data property represents the tracking data object. The tracking data can be an entire data layer object or a segment of it.
+
+* {Property} individualEvents (optional):
+individualEvents allows the validator to evaluate invidual segments from the data layer. The data layer by defaults requires the following root properties:
+```js
+  // required top-level properties
+  schema.required = ['event', 'application', 'user', 'referrer'];
+```
+However, passing individualEvents as true will clients to evaluate invidual elements such as `video` without having to pass the entire DL tree.
 
 ## Validation Errors
 
-If your tracking data does not validate, then an object with an errors array will be returned instead, like so:
+If your tracking data does not validate, then an array containing error objects will be returned instead, like so:
 
 ```js
-const validation = validator({
-  application: {
-    releaseDate: 'invalid'
+const validation = validator(
+  {
+    application: {
+      releaseDate: 'invalid'
+    }
+  },
+  
+  {
+    individualEvents: true
   }
-});
+);
 
 console.dir(validation.errors);
 ```

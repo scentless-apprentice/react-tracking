@@ -23,8 +23,7 @@ const validation = (data, individualEvents) => {
 }
 
 
-module.exports = ({ data = {}, individualEvents = false } = {}) => {
-
+module.exports = ( data = {}, options = {} ) => {
   if (!Object.keys(data).length) {
     let error = logger.emptyDataError;
     logger.error(error);
@@ -32,5 +31,5 @@ module.exports = ({ data = {}, individualEvents = false } = {}) => {
     return error;
   }
 
-  return validation(data, individualEvents);
+  return validation(data, options.individualEvents);
 };
