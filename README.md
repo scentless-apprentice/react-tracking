@@ -42,7 +42,7 @@ describe('MyApp tracking data', () => {
   });
 });
 ```
-## Pameters
+## Parameters
 
 The validator expects an object with a `data` property and an optional `individualEvents` flag.
 
@@ -62,15 +62,17 @@ However, passing individualEvents as true will clients to evaluate invidual elem
 If your tracking data does not validate, then an array containing error objects will be returned instead, like so:
 
 ```js
-const validation = validator({
- data: {
-  application: {
-    releaseDate: 'invalid'
+const validation = validator(
+  {
+    application: {
+      releaseDate: 'invalid'
+    }
+  },
+  
+  {
+    individualEvents: true
   }
- },
- individualEvents: true
- 
-});
+);
 
 console.dir(validation.errors);
 ```
