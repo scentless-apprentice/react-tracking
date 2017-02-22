@@ -21,17 +21,10 @@ module.exports = {
       enum: ['anon', 'regi', 'sub'],
     },
 
-    /**
-     * Date when the first subscription associated
-     * with the user started.
-     */
-    startDate: { format: 'date' },
-
-    /**
-     * Active bundles for this user.
-     */
-    activeBundles: {
-      items: { type: 'string' },
+    subscriptions: {
+      items: {
+        type: 'object'
+      }
     },
 
     /**
