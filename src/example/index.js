@@ -28,7 +28,11 @@ module.exports = {
 
   user: {
     type: 'regi',
-    activeBundles: ['a', 'b'],
+    regiId: '11100023',
+    subscriptions: [{
+      test: 1
+    }],    
+    watSeg: '{ test: "true" }',
   },
 
   referrer: {
