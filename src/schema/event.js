@@ -35,7 +35,7 @@ module.exports = {
   	 * impact that value. If the new elements include tracked module(s) that appear in the
   	 * viewport immediately, it should push a new value into viewport.modules.
   	 */
-    'dynamicEventsLoaded',
+    'dynamicElementsLoaded',
 
     /**
   	 * This event should fire for any video related event. This should push new values into
