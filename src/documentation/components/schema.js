@@ -33,7 +33,7 @@ const segmentTypes = {
   properties: function(properties = [], parentName = '') {
     return Object.keys(properties).map((prop, key)=>  {
       return `${segmentTypes.schemaChunk(properties[prop], prop, parentName)}`;
-    }).join('\n\n---\n\n');
+    }).join('\n\n');
   }  
 };
 
