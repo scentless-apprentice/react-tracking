@@ -1,7 +1,7 @@
 {
   "name": "tracking-schema",
   "version": "0.0.1",
-  "description": "Tracking schema for NYT apps",
+  "description": "The following illustrates an ideal data layer object as implemented in new NYT Web applications. The overall goal is to have the front-end application team create and maintain this object through the lifecycle of a user's visit. In addition, there will be several events pushed into the data layer that will update the data found in the object as well as be used for triggering tags in GTM.",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
