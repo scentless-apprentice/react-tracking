@@ -28,10 +28,12 @@ const compile = (userPath, fallbackPath, cb) => {
       fs.readFile(sourceTemplate, function (err, contents) {
         
         if (err) {
-          throw 'cannot read ' + sourceTemplate;
+          throw 'cannot read ' + sourceTemplate + ' --- ' + err;
         }
         
-        const data = schemaModel.get();
+        const data = Object.assign({
+          pkg: require(path.join(process.cwd(), 'package.json'))
+        }, schemaModel.get());
 
         cb(toMarkdown(contents, data));
       });
@@ -42,7 +44,7 @@ const compile = (userPath, fallbackPath, cb) => {
 }
 
 const createReadme = (overwrite=true) => {
-  compile('.README.md', './.documentation.tmpl.md', function(markdown) {
+  compile('.README.md', path.join(__dirname, '.documentation.tmpl.md'), function(markdown) {
     let destination = './documentation.md';
     
     fs.exists(destination, function (exists) {
