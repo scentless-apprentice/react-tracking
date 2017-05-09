@@ -7,24 +7,43 @@ module.exports = {
   // TODO: What should be required?
   // required: [],
 
+  description: 'Describes basic attributes of the page design layout.',
+
   properties: {
 
     /**
      * The type of NYT content asset as presented to the user during
      * the session.
-     */
-    pageType: { type: 'string' },
+    **/
+    pageType: {
+      type: 'string',
+      description: 'The type of NYT content asset as presented to the user during the session.',
+    },
 
-    /**
-     * TBD ???
-     */
-    pageSubtype: { type: 'string' },
+    pageSubtype: {
+      type: 'string',
+      description: 'TBD',
+    },
 
-    cardId: { type: 'string' },
-    cardType: { type: 'string' },
-    cardRendition: { enum: ['whole', 'skim'] },
+    cardId: {
+      type: 'string',
+      description: 'TBD',
+    },
+
+    cardType: {
+      type: 'string',
+      description: 'TBD',
+    },
+
+    cardRendition: {
+      enum: ['whole', 'skim'],
+      description: 'TBD',
+    },
 
     // TODO: Why is this here?
-    documentHeight: { type: 'number' },
+    documentHeight: {
+      type: 'number',
+      description: 'integer height of the entire page in pixels',
+    },
   },
 };
