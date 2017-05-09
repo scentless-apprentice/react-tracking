@@ -16,7 +16,7 @@ module.exports = {
      * Referring URL
      */
     url: {
-      format: 'uri'
+      format: 'uri',
       description: 'A URL of previous page or document.referrer',
     },
   }, // end referrer.properties

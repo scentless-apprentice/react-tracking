@@ -14,7 +14,7 @@ module.exports = {
     'meterCount': {
       type: 'number',
       description: 'A value that indicates the total number of metered NYT content assets consumed during the user session.',
-    }
+    },
     'isLoggedIn': {
       type: 'boolean',
       description: 'A flag that indicates whether a user session is authenticated.',
