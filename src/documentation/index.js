@@ -2,12 +2,13 @@
 const path = require('path');
 const fs = require('fs');
 const template = require('es6-template-strings');
-const components =  "./components";
+const components =  require('./components');
 const schemaModel = require('../schema');
 
 const toMarkdown = (templateContents, data) => {
   // bind all functions in ./macros and pass the current scope (data + macros)
   let boundComponents = {};
+
   Object.keys(components).forEach((key, idx) => {
     boundComponents[key] = options => (components[key] || function(){ return '';})(options, scope);
   });
@@ -32,8 +33,9 @@ const compile = (userPath, fallbackPath, cb) => {
         }
         
         const data = Object.assign({
-          pkg: require(path.join(process.cwd(), 'package.json'))
-        }, schemaModel.get());
+          pkg: require(path.join(process.cwd(), 'package.json')),
+          schemaData: schemaModel.get()
+        });
 
         cb(toMarkdown(contents, data));
       });
@@ -44,8 +46,8 @@ const compile = (userPath, fallbackPath, cb) => {
 }
 
 const createReadme = (overwrite=true) => {
-  compile('.README.md', path.join(__dirname, '.documentation.tmpl.md'), function(markdown) {
-    let destination = './documentation.md';
+  compile('.documentation.tmpl.md', path.join(__dirname, '.documentation.tmpl.md'), function(markdown) {
+    let destination = './Documentation.md';
     
     fs.exists(destination, function (exists) {
       if (exists && !overwrite) {
@@ -53,7 +55,7 @@ const createReadme = (overwrite=true) => {
       }
       fs.writeFile(destination, markdown, function (err) {
         if (err) throw err;
-        console.log('documentation.md created');
+        console.log('Documentation.md created');
       });
     });
   });
