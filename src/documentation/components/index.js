@@ -1,3 +1,6 @@
-export default function doc(options, scope) {
-  return '';
-}
+'use strict';
+
+module.exports = {
+  author: require('./author'),
+  schemaGenerator: require('./schema')
+};
