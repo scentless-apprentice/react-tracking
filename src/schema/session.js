@@ -12,11 +12,11 @@ module.exports = {
 
   properties: {
     'meterCount': {
-      type: 'number'
+      type: 'number',
       description: 'A value that indicates the total number of metered NYT content assets consumed during the user session.',
     }
     'isLoggedIn': {
-      type: 'boolean'
+      type: 'boolean',
       description: 'A flag that indicates whether a user session is authenticated.',
     }
   }    
