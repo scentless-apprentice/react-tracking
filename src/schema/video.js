@@ -1,3 +1,4 @@
+const mData = require('./video-mdata');
 /**
  * Contains data pertaining to video assets.
  */
@@ -7,6 +8,8 @@ module.exports = {
 
   // properties that are required (for `video`)
   required: ['contentId'],
+
+  description: 'external documentation - video keys documented separately',
 
   properties: {
 
@@ -51,82 +54,6 @@ module.exports = {
       type: 'string'
     },
 
-    mData: {
-      additionalProperties: false,
-
-      properties: {
-        device: {
-          enum: ['desktop', 'mobile']
-        },
-
-        playerMode: {
-          type: 'string'
-        },
-
-        playerType: {
-          type: 'string'
-        },
-
-        playerUsage: {
-          type: 'string'
-        },
-
-        playerVersion: {
-          type: 'string'
-        },
-
-        tech: {
-          type: 'string'
-        },
-
-        videoDeliveryMethod: {
-          enum: ['vod', 'live']
-        },
-
-        // duration in seconds
-        videoDuration: {
-          type: 'number'
-        },
-
-        // series
-        videoFranchise: {
-          type: 'string'
-        },
-
-        // headline
-        videoName: {
-          type: 'string'
-        },
-
-        // scoop playlist
-        videoPrimaryPlaylistId: {
-          type: 'number'
-        },
-
-        videoPrimaryPlaylistName: {
-          type: 'string'
-        },
-
-        // section
-        videoSection: {
-          type: 'string'
-        },
-
-        // subsection
-        videoSubSection: {
-          type: 'string'
-        },
-
-        // timecode of event
-        videoTimeOfEvent: {
-          type: 'number'
-        },
-
-        // video || ad || 360video
-        videoType: {
-          enum: ['video', 'ad', '360video']
-        },
-      }      
-    }
+    mData: mData
   }
 };
