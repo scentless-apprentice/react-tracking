@@ -19,11 +19,11 @@ const toMarkdown = (templateContents, data) => {
 
 const compile = (userPath, fallbackPath, cb) => {
   let userTemplate = path.join(process.cwd(), userPath);
-  
+
   fs.exists(userTemplate, function (exists) {
-      
+
     const sourceTemplate = (exists && userTemplate) || (fallbackPath || null);
-    
+
     if (sourceTemplate) {
 
       fs.readFile(sourceTemplate, function (err, contents) {
@@ -31,7 +31,7 @@ const compile = (userPath, fallbackPath, cb) => {
         if (err) {
           throw 'cannot read ' + sourceTemplate + ' --- ' + err;
         }
-        
+
         const data = Object.assign({
           pkg: require(path.join(process.cwd(), 'package.json')),
           schemaData: schemaModel.get()
@@ -48,7 +48,7 @@ const compile = (userPath, fallbackPath, cb) => {
 const createDocumentation = (overwrite=true) => {
   compile('.documentation.tmpl.md', path.join(__dirname, '.documentation.tmpl.md'), function(markdown) {
     const destination = './Documentation.md';
-    
+
     fs.exists(destination, function (exists) {
       if (exists && !overwrite) {
         throw destination + ' already exists';
