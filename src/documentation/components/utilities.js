@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   specialDataTypes: function(schemaObject) {
     const {type, items, properties} = schemaObject;
