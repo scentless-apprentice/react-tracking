@@ -24,10 +24,4 @@ module.exports = {
   buildSegnment: function (valid, formatted) {
     return valid ? formatted : '';
   },
-
-  buildPropertiesSegment: function(properties = [], parentName = '', cb) {
-    return Object.keys(properties).map((prop, key)=>  {
-      return cb(properties[prop], prop, parentName);
-    }).join('\n\n');
-  },
-}
+};
