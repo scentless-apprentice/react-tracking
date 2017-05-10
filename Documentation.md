@@ -157,7 +157,7 @@ Data Type: **String**
 
 ### datalayer.interaction.type
 
-Description: click for example
+Description: click
 
 Data Type: **String**
 

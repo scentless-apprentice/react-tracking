@@ -52,7 +52,7 @@ module.exports = {
      */
     type: {
       type: 'string',
-      description: 'click for example'
+      description: 'click'
     },
 
     /**
