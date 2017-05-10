@@ -1,42 +1,43 @@
-const segmentTypes = {
-  schemaChunk: function schemaChunk(schemaData, propName = '', parentName = '') {
-    const propNameSpace = [parentName, propName].filter((str)=> !!str).join('.');
+function segment(valid, formatted) {
+  return valid ? formatted : '';
+}
 
-    console.log(`Documenting ${propNameSpace}`);
+function buildSchemaChunk(schemaData, propName = '', parentName = '') {
+  const propNameSpace = [parentName, propName].filter((str)=> !!str).join('.');
+  const {
+    description,
+    type,
+    required = [],
+    additionalProperties,
+    properties
+  } = schemaData;
 
-    return [
-      `### ${propNameSpace}`,
-      segmentTypes.description(schemaData.description),
-      segmentTypes.dataType(schemaData.type),
-      segmentTypes.required(schemaData.required),
-      segmentTypes.additionalProperties(schemaData.properties && schemaData.additionalProperties),
-      segmentTypes.properties(schemaData.properties, propNameSpace),
-    ].filter((str)=> !!str).join('\n\n');
-  },
+  console.log(`Documenting ${propNameSpace}`);
 
-  description: function(description){
-    return description ?  `  Description: ${description}`: '';
-  },
+  return [
+    // title
+    `### ${propNameSpace}`,
+    // description
+    segment(description, `  Description: ${description}`),
+    // data type
+    segment(type, `  Data Type: ${type}`),
+    // require fields
+    segment(required.length, `  Required Fields: ${required.join(', ')}`),
+    // additional properties
+    segment(properties && additionalProperties, `  Accepts Additional Properties: ${!!additionalProperties}`),
+    // sub properties
+    chunkProperties(properties, propNameSpace),
+    // filter out all the empty strings and joing with new lines
+  ].filter((str)=> !!str).join('\n\n');
+}
 
-  dataType: function(type){
-    return type ?  `  Data Type: ${type}`: '';
-  },
-  
-  required: function(requireFields) {
-    return requireFields ? `  Required Fields: ${requireFields.join(', ')}` : '';
-  },
+function chunkProperties(properties = [], parentName = '') {
+  return Object.keys(properties).map((prop, key)=>  {
+    return buildSchemaChunk(properties[prop], prop, parentName);
+  }).join('\n\n');
+}
 
-  additionalProperties: function(additionalProperties){
-    return additionalProperties ? `  Accepts Additional Properties: ${!!additionalProperties}` : '';
-  },
 
-  properties: function(properties = [], parentName = '') {
-    return Object.keys(properties).map((prop, key)=>  {
-      return `${segmentTypes.schemaChunk(properties[prop], prop, parentName)}`;
-    }).join('\n\n');
-  }  
-};
-
-module.exports = function schemaGenerator(options, scope) {
-  return segmentTypes.schemaChunk(scope.schemaData, 'datalayer');
+module.exports = function schemaGenerator(options, { schemaData } = scope) {
+  return buildSchemaChunk(schemaData, 'datalayer');
 }
