@@ -2,11 +2,24 @@ function segment(valid, formatted) {
   return valid ? formatted : '';
 }
 
+function specialDataTypes(schemaObject) {
+  const {type, items, properties} = schemaObject;
+  if (properties) return 'object';
+  if (items) return `array of ${items.type}`;
+  if (schemaObject.enum) return `must match \n* ${schemaObject.enum.join('\n* ')}`;
+  return type || '';
+}
+
+function getSpecialDescription({ items = {} }) {
+  return items.description || 'No description found';
+}
+
 function buildSchemaChunk(schemaData, propName = '', parentName = '') {
   const propNameSpace = [parentName, propName].filter((str)=> !!str).join('.');
   const {
-    description,
-    type,
+    description = getSpecialDescription(schemaData),
+    type = specialDataTypes(schemaData),
+    format,
     required = [],
     additionalProperties,
     properties
@@ -21,6 +34,8 @@ function buildSchemaChunk(schemaData, propName = '', parentName = '') {
     segment(description, `  Description: ${description}`),
     // data type
     segment(type, `  Data Type: ${type}`),
+    // data format
+    segment(format, `  Data format: ${format}`),
     // require fields
     segment(required.length, `  Required Fields: ${required.join(', ')}`),
     // additional properties

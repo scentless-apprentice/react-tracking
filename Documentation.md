@@ -6,15 +6,29 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
 ### datalayer
 
+  Description: No description found
+
+  Data Type: object
+
   Required Fields: event, application, user, referrer
 
 ### datalayer.event
 
   Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
 
+  Data Type: must match 
+* pageDataReady
+* scrollComplete
+* heartbeat
+* moduleInteraction
+* dynamicElementsLoaded
+* videoEvent
+
 ### datalayer.application
 
   Description: Describes basics attributes of the NYT Web application where the data layer is constructed. For example, it provides the application's version and release number.
+
+  Data Type: object
 
   Required Fields: dlVersion, environment, name
 
@@ -34,13 +48,25 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: The timestamp value that indicates when the application version was released.
 
+  Data format: date-time
+
 ### datalayer.application.renderTimestamp
 
   Description: The timestamp value that indicates when the page was rendered by the server. Note: Instead, omit and rely on gtm.js which is a timestamp of GTM loading. This value can be used to compute time-bound events for analyses like heartbeat, etc.
 
+  Data format: date-time
+
 ### datalayer.application.environment
 
   Description: A value that indicates the location or status of the application.
+
+  Data Type: must match 
+* production
+* staging
+* local
+* test
+* dev
+* qa
 
 ### datalayer.application.name
 
@@ -51,6 +77,8 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 ### datalayer.user
 
   Description: Describes basic attributes of the NYT user.
+
+  Data Type: object
 
   Required Fields: type
 
@@ -64,9 +92,16 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: A value that indicates the type of NYT user
 
+  Data Type: must match 
+* anon
+* regi
+* sub
+
 ### datalayer.user.subscriptions
 
   Description: TBD
+
+  Data Type: array of object
 
 ### datalayer.user.watSeg
 
@@ -78,21 +113,29 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.
 
+  Data Type: object
+
   Required Fields: url
 
 ### datalayer.referrer.url
 
   Description: A URL of previous page or document.referrer
 
+  Data format: uri
+
 ### datalayer.interaction
 
   Description: module behavioral/click tracking will have additional fields as we refine the the specifications for that effort
+
+  Data Type: object
 
   Required Fields: type
 
 ### datalayer.interaction.module
 
   Description: TBD
+
+  Data Type: object
 
 ### datalayer.interaction.module.name
 
@@ -140,11 +183,15 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: Describes attributes of NYT content assets. For example,
 
+  Data Type: object
+
   Required Fields: id
 
 ### datalayer.asset.url
 
   Description: The canonical URL of the NYT content asset. This value is null for certain "embedded-only" content types like “image slideshow” and some “interactive graphics” assets.
+
+  Data format: uri
 
 ### datalayer.asset.section
 
@@ -166,6 +213,10 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
 ### datalayer.asset.authors
 
+  Description: The list of authors of the NYT content asset, usually joined together with commas and a final "and" to form a byline. Ordinality is important within the newsroom, and generally, authors are ranked in descending order of their contributions to the content or so that the author present in the location where the news events transpired is listed first.
+
+  Data Type: array of string
+
 ### datalayer.asset.id
 
   Description: The unique ID of the NYT content asset
@@ -176,9 +227,13 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: The UNIX timestamp value that indicates when the NYT content asset was first digitally published.
 
+  Data format: date-time
+
 ### datalayer.asset.lastUpdatedTimestamp
 
   Description: The UNIX date-time value that indicates when an NYT digital content asset was last modified or re-published via the CMS.
+
+  Data format: date-time
 
 ### datalayer.asset.collectionName
 
@@ -189,6 +244,11 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 ### datalayer.asset.collectionType
 
   Description: The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.
+
+  Data Type: must match 
+* column
+* series
+* issue
 
 ### datalayer.asset.desk
 
@@ -230,6 +290,8 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: Describes basic attributes of the page design layout.
 
+  Data Type: object
+
 ### datalayer.presentation.pageType
 
   Description: The type of NYT content asset as presented to the user during the session.
@@ -258,6 +320,10 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: TBD
 
+  Data Type: must match 
+* whole
+* skim
+
 ### datalayer.presentation.documentHeight
 
   Description: integer height of the entire page in pixels
@@ -267,6 +333,8 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 ### datalayer.marketing
 
   Description: Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.
+
+  Data Type: object
 
 ### datalayer.marketing.flow
 
@@ -283,6 +351,8 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 ### datalayer.viewport
 
   Description: Describes the current page position within the user agent browser’s viewport and the modules currently in view.
+
+  Data Type: object
 
 ### datalayer.viewport.scrollTop
 
@@ -312,101 +382,180 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: external documentation - video keys documented separately
 
+  Data Type: object
+
   Required Fields: contentId
 
 ### datalayer.video.action
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.region
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.state
 
+  Description: No description found
+
+  Data Type: must match 
+* player
+* paused
+
 ### datalayer.video.contentCollection
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.contentId
 
+  Description: No description found
+
   Data Type: number
 
 ### datalayer.video.eventName
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.eventTimestamp
 
+  Description: No description found
+
+  Data format: date-time
+
 ### datalayer.video.module
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.version
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.mData
 
+  Description: No description found
+
+  Data Type: object
+
 ### datalayer.video.mData.device
 
+  Description: No description found
+
+  Data Type: must match 
+* desktop
+* mobile
+
 ### datalayer.video.mData.playerMode
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.playerType
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.mData.playerUsage
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.playerVersion
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.mData.tech
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.videoDeliveryMethod
 
+  Description: No description found
+
+  Data Type: must match 
+* vod
+* live
+
 ### datalayer.video.mData.videoDuration
+
+  Description: No description found
 
   Data Type: number
 
 ### datalayer.video.mData.videoFranchise
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.mData.videoName
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.videoPrimaryPlaylistId
 
+  Description: No description found
+
   Data Type: number
 
 ### datalayer.video.mData.videoPrimaryPlaylistName
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.videoSection
 
+  Description: No description found
+
   Data Type: string
 
 ### datalayer.video.mData.videoSubSection
+
+  Description: No description found
 
   Data Type: string
 
 ### datalayer.video.mData.videoTimeOfEvent
 
+  Description: No description found
+
   Data Type: number
 
 ### datalayer.video.mData.videoType
 
+  Description: No description found
+
+  Data Type: must match 
+* video
+* ad
+* 360video
+
 ### datalayer.session
+
+  Description: No description found
+
+  Data Type: object
 
 ### datalayer.session.meterCount
 
