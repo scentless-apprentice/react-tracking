@@ -6,8 +6,11 @@ function specialDataTypes(schemaObject) {
   const {type, items, properties} = schemaObject;
   if (properties) return 'object';
   if (items) return `array of ${items.type}`;
-  if (schemaObject.enum) return `must match \n* ${schemaObject.enum.join('\n* ')}`;
   return type || '';
+}
+
+function handleEnum(_enum) {
+  if (_enum) return `${typeof _enum[0]} must match one of these: \n* ${_enum.join('\n* ')}`;
 }
 
 function getSpecialDescription({ items = {} }) {
@@ -36,6 +39,8 @@ function buildSchemaChunk(schemaData, propName = '', parentName = '') {
     segment(type, `  Data Type: ${type}`),
     // data format
     segment(format, `  Data format: ${format}`),
+    // Enum. match an element in the array
+    segment(schemaData.enum, `  Enum: ${handleEnum(schemaData.enum)}`),
     // require fields
     segment(required.length, `  Required Fields: ${required.join(', ')}`),
     // additional properties

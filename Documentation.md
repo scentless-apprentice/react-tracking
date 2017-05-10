@@ -16,7 +16,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * pageDataReady
 * scrollComplete
 * heartbeat
@@ -60,7 +60,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: A value that indicates the location or status of the application.
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * production
 * staging
 * local
@@ -92,7 +92,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: A value that indicates the type of NYT user
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * anon
 * regi
 * sub
@@ -245,7 +245,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * column
 * series
 * issue
@@ -320,7 +320,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: TBD
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * whole
 * skim
 
@@ -402,7 +402,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: No description found
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * player
 * paused
 
@@ -452,7 +452,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: No description found
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * desktop
 * mobile
 
@@ -490,7 +490,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: No description found
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * vod
 * live
 
@@ -546,7 +546,7 @@ The following illustrates an ideal data layer object as implemented in new NYT W
 
   Description: No description found
 
-  Data Type: must match 
+  Enum: string must match one of these: 
 * video
 * ad
 * 360video
