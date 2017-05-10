@@ -45,9 +45,9 @@ const compile = (userPath, fallbackPath, cb) => {
   });
 }
 
-const createReadme = (overwrite=true) => {
+const createDocumentation = (overwrite=true) => {
   compile('.documentation.tmpl.md', path.join(__dirname, '.documentation.tmpl.md'), function(markdown) {
-    let destination = './Documentation.md';
+    const destination = './Documentation.md';
     
     fs.exists(destination, function (exists) {
       if (exists && !overwrite) {
@@ -62,5 +62,5 @@ const createReadme = (overwrite=true) => {
 }
 
 module.exports = {
-  generate: createReadme
+  generate: createDocumentation
 };
