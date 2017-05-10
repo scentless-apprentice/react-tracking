@@ -14,6 +14,16 @@ This repo will provide the following:
 
  - **Semver Schema:** Because this is an installable module, you can validate your data against a specific version of the schema.
 
+## Documentation
+
+ - For documentation on the current state of the schema please visit the [Documentation File](https://github.com/nytm/tracking-schema/blob/master/Documentation.md).
+ - If you are making any changes to the schema via pull request, please run the documentation script to make sure the documentation stays up to date.
+
+```
+npm run documentation
+```
+
+ - Therefore, every pull request that alters the schema taxonomy or any field description must include an updated Documentation.md file
 
 ## Installation
 
