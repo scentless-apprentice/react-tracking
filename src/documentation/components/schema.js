@@ -4,13 +4,18 @@ function segment(valid, formatted) {
 
 function specialDataTypes(schemaObject) {
   const {type, items, properties} = schemaObject;
-  if (properties) return 'object';
-  if (items) return `array of ${items.type}`;
-  return type || '';
+  if (properties) return '**Object**';
+  if (items) return `**Array of ${capitalizedDataType(items.type)}s**`;
+  if (schemaObject.enum) return handleEnum(schemaObject.enum);
+  return '';
+}
+
+function capitalizedDataType(dataType){
+  return dataType[0].toUpperCase() + dataType.slice(1, dataType.lenth);
 }
 
 function handleEnum(_enum) {
-  if (_enum) return `${typeof _enum[0]} must match one of these: \n* ${_enum.join('\n* ')}`;
+  if (_enum) return `**${capitalizedDataType(typeof _enum[0])}**. It must match one of these:\n* ${_enum.join('\n* ')}`;
 }
 
 function getSpecialDescription({ items = {} }) {
@@ -21,12 +26,16 @@ function buildSchemaChunk(schemaData, propName = '', parentName = '') {
   const propNameSpace = [parentName, propName].filter((str)=> !!str).join('.');
   const {
     description = getSpecialDescription(schemaData),
-    type = specialDataTypes(schemaData),
     format,
     required = [],
     additionalProperties,
     properties
   } = schemaData;
+
+  const type = schemaData.type ?
+    `**${capitalizedDataType(schemaData.type)}**`
+    :
+    specialDataTypes(schemaData);
 
   console.log(`Documenting ${propNameSpace}`);
 
@@ -34,17 +43,15 @@ function buildSchemaChunk(schemaData, propName = '', parentName = '') {
     // title
     `### ${propNameSpace}`,
     // description
-    segment(description, `  Description: ${description}`),
+    segment(description, `Description: ${description}`),
     // data type
-    segment(type, `  Data Type: ${type}`),
+    segment(type, `Data Type: ${type}`),
     // data format
-    segment(format, `  Data format: ${format}`),
-    // Enum. match an element in the array
-    segment(schemaData.enum, `  Enum: ${handleEnum(schemaData.enum)}`),
+    segment(format, `Data format: ${format}`),
     // require fields
-    segment(required.length, `  Required Fields: ${required.join(', ')}`),
+    segment(required.length, `Required Fields: ${required.join(', ')}`),
     // additional properties
-    segment(properties && additionalProperties, `  Accepts Additional Properties: ${!!additionalProperties}`),
+    segment(properties && additionalProperties, `Accepts Additional Properties: ${!!additionalProperties}`),
     // sub properties
     chunkProperties(properties, propNameSpace),
     // filter out all the empty strings and joing with new lines
