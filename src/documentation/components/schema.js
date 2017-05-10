@@ -19,8 +19,8 @@ const generator = {
     const type = core.buildDataType(schemaData);
 
     return [
-      // title
-      `### ${propNameSpace}`,
+      // title      
+      core.buildSegnment(propNameSpace, `### ${propNameSpace}`),
       // description
       core.buildSegnment(description, `Description: ${description}`),
       // data type
@@ -32,9 +32,15 @@ const generator = {
       // additional properties
       core.buildSegnment(properties && additionalProperties, `Accepts Additional Properties: ${!!additionalProperties}`),
       // sub properties
-      core.buildPropertiesSegment(properties, propNameSpace, generator.generate),
+      this.buildPropertiesSegment(properties, propNameSpace),
       // filter out all the empty strings and joing with new lines
     ].filter((str)=> !!str).join('\n\n');
+  },
+
+  buildPropertiesSegment: function(properties = [], parentName = '') {
+    return Object.keys(properties).map((prop, key)=>  {
+      return this.generate(properties[prop], prop, parentName);
+    }).join('\n\n');
   },
 
   init: function(schemaData) { return this.generate(schemaData, 'datalayer'); }
