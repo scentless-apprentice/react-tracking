@@ -5,9 +5,9 @@ const core = require('./core');
 const generator = {
   generate: function(schemaData, propName = '', parentName = '') {
     const propNameSpace = core.concactNameSpace(parentName, propName);
-    
+
     core.log(propNameSpace);
-    
+
     const {
       description = core.getSpecialDescription(schemaData),
       required = [],
@@ -15,11 +15,11 @@ const generator = {
       additionalProperties,
       properties
     } = schemaData;
-    
+
     const type = core.buildDataType(schemaData);
 
     return [
-      // title      
+      // title
       core.buildSegnment(propNameSpace, `### ${propNameSpace}`),
       // description
       core.buildSegnment(description, `Description: ${description}`),
