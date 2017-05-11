@@ -54,6 +54,7 @@ module.exports = {
       properties: {
         /**
          * The user-facing label of the block interacted with.
+         * Provided by `block.title`
          * E.g. "Top Stories"
          */
         label: {
@@ -70,7 +71,7 @@ module.exports = {
         /**
          * The name of the block interacted with.
          * E.g. "top-stories"
-         * TODO: Clarify this
+         * TODO: Clarify this - would `block.template` be more appropriate?
          */
         name: {
           type: 'string',
@@ -96,11 +97,13 @@ module.exports = {
         },
         /**
          * The list powering a block
+         * Provided by block.dataSource
          * E.g. {name: 'briefing_california', uri: '123456789'}
          */
         list: {
           /**
            * The name of the list powering a block
+           * TODO: This isn't provided by the program, only the URI is provided
            * E.g. 'briefing_california'
            */
           name: {
@@ -122,15 +125,24 @@ module.exports = {
      */
     card: {
       properties: {
+        /**
+         * TO-DO: What is an example of this?
+         */
         region: {
           type: 'string',
           description: '',
         },
+        /**
+         * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
+         */
         index: {
           type: 'int',
           description: 1,
         },
         /**
+         * TO-DO: Can this be the card template? E.g., bullet
+         * TO-DO: Should this be an enum?
+         * NOTE: https://github.com/nytm/wf-project-vi/blob/master/src/shared/Card/index.js#L25
          * TO-DO: Should we change the key here, in case there's the risk of a keyword
          * conflict with 'type'?
          */
@@ -138,17 +150,36 @@ module.exports = {
           type: 'string',
           description: 'visual'
         },
+        /**
+         * The primary user-facing label on the card - should be headline or summary
+         * Provided by the Vi platform
+         * E.g. 'Trump fires Comey from FBI'
+         */
         rendition: {
           enum: ['whole', 'skim'],
           description: 'whole',
         },
+        /**
+         * TO-DO: Do we need this if we have the Scoop ID? Both should be unique identifiers
+         */
         name: {
           type: 'string',
+          description: '11comey',
         },
+        /**
+         * The primary user-facing label on the card - should be headline or summary
+         * Provided by the Samizdat response
+         * E.g. 'Trump fires Comey from FBI'
+         */
         label: {
-          type: 'headline',
-
+          type: 'string',
+          description: 'headline'
         },
+        /**
+         * The scoop ID for the asset behind the card
+         * Provided by the Samizdat response
+         * E.g. '100000005090678'
+         */
         contentId: {
           type: 'string',
           description: '100000005090678'

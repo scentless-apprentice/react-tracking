@@ -45,5 +45,29 @@ module.exports = {
       type: 'number',
       description: 'integer height of the entire page in pixels',
     },
+
+    program: {
+      name: {
+        type: 'string',
+        description: 'home'
+      },
+      // TODO: Do we need this? Think it should be outside of a program and defined by the application
+      rendition: {
+        type: 'string',
+        description: 'desktop'
+      },
+      type: {
+        enum: ['home', 'story'],
+        description: 'tbd',
+      },
+      /**
+       * The git hash representing the program
+       * E.g. "12309239"
+       */
+      version: {
+        type: 'string',
+        description: '12309239',
+      }
+    }
   },
 };
