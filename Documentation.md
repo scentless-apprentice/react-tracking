@@ -155,6 +155,106 @@ Description: Top News|Featured|Opinion|News|Culture|etc...
 
 Data Type: **String**
 
+### datalayer.interaction.block
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.interaction.block.label
+
+Description: Top Stories
+
+Data Type: **String**
+
+### datalayer.interaction.block.rendition
+
+Data Type: **String**
+
+### datalayer.interaction.block.name
+
+Description: top-stories
+
+Data Type: **String**
+
+### datalayer.interaction.block.index
+
+Description: 1
+
+Data Type: **Int**
+
+### datalayer.interaction.block.version
+
+Description: 1fjei9
+
+Data Type: **String**
+
+### datalayer.interaction.block.list
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.interaction.block.list.name
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.interaction.block.list.uri
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.interaction.card
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.interaction.card.region
+
+Data Type: **String**
+
+### datalayer.interaction.card.index
+
+Description: 1
+
+Data Type: **Int**
+
+### datalayer.interaction.card.type
+
+Description: visual
+
+Data Type: **String**
+
+### datalayer.interaction.card.rendition
+
+Description: whole
+
+Data Type: **String**. It must match one of these:
+* whole
+* skim
+
+### datalayer.interaction.card.name
+
+Description: 11comey
+
+Data Type: **String**
+
+### datalayer.interaction.card.label
+
+Description: headline
+
+Data Type: **String**
+
+### datalayer.interaction.card.contentId
+
+Description: 100000005090678
+
+Data Type: **String**
+
 ### datalayer.interaction.type
 
 Description: click
@@ -329,6 +429,38 @@ Data Type: **String**. It must match one of these:
 Description: integer height of the entire page in pixels
 
 Data Type: **Number**
+
+### datalayer.presentation.program
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.presentation.program.name
+
+Description: home
+
+Data Type: **String**
+
+### datalayer.presentation.program.rendition
+
+Description: desktop
+
+Data Type: **String**
+
+### datalayer.presentation.program.type
+
+Description: tbd
+
+Data Type: **String**. It must match one of these:
+* home
+* story
+
+### datalayer.presentation.program.version
+
+Description: 12309239
+
+Data Type: **String**
 
 ### datalayer.marketing
 

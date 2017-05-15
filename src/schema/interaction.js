@@ -86,7 +86,7 @@ module.exports = {
          * TODO: Clarify this - start at 0 or 1?
          */
         index: {
-          type: 'int',
+          type: 'integer',
           description: 1,
         },
         /**
@@ -105,21 +105,23 @@ module.exports = {
          * E.g. {name: 'briefing_california', uri: '123456789'}
          */
         list: {
-          /**
-           * The name of the list powering a block
-           * TODO: This isn't provided by the program, only the URI is provided. Can we omit this?
-           * E.g. 'briefing_california'
-           */
-          name: {
-            type: 'string'
-          },
-          /**
-           * The unique identifier (i.e., uri) that is the data source for a block
-           * PROVIDED BY: Program manager
-           * E.g. '123456789'
-           */
-          uri: {
-            type: 'string'
+          properties: {
+            /**
+             * The name of the list powering a block
+             * TODO: This isn't provided by the program, only the URI is provided. Can we omit this?
+             * E.g. 'briefing_california'
+             */
+            name: {
+              type: 'string'
+            },
+            /**
+             * The unique identifier (i.e., uri) that is the data source for a block
+             * PROVIDED BY: Program manager
+             * E.g. '123456789'
+             */
+            uri: {
+              type: 'string'
+            },
           },
         },
       },
@@ -192,7 +194,8 @@ module.exports = {
           type: 'string',
           description: '100000005090678'
         }
-      }
+      },
+    },
 
     /**
      * The type of interaction
