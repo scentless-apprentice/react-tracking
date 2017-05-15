@@ -54,6 +54,7 @@ module.exports = {
       properties: {
         /**
          * The user-facing label of the block interacted with.
+         * PROVIDED BY: Program manager
          * Provided by `block.title`
          * E.g. "Top Stories"
          */
@@ -70,8 +71,9 @@ module.exports = {
         },
         /**
          * The name of the block interacted with.
+         * PROVIDED BY: Program manager
          * E.g. "top-stories"
-         * TODO: Clarify this - would `block.template` be more appropriate?
+         * TODO: Clarify this - would `block.data_id` be more appropriate?
          */
         name: {
           type: 'string',
@@ -79,6 +81,7 @@ module.exports = {
         },
         /**
          * The order in which a block appears in a program
+         * PROVIDED BY: Vi platform
          * E.g. 1 (first block within a program)
          * TODO: Clarify this - start at 0 or 1?
          */
@@ -89,6 +92,7 @@ module.exports = {
         /**
          * The version of a block's front-end implementation
          * E.g. 1 (first block within a program)
+         * PROVIDED BY: Vi platform
          * TODO: Can this be the git hash for the Block component?
          */
         version: {
@@ -97,13 +101,13 @@ module.exports = {
         },
         /**
          * The list powering a block
-         * Provided by block.dataSource
+         * PROVIDED BY: Program manager (block.dataSource)
          * E.g. {name: 'briefing_california', uri: '123456789'}
          */
         list: {
           /**
            * The name of the list powering a block
-           * TODO: This isn't provided by the program, only the URI is provided
+           * TODO: This isn't provided by the program, only the URI is provided. Can we omit this?
            * E.g. 'briefing_california'
            */
           name: {
@@ -111,6 +115,7 @@ module.exports = {
           },
           /**
            * The unique identifier (i.e., uri) that is the data source for a block
+           * PROVIDED BY: Program manager
            * E.g. '123456789'
            */
           uri: {
@@ -134,6 +139,7 @@ module.exports = {
         },
         /**
          * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
+         * PROVIDED BY: Vi platform
          */
         index: {
           type: 'int',
@@ -145,6 +151,7 @@ module.exports = {
          * NOTE: https://github.com/nytm/wf-project-vi/blob/master/src/shared/Card/index.js#L25
          * TO-DO: Should we change the key here, in case there's the risk of a keyword
          * conflict with 'type'?
+         * PROVIDED BY: Vi platform
          */
         type: {
           type: 'string',
@@ -152,7 +159,7 @@ module.exports = {
         },
         /**
          * The primary user-facing label on the card - should be headline or summary
-         * Provided by the Vi platform
+         * PROVIDED BY: Vi platform
          * E.g. 'Trump fires Comey from FBI'
          */
         rendition: {
@@ -161,6 +168,7 @@ module.exports = {
         },
         /**
          * TO-DO: Do we need this if we have the Scoop ID? Both should be unique identifiers
+         * PROVIDED BY: Samizdat data
          */
         name: {
           type: 'string',
@@ -168,7 +176,7 @@ module.exports = {
         },
         /**
          * The primary user-facing label on the card - should be headline or summary
-         * Provided by the Samizdat response
+         * PROVIDED BY: Samizdat data
          * E.g. 'Trump fires Comey from FBI'
          */
         label: {
@@ -177,7 +185,7 @@ module.exports = {
         },
         /**
          * The scoop ID for the asset behind the card
-         * Provided by the Samizdat response
+         * PROVIDED BY: Samizdat data
          * E.g. '100000005090678'
          */
         contentId: {

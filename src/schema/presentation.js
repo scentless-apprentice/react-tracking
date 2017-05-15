@@ -51,17 +51,24 @@ module.exports = {
         type: 'string',
         description: 'home'
       },
-      // TODO: Do we need this? Think it should be outside of a program and defined by the application
+      /**
+       * PROVIDED BY: Vi platform
+       * TODO: Do we need this as an explicit key within the program object? I think it should be outside of a program and defined by the application
+       */
       rendition: {
         type: 'string',
         description: 'desktop'
       },
+      /**
+       * PROVIDED BY: Program manager
+       */
       type: {
         enum: ['home', 'story'],
         description: 'tbd',
       },
       /**
        * The git hash representing the program
+       * TODO: Should this be the git hash of the Vi front-end rendering the program, or the program itself?
        * E.g. "12309239"
        */
       version: {
