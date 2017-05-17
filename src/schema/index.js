@@ -17,6 +17,7 @@ const marketing = require('./marketing');
 const viewport = require('./viewport');
 const session = require('./session');
 const video = require('./video');
+const heartbeat = require('./heartbeat');
 
 
 const allProps = { // main "dataLayer" starts here
@@ -30,7 +31,8 @@ const allProps = { // main "dataLayer" starts here
   marketing,
   viewport,
   video,
-  
+  heartbeat,
+
   // TODO: this is mostly empty
   session,
   

@@ -551,6 +551,26 @@ Data Type: **String**. It must match one of these:
 * ad
 * 360video
 
+### datalayer.heartbeat
+
+Description: This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.
+
+Data Type: **Object**
+
+Required Fields: timeSincePageDataReady, heartbeatInterval
+
+### datalayer.heartbeat.timeSincePageDataReady
+
+Description: The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
+
+Data Type: **Integer**
+
+### datalayer.heartbeat.heartbeatInterval
+
+Description: The frequency of heartbeat event object pushes, in milliseconds.
+
+Data Type: **Integer**
+
 ### datalayer.session
 
 Description: No description found
