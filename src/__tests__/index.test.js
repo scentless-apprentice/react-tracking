@@ -1,15 +1,15 @@
-const validate = require('../index').validate;
+const validator = require('../index').validator;
 const example = require('../example');
 
 describe('index', () => {
   it('validates against example data', () => {
-    const result = validate(example);
+    const result = validator(example);
 
     expect(!result.errors).toBe(true, result.errors);
   });
 
   it('validates individual video event data', () => {
-    const result = validate(
+    const result = validator(
       { video: example.video },
       { individualEvents: true },
     );
