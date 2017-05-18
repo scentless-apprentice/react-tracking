@@ -39,14 +39,14 @@ Use in your tests to validate your app's tracking data against the schema.
 
 ```js
 // import the validator provided by this module.
-import validator from 'tracking-schema';
+import { validator } from 'tracking-schema';
 
 // import some module that exports a sampling of your app's tracking data.
 import myAppsTrackingData from '../trackingData';
 
 describe('MyApp tracking data', () => {
   it('should validate against the tracking-schema', () => {
-    var result = validator({data: myAppsTrackingData});
+    var result = validator(myAppsTrackingData);
 
     expect(!result.errors).toBe(true);
   });
