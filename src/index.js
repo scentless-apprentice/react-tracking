@@ -1,2 +1,7 @@
-export { default as schemaModel } from './schema';
-export { default } from './validate';
+const schemaModel = require('./schema');
+const validate = require('./validate');
+
+module.exports = {
+  schemaModel,
+  validate,
+};
