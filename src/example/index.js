@@ -22,6 +22,28 @@ module.exports = {
     wordCount: 1173
   },
 
+  interaction: {
+    type: 'click',
+    card: {
+      region: '',
+      index: 1,
+      type: 'visual',
+      rendition: 'whole',
+      label: 'Donald Trump, Australia, Betsy DeVos: Your Thursday Briefing',
+      contentId: '100000004906353',
+    },
+    block: {
+      label: 'Top Stories',
+      rendition: 'Overflow',
+      name:
+      index: 1,
+      version:
+      list: {
+        uri: 'nyt:/list/scoop/list/home-special-a'
+      }
+    }
+  },
+
   presentation: {
     pageType: 'article'
   },
@@ -31,14 +53,14 @@ module.exports = {
     regiId: '11100023',
     subscriptions: [{
       test: 1
-    }],    
+    }],
     watSeg: '{ test: "true" }',
   },
 
   referrer: {
     url: 'http://example.com',
   },
-   
+
   video: {
     module: 'video-player',
     version: 'unknown',
@@ -66,6 +88,6 @@ module.exports = {
       videoSection: 'arts',
       videoSubSection: '',
       videoTimeOfEvent: 0
-    }  
+    }
   }
 };

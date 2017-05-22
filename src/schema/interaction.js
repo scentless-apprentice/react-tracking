@@ -63,31 +63,30 @@ module.exports = {
           description: 'Top Stories',
         },
         /**
-         * TO-DO: What is this?
+         * PROVIDED BY: Program manager (maps to block.template)
+         * E.g., 'Overflow'
          */
         rendition: {
           type: 'string',
-          description: '',
+          description: 'Overflow',
         },
         /**
          * The name of the block interacted with.
-         * PROVIDED BY: Program manager
-         * E.g. "top-stories"
-         * TODO: Clarify this - would `block.data_id` be more appropriate?
+         * PROVIDED BY: Program manager (block.data_id)
+         * E.g. "mobile-home/1"
          */
         name: {
           type: 'string',
-          description: 'top-stories'
+          description: 'mobile-home/1'
         },
         /**
          * The order in which a block appears in a program
          * PROVIDED BY: Vi platform
-         * E.g. 1 (first block within a program)
-         * TODO: Clarify this - start at 0 or 1?
+         * E.g. 0 (i.e., first block within a program)
          */
         index: {
           type: 'integer',
-          description: 1,
+          description: 'The ordinal rank of a block within a program (zero-indexed)',
         },
         /**
          * The version of a block's front-end implementation
@@ -144,8 +143,8 @@ module.exports = {
          * PROVIDED BY: Vi platform
          */
         index: {
-          type: 'int',
-          description: 1,
+          type: 'integer',
+          description: 'An integer representing the ordinal rank of a card within a block',
         },
         /**
          * TO-DO: Can this be the card template? E.g., bullet
@@ -169,12 +168,11 @@ module.exports = {
           description: 'whole',
         },
         /**
-         * TO-DO: Do we need this if we have the Scoop ID? Both should be unique identifiers
          * PROVIDED BY: Samizdat data
          */
-        name: {
+        url: {
           type: 'string',
-          description: '11comey',
+          description: 'https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html',
         },
         /**
          * The primary user-facing label on the card - should be headline or summary
@@ -190,7 +188,7 @@ module.exports = {
          * PROVIDED BY: Samizdat data
          * E.g. '100000005090678'
          */
-        contentId: {
+        id: {
           type: 'string',
           description: '100000005090678'
         }

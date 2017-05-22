@@ -169,19 +169,21 @@ Data Type: **String**
 
 ### datalayer.interaction.block.rendition
 
+Description: Overflow
+
 Data Type: **String**
 
 ### datalayer.interaction.block.name
 
-Description: top-stories
+Description: mobile-home/1
 
 Data Type: **String**
 
 ### datalayer.interaction.block.index
 
-Description: 1
+Description: The ordinal rank of a block within a program (zero-indexed)
 
-Data Type: **Int**
+Data Type: **Integer**
 
 ### datalayer.interaction.block.version
 
@@ -219,9 +221,9 @@ Data Type: **String**
 
 ### datalayer.interaction.card.index
 
-Description: 1
+Description: An integer representing the ordinal rank of a card within a block
 
-Data Type: **Int**
+Data Type: **Integer**
 
 ### datalayer.interaction.card.type
 
@@ -237,9 +239,9 @@ Data Type: **String**. It must match one of these:
 * whole
 * skim
 
-### datalayer.interaction.card.name
+### datalayer.interaction.card.url
 
-Description: 11comey
+Description: https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html
 
 Data Type: **String**
 
@@ -249,7 +251,7 @@ Description: headline
 
 Data Type: **String**
 
-### datalayer.interaction.card.contentId
+### datalayer.interaction.card.id
 
 Description: 100000005090678
 
