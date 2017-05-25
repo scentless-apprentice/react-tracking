@@ -54,8 +54,7 @@ module.exports = {
       properties: {
         /**
          * The user-facing label of the block interacted with.
-         * PROVIDED BY: Program manager
-         * Provided by `block.title`
+         * PROVIDED BY: Program manager (i.e., block.title) or, if null, then Samizdat
          * E.g. "Top Stories"
          */
         label: {
@@ -66,7 +65,7 @@ module.exports = {
          * PROVIDED BY: Program manager (maps to block.template)
          * E.g., 'Overflow'
          */
-        rendition: {
+        template: {
           type: 'string',
           description: 'Overflow',
         },
@@ -89,10 +88,10 @@ module.exports = {
           description: 'The ordinal rank of a block within a program (zero-indexed)',
         },
         /**
-         * The version of a block's front-end implementation
-         * E.g. 1 (first block within a program)
+         * The version of a block's front-end view implementation
          * PROVIDED BY: Vi platform
-         * TODO: Can this be the git hash for the Block component?
+         * NOTE: this should be left blank until we (Platforms + Data) can figure out
+         * how this should be represented and what it should mean
          */
         version: {
           type: 'string',
@@ -101,25 +100,21 @@ module.exports = {
         /**
          * The list powering a block
          * PROVIDED BY: Program manager (block.dataSource)
-         * E.g. {name: 'briefing_california', uri: '123456789'}
+         * NOTE: This is an object because its expected that in the future, we may add
+         * more data to the list object that specifies additional targeting (e.g., geo
+         * personalization) on a list. That said, only the `uri` is required for now.
+         * E.g. {uri: '123456789'}
          */
         list: {
           properties: {
             /**
-             * The name of the list powering a block
-             * TODO: This isn't provided by the program, only the URI is provided. Can we omit this?
-             * E.g. 'briefing_california'
-             */
-            name: {
-              type: 'string'
-            },
-            /**
              * The unique identifier (i.e., uri) that is the data source for a block
              * PROVIDED BY: Program manager
-             * E.g. '123456789'
+             * E.g. 'mobile-home/1'
              */
             uri: {
               type: 'string'
+              description: 'Unique identifier for the list powering a block'
             },
           },
         },
@@ -132,11 +127,13 @@ module.exports = {
     card: {
       properties: {
         /**
-         * TO-DO: What is an example of this?
+         * NOTE: We will leave this blank for now until we can define what "region" means -
+         * e.g., whether it means exact pixel coordinates or some contextual info (e.g.,
+         * column c bottom). Keeping in, though, since there is a parallel in NYT5.
          */
         region: {
           type: 'string',
-          description: '',
+          description: 'TBD',
         },
         /**
          * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
