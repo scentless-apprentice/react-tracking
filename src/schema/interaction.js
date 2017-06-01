@@ -47,6 +47,11 @@ module.exports = {
       }, // end interaction.module.properties
     }, // end interaction.module
 
+    // Region to be defined
+    region: {
+      properties: {}
+    },
+
     /**
      * The block interacted with.
      */
@@ -127,15 +132,6 @@ module.exports = {
     card: {
       properties: {
         /**
-         * NOTE: We will leave this blank for now until we can define what "region" means -
-         * e.g., whether it means exact pixel coordinates or some contextual info (e.g.,
-         * column c bottom). Keeping in, though, since there is a parallel in NYT5.
-         */
-        region: {
-          type: 'string',
-          description: 'TBD',
-        },
-        /**
          * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
          * PROVIDED BY: Vi platform
          */
@@ -144,11 +140,8 @@ module.exports = {
           description: 'An integer representing the ordinal rank of a card within a block',
         },
         /**
-         * TO-DO: Can this be the card template? E.g., bullet
-         * TO-DO: Should this be an enum?
-         * NOTE: https://github.com/nytm/wf-project-vi/blob/master/src/shared/Card/index.js#L25
-         * TO-DO: Should we change the key here, in case there's the risk of a keyword
-         * conflict with 'type'?
+         * NOTE: type should map to the keys in this object:
+         * https://github.com/nytm/wf-project-vi/blob/master/src/shared/Card/index.js#L25
          * PROVIDED BY: Vi platform
          */
         type: {
@@ -156,12 +149,12 @@ module.exports = {
           description: 'visual'
         },
         /**
-         * The primary user-facing label on the card - should be headline or summary
+         * The rendition on a card. Should capture any block-level overrides (e.g., packages)
+         * that don't conform to the current whole/skim/headline rendition format
          * PROVIDED BY: Vi platform
-         * E.g. 'Trump fires Comey from FBI'
          */
         rendition: {
-          enum: ['whole', 'skim'],
+          type: 'string',
           description: 'whole',
         },
         /**
@@ -172,7 +165,8 @@ module.exports = {
           description: 'https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html',
         },
         /**
-         * The primary user-facing label on the card - should be headline or summary
+         * The primary user-facing label on the card - should be headline or summary.
+         * If its the summary, then truncate at 150 chars
          * PROVIDED BY: Samizdat data
          * E.g. 'Trump fires Comey from FBI'
          */
