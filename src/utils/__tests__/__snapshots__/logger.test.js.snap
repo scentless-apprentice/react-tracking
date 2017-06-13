@@ -1,0 +1,16 @@
+exports[`logger logs errors to console.log 1`] = `
+Array [
+  Array [
+    "[tracking-schema] 🚫 tracking data is invalid 🚫",
+  ],
+  Array [
+    " 👉  [additionalProperties error]: ROOT should NOT have additional properties (it had \'someParam\')",
+  ],
+  Array [
+    " 👉  [required error]: ROOT.thing should have required property \'id\'",
+  ],
+  Array [
+    " 👉  [type error]: ROOT.thing should be number",
+  ],
+]
+`;

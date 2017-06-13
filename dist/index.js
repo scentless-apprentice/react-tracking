@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -334,7 +334,7 @@ function unescapeJsonPointer(str) {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var json = typeof JSON !== 'undefined' ? JSON : __webpack_require__(60);
+var json = typeof JSON !== 'undefined' ? JSON : __webpack_require__(62);
 
 module.exports = function (obj, opts) {
     if (!opts) opts = {};
@@ -437,15 +437,16 @@ var objectKeys = Object.keys || function (obj) {
 
 var event = __webpack_require__(50);
 var application = __webpack_require__(48);
-var user = __webpack_require__(56);
-var referrer = __webpack_require__(54);
-var interaction = __webpack_require__(51);
+var user = __webpack_require__(57);
+var referrer = __webpack_require__(55);
+var interaction = __webpack_require__(52);
 var asset = __webpack_require__(49);
-var presentation = __webpack_require__(53);
-var marketing = __webpack_require__(52);
-var viewport = __webpack_require__(58);
-var session = __webpack_require__(55);
-var video = __webpack_require__(57);
+var presentation = __webpack_require__(54);
+var marketing = __webpack_require__(53);
+var viewport = __webpack_require__(60);
+var session = __webpack_require__(56);
+var video = __webpack_require__(59);
+var heartbeat = __webpack_require__(51);
 
 var allProps = { // main "dataLayer" starts here
   event: event,
@@ -458,6 +459,7 @@ var allProps = { // main "dataLayer" starts here
   marketing: marketing,
   viewport: viewport,
   video: video,
+  heartbeat: heartbeat,
 
   // TODO: this is mostly empty
   session: session
@@ -780,7 +782,7 @@ module.exports = function equal(a, b) {
 "use strict";
 
 
-var url = __webpack_require__(67)
+var url = __webpack_require__(69)
   , equal = __webpack_require__(5)
   , util = __webpack_require__(0)
   , SchemaObject = __webpack_require__(7);
@@ -1519,8 +1521,7 @@ module.exports = function generate_validate(it, $keyword) {
   var $valid = 'valid' + $lvl,
     $breakOnError = !it.opts.allErrors,
     $closingBraces1 = '',
-    $closingBraces2 = '',
-    $errorKeyword;
+    $closingBraces2 = '';
   var $typeSchema = it.schema.type,
     $typeIsArray = Array.isArray($typeSchema);
   if ($typeSchema && it.opts.coerceTypes) {
@@ -1573,7 +1574,7 @@ module.exports = function generate_validate(it, $keyword) {
       $$outStack.push(out);
       out = ''; /* istanbul ignore else */
       if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+        out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
         if ($typeIsArray) {
           out += '' + ($typeSchema.join(","));
         } else {
@@ -1715,7 +1716,7 @@ module.exports = function generate_validate(it, $keyword) {
           }
           if ($rulesGroup.type) {
             out += ' } ';
-            if ($typeSchema && $typeSchema === $rulesGroup.type) {
+            if ($typeSchema && $typeSchema === $rulesGroup.type && !$coerceToTypes) {
               var $typeChecked = true;
               out += ' else { ';
               var $schemaPath = it.schemaPath + '.type',
@@ -1724,7 +1725,7 @@ module.exports = function generate_validate(it, $keyword) {
               $$outStack.push(out);
               out = ''; /* istanbul ignore else */
               if (it.createErrors !== false) {
-                out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+                out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
                 if ($typeIsArray) {
                   out += '' + ($typeSchema.join(","));
                 } else {
@@ -1775,7 +1776,7 @@ module.exports = function generate_validate(it, $keyword) {
       }
     }
   }
-  if ($typeSchema && !$typeChecked && !(it.opts.coerceTypes && $coerceToTypes)) {
+  if ($typeSchema && !$typeChecked && !$coerceToTypes) {
     var $schemaPath = it.schemaPath + '.type',
       $errSchemaPath = it.errSchemaPath + '/type',
       $method = $typeIsArray ? 'checkDataTypes' : 'checkDataType';
@@ -1784,7 +1785,7 @@ module.exports = function generate_validate(it, $keyword) {
     $$outStack.push(out);
     out = ''; /* istanbul ignore else */
     if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+      out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
       if ($typeIsArray) {
         out += '' + ($typeSchema.join(","));
       } else {
@@ -2105,7 +2106,7 @@ function isObject(val) {
 /* eslint-disable no-console */
 var Ajv = __webpack_require__(16);
 var schemaGenerator = __webpack_require__(2);
-var logger = __webpack_require__(59);
+var logger = __webpack_require__(61);
 var ajv = new Ajv({
   allErrors: true
 });
@@ -2659,7 +2660,7 @@ var util = __webpack_require__(0);
 var DATE = /^\d\d\d\d-(\d\d)-(\d\d)$/;
 var DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31];
 var TIME = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d:\d\d)?$/i;
-var HOSTNAME = /^[0-9a-z](?:(?:[-0-9a-z]{0,61})?[0-9a-z])?(\.[0-9a-z](?:(?:[-0-9a-z]{0,61})?[0-9a-z])?)*$/i;
+var HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[-0-9a-z]{0,61}[0-9a-z])?)*$/i;
 var URI = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?$/i;
 var UUID = /^(?:urn\:uuid\:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 var JSON_POINTER = /^(?:\/(?:[^~\/]|~0|~1)*)*$|^\#(?:\/(?:[a-z0-9_\-\.!$&'()*+,;:=@]|%[0-9a-f]{2}|~0|~1)*)*$/i;
@@ -3536,7 +3537,6 @@ module.exports = function generate_anyOf(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
@@ -3570,7 +3570,7 @@ module.exports = function generate_anyOf(it, $keyword) {
     it.compositeRule = $it.compositeRule = $wasComposite;
     out += ' ' + ($closingBraces) + ' if (!' + ($valid) + ') {  var err =   '; /* istanbul ignore else */
     if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || 'anyOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+      out += ' { keyword: \'' + ('anyOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
       if (it.opts.messages !== false) {
         out += ' , message: \'should match some schema in anyOf\' ';
       }
@@ -3609,7 +3609,6 @@ module.exports = function generate_constant(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $isData = it.opts.v5 && $schema && $schema.$data,
@@ -3628,7 +3627,7 @@ module.exports = function generate_constant(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'constant') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+    out += ' { keyword: \'' + ('constant') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
     if (it.opts.messages !== false) {
       out += ' , message: \'should be equal to constant\' ';
     }
@@ -3683,9 +3682,8 @@ module.exports = function generate_custom(it, $keyword) {
   }
   var $rule = this,
     $definition = 'definition' + $lvl,
-    $rDef = $rule.definition,
-    $validate = $rDef.validate,
-    $compile, $inline, $macro, $ruleValidate, $validateCode;
+    $rDef = $rule.definition;
+  var $compile, $inline, $macro, $ruleValidate, $validateCode;
   if ($isData && $rDef.$data) {
     $validateCode = 'keywordValidate' + $lvl;
     var $validateSchema = $rDef.validateSchema;
@@ -3897,7 +3895,6 @@ module.exports = function generate_dependencies(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $errs = 'errs__' + $lvl;
   var $it = it.util.copy(it);
@@ -3942,7 +3939,7 @@ module.exports = function generate_dependencies(it, $keyword) {
       $$outStack.push(out);
       out = ''; /* istanbul ignore else */
       if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ($errorKeyword || 'dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
+        out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
         if (it.opts.messages !== false) {
           out += ' , message: \'should have ';
           if ($deps.length == 1) {
@@ -3985,7 +3982,7 @@ module.exports = function generate_dependencies(it, $keyword) {
           }
           out += ' if (' + ($data) + ($prop) + ' === undefined) {  var err =   '; /* istanbul ignore else */
           if (it.createErrors !== false) {
-            out += ' { keyword: \'' + ($errorKeyword || 'dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
+            out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
             if (it.opts.messages !== false) {
               out += ' , message: \'should have ';
               if ($deps.length == 1) {
@@ -4017,7 +4014,7 @@ module.exports = function generate_dependencies(it, $keyword) {
   for (var $property in $schemaDeps) {
     var $sch = $schemaDeps[$property];
     if (it.util.schemaHasRules($sch, it.RULES.all)) {
-      out += ' ' + ($nextValid) + ' = true; if (' + ($data) + '[\'' + ($property) + '\'] !== undefined) { ';
+      out += ' ' + ($nextValid) + ' = true; if (' + ($data) + (it.util.getProperty($property)) + ' !== undefined) { ';
       $it.schema = $sch;
       $it.schemaPath = $schemaPath + it.util.getProperty($property);
       $it.errSchemaPath = $errSchemaPath + '/' + it.util.escapeFragment($property);
@@ -4052,7 +4049,6 @@ module.exports = function generate_enum(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $isData = it.opts.v5 && $schema && $schema.$data,
@@ -4081,7 +4077,7 @@ module.exports = function generate_enum(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'enum') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { allowedValues: schema' + ($lvl) + ' } ';
+    out += ' { keyword: \'' + ('enum') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { allowedValues: schema' + ($lvl) + ' } ';
     if (it.opts.messages !== false) {
       out += ' , message: \'should be equal to one of the allowed values\' ';
     }
@@ -4125,7 +4121,6 @@ module.exports = function generate_format(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   if (it.opts.format === false) {
     if ($breakOnError) {
@@ -4209,7 +4204,7 @@ module.exports = function generate_format(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'format') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { format:  ';
+    out += ' { keyword: \'' + ('format') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { format:  ';
     if ($isData) {
       out += '' + ($schemaValue);
     } else {
@@ -4271,7 +4266,6 @@ module.exports = function generate_items(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
@@ -4295,7 +4289,7 @@ module.exports = function generate_items(it, $keyword) {
       $$outStack.push(out);
       out = ''; /* istanbul ignore else */
       if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ($errorKeyword || 'additionalItems') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { limit: ' + ($schema.length) + ' } ';
+        out += ' { keyword: \'' + ('additionalItems') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { limit: ' + ($schema.length) + ' } ';
         if (it.opts.messages !== false) {
           out += ' , message: \'should NOT have more than ' + ($schema.length) + ' items\' ';
         }
@@ -4423,7 +4417,6 @@ module.exports = function generate_multipleOf(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $isData = it.opts.v5 && $schema && $schema.$data,
     $schemaValue;
@@ -4452,7 +4445,7 @@ module.exports = function generate_multipleOf(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'multipleOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { multipleOf: ' + ($schemaValue) + ' } ';
+    out += ' { keyword: \'' + ('multipleOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { multipleOf: ' + ($schemaValue) + ' } ';
     if (it.opts.messages !== false) {
       out += ' , message: \'should be multiple of ';
       if ($isData) {
@@ -4507,7 +4500,6 @@ module.exports = function generate_not(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $errs = 'errs__' + $lvl;
   var $it = it.util.copy(it);
@@ -4535,7 +4527,7 @@ module.exports = function generate_not(it, $keyword) {
     $$outStack.push(out);
     out = ''; /* istanbul ignore else */
     if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || 'not') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+      out += ' { keyword: \'' + ('not') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
       if (it.opts.messages !== false) {
         out += ' , message: \'should NOT be valid\' ';
       }
@@ -4564,7 +4556,7 @@ module.exports = function generate_not(it, $keyword) {
   } else {
     out += '  var err =   '; /* istanbul ignore else */
     if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || 'not') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+      out += ' { keyword: \'' + ('not') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
       if (it.opts.messages !== false) {
         out += ' , message: \'should NOT be valid\' ';
       }
@@ -4598,7 +4590,6 @@ module.exports = function generate_oneOf(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
@@ -4638,7 +4629,7 @@ module.exports = function generate_oneOf(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'oneOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+    out += ' { keyword: \'' + ('oneOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
     if (it.opts.messages !== false) {
       out += ' , message: \'should match exactly one schema in oneOf\' ';
     }
@@ -4682,7 +4673,6 @@ module.exports = function generate_pattern(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $isData = it.opts.v5 && $schema && $schema.$data,
     $schemaValue;
@@ -4702,7 +4692,7 @@ module.exports = function generate_pattern(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || 'pattern') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { pattern:  ';
+    out += ' { keyword: \'' + ('pattern') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { pattern:  ';
     if ($isData) {
       out += '' + ($schemaValue);
     } else {
@@ -4764,7 +4754,6 @@ module.exports = function generate_patternRequired(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $key = 'key' + $lvl,
@@ -4786,7 +4775,7 @@ module.exports = function generate_patternRequired(it, $keyword) {
       var $missingPattern = it.util.escapeQuotes($pProperty);
       out += ' if (!' + ($matched) + ') { ' + ($valid) + ' = false;  var err =   '; /* istanbul ignore else */
       if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ($errorKeyword || 'patternRequired') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingPattern: \'' + ($missingPattern) + '\' } ';
+        out += ' { keyword: \'' + ('patternRequired') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingPattern: \'' + ($missingPattern) + '\' } ';
         if (it.opts.messages !== false) {
           out += ' , message: \'should have property matching pattern \\\'' + ($missingPattern) + '\\\'\' ';
         }
@@ -4823,7 +4812,6 @@ module.exports = function generate_properties(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
@@ -4917,7 +4905,7 @@ module.exports = function generate_properties(it, $keyword) {
           $$outStack.push(out);
           out = ''; /* istanbul ignore else */
           if (it.createErrors !== false) {
-            out += ' { keyword: \'' + ($errorKeyword || 'additionalProperties') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { additionalProperty: \'' + ($additionalProperty) + '\' } ';
+            out += ' { keyword: \'' + ('additionalProperties') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { additionalProperty: \'' + ($additionalProperty) + '\' } ';
             if (it.opts.messages !== false) {
               out += ' , message: \'should NOT have additional properties\' ';
             }
@@ -5037,7 +5025,7 @@ module.exports = function generate_properties(it, $keyword) {
               $$outStack.push(out);
               out = ''; /* istanbul ignore else */
               if (it.createErrors !== false) {
-                out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+                out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
                 if (it.opts.messages !== false) {
                   out += ' , message: \'';
                   if (it.opts._errorDataPathProperty) {
@@ -5182,7 +5170,7 @@ module.exports = function generate_properties(it, $keyword) {
               $$outStack.push(out);
               out = ''; /* istanbul ignore else */
               if (it.createErrors !== false) {
-                out += ' { keyword: \'' + ($errorKeyword || 'patternGroups') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { reason: \'' + ($reason) + '\', limit: ' + ($limit) + ', pattern: \'' + (it.util.escapeQuotes($pgProperty)) + '\' } ';
+                out += ' { keyword: \'' + ('patternGroups') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { reason: \'' + ($reason) + '\', limit: ' + ($limit) + ', pattern: \'' + (it.util.escapeQuotes($pgProperty)) + '\' } ';
                 if (it.opts.messages !== false) {
                   out += ' , message: \'should NOT have ' + ($moreOrLess) + ' than ' + ($limit) + ' properties matching pattern "' + (it.util.escapeQuotes($pgProperty)) + '"\' ';
                 }
@@ -5220,7 +5208,7 @@ module.exports = function generate_properties(it, $keyword) {
               $$outStack.push(out);
               out = ''; /* istanbul ignore else */
               if (it.createErrors !== false) {
-                out += ' { keyword: \'' + ($errorKeyword || 'patternGroups') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { reason: \'' + ($reason) + '\', limit: ' + ($limit) + ', pattern: \'' + (it.util.escapeQuotes($pgProperty)) + '\' } ';
+                out += ' { keyword: \'' + ('patternGroups') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { reason: \'' + ($reason) + '\', limit: ' + ($limit) + ', pattern: \'' + (it.util.escapeQuotes($pgProperty)) + '\' } ';
                 if (it.opts.messages !== false) {
                   out += ' , message: \'should NOT have ' + ($moreOrLess) + ' than ' + ($limit) + ' properties matching pattern "' + (it.util.escapeQuotes($pgProperty)) + '"\' ';
                 }
@@ -5275,7 +5263,6 @@ module.exports = function generate_ref(it, $keyword) {
   var $schema = it.schema[$keyword];
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $async, $refCode;
@@ -5297,7 +5284,7 @@ module.exports = function generate_ref(it, $keyword) {
         $$outStack.push(out);
         out = ''; /* istanbul ignore else */
         if (it.createErrors !== false) {
-          out += ' { keyword: \'' + ($errorKeyword || '$ref') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { ref: \'' + (it.util.escapeQuotes($schema)) + '\' } ';
+          out += ' { keyword: \'' + ('$ref') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { ref: \'' + (it.util.escapeQuotes($schema)) + '\' } ';
           if (it.opts.messages !== false) {
             out += ' , message: \'can\\\'t resolve reference ' + (it.util.escapeQuotes($schema)) + '\' ';
           }
@@ -5403,7 +5390,6 @@ module.exports = function generate_required(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $isData = it.opts.v5 && $schema && $schema.$data,
@@ -5462,7 +5448,7 @@ module.exports = function generate_required(it, $keyword) {
         $$outStack.push(out);
         out = ''; /* istanbul ignore else */
         if (it.createErrors !== false) {
-          out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+          out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
           if (it.opts.messages !== false) {
             out += ' , message: \'';
             if (it.opts._errorDataPathProperty) {
@@ -5516,7 +5502,7 @@ module.exports = function generate_required(it, $keyword) {
         $$outStack.push(out);
         out = ''; /* istanbul ignore else */
         if (it.createErrors !== false) {
-          out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+          out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
           if (it.opts.messages !== false) {
             out += ' , message: \'';
             if (it.opts._errorDataPathProperty) {
@@ -5560,7 +5546,7 @@ module.exports = function generate_required(it, $keyword) {
         if ($isData) {
           out += ' if (' + ($vSchema) + ' && !Array.isArray(' + ($vSchema) + ')) {  var err =   '; /* istanbul ignore else */
           if (it.createErrors !== false) {
-            out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+            out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
             if (it.opts.messages !== false) {
               out += ' , message: \'';
               if (it.opts._errorDataPathProperty) {
@@ -5581,7 +5567,7 @@ module.exports = function generate_required(it, $keyword) {
         }
         out += ' for (var ' + ($i) + ' = 0; ' + ($i) + ' < ' + ($vSchema) + '.length; ' + ($i) + '++) { if (' + ($data) + '[' + ($vSchema) + '[' + ($i) + ']] === undefined) {  var err =   '; /* istanbul ignore else */
         if (it.createErrors !== false) {
-          out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+          out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
           if (it.opts.messages !== false) {
             out += ' , message: \'';
             if (it.opts._errorDataPathProperty) {
@@ -5616,7 +5602,7 @@ module.exports = function generate_required(it, $keyword) {
             }
             out += ' if (' + ($data) + ($prop) + ' === undefined) {  var err =   '; /* istanbul ignore else */
             if (it.createErrors !== false) {
-              out += ' { keyword: \'' + ($errorKeyword || 'required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
+              out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
               if (it.opts.messages !== false) {
                 out += ' , message: \'';
                 if (it.opts._errorDataPathProperty) {
@@ -5660,7 +5646,6 @@ module.exports = function generate_switch(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
@@ -5701,7 +5686,7 @@ module.exports = function generate_switch(it, $keyword) {
             $$outStack.push(out);
             out = ''; /* istanbul ignore else */
             if (it.createErrors !== false) {
-              out += ' { keyword: \'' + ($errorKeyword || 'switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
+              out += ' { keyword: \'' + ('switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
               if (it.opts.messages !== false) {
                 out += ' , message: \'should pass "switch" keyword validation\' ';
               }
@@ -5741,7 +5726,7 @@ module.exports = function generate_switch(it, $keyword) {
             $$outStack.push(out);
             out = ''; /* istanbul ignore else */
             if (it.createErrors !== false) {
-              out += ' { keyword: \'' + ($errorKeyword || 'switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
+              out += ' { keyword: \'' + ('switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
               if (it.opts.messages !== false) {
                 out += ' , message: \'should pass "switch" keyword validation\' ';
               }
@@ -5796,7 +5781,6 @@ module.exports = function generate_uniqueItems(it, $keyword) {
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $isData = it.opts.v5 && $schema && $schema.$data,
@@ -5820,7 +5804,7 @@ module.exports = function generate_uniqueItems(it, $keyword) {
     $$outStack.push(out);
     out = ''; /* istanbul ignore else */
     if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || 'uniqueItems') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { i: i, j: j } ';
+      out += ' { keyword: \'' + ('uniqueItems') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { i: i, j: j } ';
       if (it.opts.messages !== false) {
         out += ' , message: \'should NOT have duplicate items (items ## \' + j + \' and \' + i + \' are identical)\' ';
       }
@@ -6789,29 +6773,13 @@ function containsMacro(schema) {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var schemaModel = __webpack_require__(2);
+var validator = __webpack_require__(15);
 
-var _schema = __webpack_require__(2);
-
-Object.defineProperty(exports, 'schemaModel', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_schema).default;
-  }
-});
-
-var _validate = __webpack_require__(15);
-
-Object.defineProperty(exports, 'default', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_validate).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+module.exports = {
+  schemaModel: schemaModel,
+  validator: validator
+};
 
 /***/ }),
 /* 48 */
@@ -6827,6 +6795,8 @@ module.exports = {
   // disallow properties not explicilty listed
   additionalProperties: false,
 
+  description: 'Describes basics attributes of the NYT Web application where the data layer is constructed. For example, it provides the application\'s version and release number.',
+
   // properties that are required (for `application`)
   required: ['dlVersion', 'environment', 'name'],
 
@@ -6838,38 +6808,55 @@ module.exports = {
      * This number is updated with each release of `nytm/tracking-schema`
      */
     // TODO: This should be a semver REGEX
-    dlVersion: { type: 'string' }, // semver
+    dlVersion: {
+      type: 'string',
+      description: 'The version number of the data layer; this value is updated with each release of the data layer.'
+    }, // semver
 
     /**
      * Version of app (or githash)
      */
-    releaseVersion: { type: 'string' },
+    releaseVersion: {
+      type: 'string',
+      description: 'The version number of the application.'
+    },
 
     /**
      * Timestamp of when the app was released.
      */
-    releaseDate: { format: 'date-time' },
+    releaseDate: {
+      format: 'date-time',
+      description: 'The timestamp value that indicates when the application version was released.'
+    },
 
     /**
      * The timestamp value that indicates when the page was rendered by the server.
      * NOTE: Recommended to omit and rely on gtm.js which is a timestamp of GTM loading.
      * This value can be used to compute time-bound events for analysis like heartbeat, etc.
      */
-    renderTimestamp: { format: 'date-time' },
+    renderTimestamp: {
+      format: 'date-time',
+      description: 'The timestamp value that indicates when the page was rendered by the server. Note: Instead, omit and rely on gtm.js which is a timestamp of GTM loading. This value can be used to compute time-bound events for analyses like heartbeat, etc.'
+    },
 
     /**
      * Environment app is running in.
      */
     environment: {
-      enum: ['production', 'staging', 'local', 'test', 'dev', 'qa']
+      enum: ['production', 'staging', 'local', 'test', 'dev', 'qa'],
+      description: 'A value that indicates the location or status of the application.'
     },
 
     /**
      * Name of the app
      */
-    name: { type: 'string' }
+    name: {
+      type: 'string',
+      description: 'The name of the application where the data was collected.'
+    }
 
-  } };
+  } // end application.properties
+};
 
 /***/ }),
 /* 49 */
@@ -6887,32 +6874,46 @@ module.exports = {
   // TODO: What else should be required?
   required: ['id'],
 
+  'description': 'Describes attributes of NYT content assets. For example,',
+
   properties: {
     /**
      * The canonical URL of the NYT content asset.
      * Can be omitted for certain "embedded-only" content types
      * like “image slideshow” and some “interactive graphics” assets.
      */
-    url: { format: 'uri' },
+    url: {
+      format: 'uri',
+      description: 'The canonical URL of the NYT content asset. This value is null for certain "embedded-only" content types like “image slideshow” and some “interactive graphics” assets.'
+    },
 
     /**
      * The NYT content asset's public-facing label for site navigation
      * that is meant to reflect a core, permanent category of the
      * NYT report.
      */
-    section: { type: 'string' },
+    section: {
+      type: 'string',
+      description: 'The NYT content asset\'s public-facing label for site navigation that is meant to reflect a core, permanent category of the NYT report.'
+    },
 
     /**
      * The NYT content asset's public-facing label for site navigation that
      * sits hierarchically under a section and is meant to reflect a core,
      * permanent category of the NYT report.
      */
-    subSection: { type: 'string' },
+    subSection: {
+      type: 'string',
+      description: 'The NYT content asset\'s public-facing label for site navigation that sits hierarchically under a section and is meant to reflect a core, permanent category of the NYT report.'
+    },
 
     /**
      * Public-facing headline.
      */
-    headline: { type: 'string' },
+    headline: {
+      type: 'string',
+      description: 'The NYT content asset\'s public-facing title'
+    },
 
     /**
      * The list of authors of the NYT content asset, usually joined together
@@ -6923,68 +6924,106 @@ module.exports = {
      */
     // FIXME: (JG) I set this as an Array type, but the Google Doc suggests
     //        manually joining the authors, which I'd like to avoid.
-    authors: { items: { type: 'string' } },
+    authors: {
+      items: {
+        type: 'string',
+        description: 'The list of authors of the NYT content asset, usually joined together with commas and a final "and" to form a byline. Ordinality is important within the newsroom, and generally, authors are ranked in descending order of their contributions to the content or so that the author present in the location where the news events transpired is listed first.'
+      }
+    },
 
     /**
      * SCOOP id.
      */
-    id: { type: 'string' },
+    id: {
+      type: 'string',
+      description: 'The unique ID of the NYT content asset'
+    },
 
     /**
      * UNIX timestamp value that indicates when this asset was first digitally
      * published.
      */
-    publishedTimestamp: { format: 'date-time' },
+    publishedTimestamp: {
+      format: 'date-time',
+      description: 'The UNIX timestamp value that indicates when the NYT content asset was first digitally published.'
+    },
 
     /**
      * UNIX timestamp when the asset was last modified.
      */
-    lastUpdatedTimestamp: { format: 'date-time' },
+    lastUpdatedTimestamp: {
+      format: 'date-time',
+      description: 'The UNIX date-time value that indicates when an NYT digital content asset was last modified or re-published via the CMS.'
+    },
 
     /**
      * The name of the NYT content asset collection. A collection is a grouping
      * of two or more NYT content assets collected together based on
      * journalistic intent.
      */
-    collectionName: { type: 'string' },
+    collectionName: {
+      type: 'string',
+      description: 'The name of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.'
+    },
 
     /**
      * The type of collection.
      */
-    collectionType: { enum: ['column', 'series', 'issue'] },
+    collectionType: {
+      description: 'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.',
+      enum: ['column', 'series', 'issue']
+    },
 
     /**
      * The name of the NYT newsroom team that is the current owner of the asset.
      */
-    desk: { type: 'string' },
+    desk: {
+      type: 'string',
+      description: 'The name of the NYT newsroom team that is the current owner of the NYT content asset as defined in the CMS.'
+    },
 
     /**
      * Public-facing label, typically appears before the headline.
      */
-    kicker: { type: 'string' },
+    kicker: {
+      type: 'string',
+      description: 'An optional label intended to be displayed before the headline, generally in smaller type, signifying a type of content.'
+    },
 
     /**
      * The name of the NYT newsroom desk that was first assigned the NYT
      * content asset as defined in the CMS.
      */
-    originatingDesk: { type: 'string' },
+    originatingDesk: {
+      type: 'string',
+      description: 'The name of the NYT newsroom desk that was first assigned the NYT content asset as defined in the CMS.'
+    },
 
     /**
      * he short name used internally by the newsroom to indicate the content of
      * a story and name an asset while it is in production. This data is not
      * intended to be exposed or relied upon for public facing-purposes.
      */
-    slug: { type: 'string' },
+    slug: {
+      type: 'string',
+      description: 'The short name used internally by the newsroom to indicate the content of a story and name an asset while it is in production.This data is not  intended to be exposed or relied upon for public facing-purposes.'
+    },
 
     /**
      * The current number of characters in the context asset's body text
      */
-    characterCount: { type: 'number' },
+    characterCount: {
+      type: 'number',
+      description: 'The current number of characters in the context asset\'s body text'
+    },
 
     /**
      * Number of words in content asset's body text.
      */
-    wordCount: { type: 'number' }
+    wordCount: {
+      type: 'number',
+      description: 'The current number of words in the content asset\'s body text.'
+    }
   }
 };
 
@@ -6999,6 +7038,17 @@ module.exports = {
 * Name of event that triggered dataLayer push.
 */
 module.exports = {
+  description: 'The \u201Cevent\u201D value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push',
+
+  enumDescription: {
+    'pageDataReady': 'This event triggers pageview tracking. It should be sent with the initial      dataLayer push and with any dynamic update that should be tracked as a pageview. ',
+    'scrollComplete': 'This event should fire when a user has stopped scrolling for 250ms. It should push new viewport values into the dataLayer. ',
+    'heartbeat': 'This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.  ',
+    'moduleInteraction': 'This event should fire when a user interacts with a module triggering a page update, dialogue box, etc. This should push new referrer and interaction values into the dataLayer.',
+    'dynamicElementsLoaded': 'If there are elements that get loaded after the pageDataReady event, push this event and be sure to set presentation.documentHeight since the new elements will likely impact that value. If the new elements include tracked module(s) that appear in the viewport immediately, it should push a new value into viewport.modules. ',
+    'videoEvent': 'This event should fire for any video related event. This should push new values into the video object. '
+  },
+
   // TODO: Are these all of them?
   enum: [
   /**
@@ -7032,7 +7082,7 @@ module.exports = {
   * impact that value. If the new elements include tracked module(s) that appear in the
   * viewport immediately, it should push a new value into viewport.modules.
   */
-  'dynamicEventsLoaded',
+  'dynamicElementsLoaded',
 
   /**
   * This event should fire for any video related event. This should push new values into
@@ -7049,6 +7099,45 @@ module.exports = {
 
 
 /**
+* Describes attributes of the heartbeat event object.
+*/
+module.exports = {
+  // disallow properties not explicilty listed
+  additionalProperties: false,
+
+  // properties that are required (for `heartbeat`)
+  required: ['timeSincePageDataReady', 'heartbeatInterval'],
+
+  description: 'This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.',
+
+  properties: {
+
+    /**
+     * The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
+    **/
+    timeSincePageDataReady: {
+      type: 'integer',
+      description: 'The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.'
+    },
+
+    /**
+     * The frequency of `heartbeat` event object pushes, in milliseconds.
+     */
+    heartbeatInterval: {
+      type: 'integer',
+      description: 'The frequency of heartbeat event object pushes, in milliseconds.'
+    }
+  }
+};
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
 * Describes a user interaction event
 */
 module.exports = {
@@ -7058,46 +7147,75 @@ module.exports = {
   // properties that are required (for `referrer`)
   required: ['type'],
 
+  description: 'module behavioral/click tracking will have additional fields as we refine the the specifications for that effort',
+
   properties: {
     /**
      * The module interaccted with.
      */
     module: {
       additionalProperties: false,
+      description: 'TBD',
       properties: {
         /**
          * The name of the module interacted with.
          * E.g. "see more"
          */
-        name: { type: 'string' },
+        name: {
+          type: 'string',
+          description: 'see more'
+        },
 
         /**
          * The context the module is rendered in.
          * E.g. "block"
          */
-        context: { type: 'string' },
+        context: {
+          type: 'string',
+          description: 'block'
+        },
 
         /**
          * Module's label.
          * E.g. "Top News", "Featured", "Opinion", etc.
          */
-        label: { type: 'string' }
-      } }, // end interaction.module
+        label: {
+          type: 'string',
+          description: 'Top News|Featured|Opinion|News|Culture|etc...'
+        }
+      } // end interaction.module.properties
+    }, // end interaction.module
 
     /**
      * The type of interaction
      */
-    type: { type: 'string' },
+    type: {
+      type: 'string',
+      description: 'click'
+    },
 
     /**
      * Used to pass success/failure or other status message.
-     */
-    // TODO: Can this be an enum, or better yet, boolean?
-    status: { type: 'string' }
-  } };
+    */
+    status: {
+      type: 'string',
+      description: 'used to pass success/failure or other status messaging eg. log in success or failure. Many interactions won’t have a status. Those should set an empty string.'
+    },
+
+    pagetype: {
+      type: 'string',
+      description: 'pagetype when the interaction occurred'
+    },
+
+    'page_view_id': {
+      type: 'string',
+      description: 'for advertising '
+    }
+  } // end interaction.properties
+};
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7110,66 +7228,100 @@ module.exports = {
 module.exports = {
   additionalProperties: false,
 
+  description: 'Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.',
+
   properties: {
     flow: {
+      description: 'TBD',
+
       mode: {
+        description: 'for future use digi,hd',
         emum: ['digi', 'hd']
       },
       region: {
+        description: 'for future use us,int',
         emum: ['us', 'int']
       },
-      product: { type: 'string' },
-      rate: { type: 'string' }
+      product: {
+        description: 'for future use subscription,gift-purchase,crosswords,gift-redeem',
+        type: 'string'
+      },
+      rate: {
+        description: 'for future use regular,edu-b2c,spotify',
+        type: 'string'
+      }
     },
 
     campaign: {
+      description: 'TBD',
       /*
        * The alphanumeric identifier of the marketing campaign
        * associated with the original subscription.
        */
-      code: { type: 'string' },
+      code: {
+        type: 'string',
+        description: 'The alphanumeric identifier of the marketing campaign associated with the original subscription.'
+      },
 
       /*
        * value of &pos from query string       
        */
-      pos: { type: 'string' }
+      pos: {
+        type: 'string',
+        description: 'value of &pos from query string'
+      }
     },
 
     product: {
-
+      description: 'TBD',
       /**
        * A Marketing-created combination of metadata for digital subscriptions
        * that is a combination of product bundle and promotion 
        * (financial agreement between user and NYT) 
        */
-      offerChain: { type: 'string' },
+      offerChain: {
+        type: 'string',
+        description: 'A Marketing-created combination of metadata for digital subscriptions that is a combination of product bundle and promotion (financial agreement between user and NYT) '
+      },
 
       /**
        * An alphanumeric code that represents the product bundle
        *  associated with the current entitlement for digital subscriptions.      
        */
-      bundleCode: { type: 'string' },
+      bundleCode: {
+        type: 'string',
+        description: 'An alphanumeric code that represents the product bundle associated with the current entitlement for digital subscriptions.'
+      },
 
       /**
        * TBD - digi
        */
-      promotion: { type: 'string' },
+      promotion: {
+        type: 'string',
+        description: 'TBD - digi'
+      },
 
       /**
        * TBD - hd
        */
-      product: { type: 'string' },
+      product: {
+        type: 'string',
+        description: 'TBD - hd'
+      },
 
       /**
        * TBD - hd
        */
-      promotionCode: { type: 'string' }
+      promotionCode: {
+        type: 'string',
+        description: 'TBD - hd'
+      }
     }
   }
 };
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7184,30 +7336,49 @@ module.exports = {
   // TODO: What should be required?
   // required: [],
 
+  description: 'Describes basic attributes of the page design layout.',
+
   properties: {
 
     /**
      * The type of NYT content asset as presented to the user during
      * the session.
-     */
-    pageType: { type: 'string' },
+    **/
+    pageType: {
+      type: 'string',
+      description: 'The type of NYT content asset as presented to the user during the session.'
+    },
 
-    /**
-     * TBD ???
-     */
-    pageSubtype: { type: 'string' },
+    pageSubtype: {
+      type: 'string',
+      description: 'TBD'
+    },
 
-    cardId: { type: 'string' },
-    cardType: { type: 'string' },
-    cardRendition: { enum: ['whole', 'skim'] },
+    cardId: {
+      type: 'string',
+      description: 'TBD'
+    },
+
+    cardType: {
+      type: 'string',
+      description: 'TBD'
+    },
+
+    cardRendition: {
+      enum: ['whole', 'skim'],
+      description: 'TBD'
+    },
 
     // TODO: Why is this here?
-    documentHeight: { type: 'number' }
+    documentHeight: {
+      type: 'number',
+      description: 'integer height of the entire page in pixels'
+    }
   }
 };
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7224,25 +7395,17 @@ module.exports = {
   // properties that are required (for `referrer`)
   required: ['url'],
 
+  description: 'Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user\'s session.',
+
   properties: {
     /**
      * Referring URL
      */
-    url: { format: 'uri' }
-  } };
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Contains data pertaining to the user's session.
- */
-module.exports = {
-  // ...
+    url: {
+      format: 'uri',
+      description: 'A URL of previous page or document.referrer'
+    }
+  } // end referrer.properties
 };
 
 /***/ }),
@@ -7253,9 +7416,42 @@ module.exports = {
 
 
 /**
+ * Contains data pertaining to the user's session.
+ */
+module.exports = {
+  'desc': 'Contains data pertaining to the NYT user\'s session.',
+
+  // disallow properties not explicilty listed
+  additionalProperties: false,
+
+  // properties that are required (for `user`)
+  // required: ['type'],
+
+  properties: {
+    'meterCount': {
+      type: 'number',
+      description: 'A value that indicates the total number of metered NYT content assets consumed during the user session.'
+    },
+    'isLoggedIn': {
+      type: 'boolean',
+      description: 'A flag that indicates whether a user session is authenticated.'
+    }
+  }
+};
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
 * User specific data.
 */
 module.exports = {
+  'description': 'Describes basic attributes of the NYT user.',
+
   // disallow properties not explicilty listed
   additionalProperties: false,
 
@@ -7266,16 +7462,21 @@ module.exports = {
     /**
      * The NYT Registration ID of the user.
      */
-    regiId: { type: 'string' },
+    regiId: {
+      type: 'string',
+      description: 'The NYT registration ID of the NYT user.'
+    },
 
     /**
      * Type of NYT user.
      */
     type: {
-      enum: ['anon', 'regi', 'sub']
+      enum: ['anon', 'regi', 'sub'],
+      description: 'A value that indicates the type of NYT user'
     },
 
     subscriptions: {
+      description: 'TBD',
       items: {
         type: 'object'
       }
@@ -7284,17 +7485,110 @@ module.exports = {
     /**
      * Segments under 'wat' in NYT-D cookie
      */
-    watSeg: { type: 'string' }
+    watSeg: {
+      type: 'string',
+      description: 'segments under ‘wat’ in the NYT-D cookie'
+    }
 
-  } };
+  } // end user.properties
+};
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+/**
+ * Contains data pertaining to video mdata assets.
+ */
+module.exports = {
+  additionalProperties: false,
+
+  properties: {
+    device: {
+      enum: ['desktop', 'mobile']
+    },
+
+    playerMode: {
+      type: 'string'
+    },
+
+    playerType: {
+      type: 'string'
+    },
+
+    playerUsage: {
+      type: 'string'
+    },
+
+    playerVersion: {
+      type: 'string'
+    },
+
+    tech: {
+      type: 'string'
+    },
+
+    videoDeliveryMethod: {
+      enum: ['vod', 'live']
+    },
+
+    // duration in seconds
+    videoDuration: {
+      type: 'number'
+    },
+
+    // series
+    videoFranchise: {
+      type: 'string'
+    },
+
+    // headline
+    videoName: {
+      type: 'string'
+    },
+
+    // scoop playlist
+    videoPrimaryPlaylistId: {
+      type: 'number'
+    },
+
+    videoPrimaryPlaylistName: {
+      type: 'string'
+    },
+
+    // section
+    videoSection: {
+      type: 'string'
+    },
+
+    // subsection
+    videoSubSection: {
+      type: 'string'
+    },
+
+    // timecode of event
+    videoTimeOfEvent: {
+      type: 'number'
+    },
+
+    // video || ad || 360video
+    videoType: {
+      enum: ['video', 'ad', '360video']
+    }
+  }
+};
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var mData = __webpack_require__(58);
 /**
  * Contains data pertaining to video assets.
  */
@@ -7304,6 +7598,8 @@ module.exports = {
 
   // properties that are required (for `video`)
   required: ['contentId'],
+
+  description: 'external documentation - video keys documented separately',
 
   properties: {
 
@@ -7348,88 +7644,12 @@ module.exports = {
       type: 'string'
     },
 
-    mData: {
-      additionalProperties: false,
-
-      properties: {
-        device: {
-          enum: ['desktop', 'mobile']
-        },
-
-        playerMode: {
-          type: 'string'
-        },
-
-        playerType: {
-          type: 'string'
-        },
-
-        playerUsage: {
-          type: 'string'
-        },
-
-        playerVersion: {
-          type: 'string'
-        },
-
-        tech: {
-          type: 'string'
-        },
-
-        videoDeliveryMethod: {
-          enum: ['vod', 'live']
-        },
-
-        // duration in seconds
-        videoDuration: {
-          type: 'number'
-        },
-
-        // series
-        videoFranchise: {
-          type: 'string'
-        },
-
-        // headline
-        videoName: {
-          type: 'string'
-        },
-
-        // scoop playlist
-        videoPrimaryPlaylistId: {
-          type: 'number'
-        },
-
-        videoPrimaryPlaylistName: {
-          type: 'string'
-        },
-
-        // section
-        videoSection: {
-          type: 'string'
-        },
-
-        // subsection
-        videoSubSection: {
-          type: 'string'
-        },
-
-        // timecode of event
-        videoTimeOfEvent: {
-          type: 'number'
-        },
-
-        // video || ad || 360video
-        videoType: {
-          enum: ['video', 'ad', '360video']
-        }
-      }
-    }
+    mData: mData
   }
 };
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7440,46 +7660,83 @@ module.exports = {
  * and the modules currently in view.
  */
 module.exports = {
+  description: 'Describes the current page position within the user agent browser’s viewport and the modules currently in view.',
+
   properties: {
 
     /**
      * The offset, in pixels, from the top of the document at the top of the viewport,
      */
-    scrollTop: { type: 'integer' },
+    scrollTop: {
+      type: 'integer',
+      description: 'The offset, in pixels, from the top of the document at the top of the viewport,'
+    },
 
     /**
      * The height, in pixels, of the viewport.
      */
-    height: { type: 'integer' },
+    height: {
+      type: 'integer',
+      description: 'The height, in pixels, of the viewport.'
+    },
 
     /**
      * The width, in pixels, of the viewport.
      */
-    width: { type: 'integer' },
+    width: {
+      type: 'integer',
+      description: 'The width, in pixels, of the viewport.'
+    },
 
     /**
      * for future use - comma-separated list of modules in the viewport 
      */
-    modules: { type: 'string' }
+    modules: {
+      type: 'string',
+      description: 'for future use - comma-separated list of modules in the viewport'
+    }
   }
 };
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+/* eslint-disable no-console */
+
+var group = console.group || console.log;
+
+var formatDataPath = function formatDataPath(dataPath) {
+  if (dataPath.startsWith('.') || dataPath === '') {
+    return 'ROOT' + dataPath;
+  }
+
+  return dataPath;
+};
+
 module.exports = {
   error: function error(errors) {
-    // TODO: this needs to log errors to some monitoring system
     if (errors) {
-      console.log('\n🚫 data is invalid 🚫');
-      // console.dir(validate.errors);
+      group('[tracking-schema] 🚫 tracking data is invalid 🚫');
+
+      // console.log(errors);
+
       errors.forEach(function (e) {
-        console.log(' \uD83D\uDC49 ' + e.keyword + e.dataPath + ' ' + e.message);
+        var msg = ' \uD83D\uDC49  [' + e.keyword + ' error]: ' + formatDataPath(e.dataPath) + ' ' + e.message;
+
+        if (e.keyword === 'additionalProperties') {
+          msg += ' (it had ' + Object.values(e.params).map(function (p) {
+            return '\'' + p + '\'';
+          }).join(', ') + ')';
+        }
+
+        console.log(msg);
       });
+
+      if (console.groupEnd) console.groupEnd();
     }
   },
 
@@ -7490,15 +7747,15 @@ module.exports = {
 };
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.parse = __webpack_require__(61);
-exports.stringify = __webpack_require__(62);
+exports.parse = __webpack_require__(63);
+exports.stringify = __webpack_require__(64);
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports) {
 
 var at, // The index of the current character
@@ -7777,7 +8034,7 @@ module.exports = function (source, reviver) {
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports) {
 
 var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
@@ -7937,7 +8194,7 @@ module.exports = function (value, replacer, space) {
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -8473,10 +8730,10 @@ module.exports = function (value, replacer, space) {
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(70)(module), __webpack_require__(69)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(72)(module), __webpack_require__(71)))
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8567,7 +8824,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8659,18 +8916,18 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(64);
-exports.encode = exports.stringify = __webpack_require__(65);
+exports.decode = exports.parse = __webpack_require__(66);
+exports.encode = exports.stringify = __webpack_require__(67);
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8697,8 +8954,8 @@ exports.encode = exports.stringify = __webpack_require__(65);
 
 
 
-var punycode = __webpack_require__(63);
-var util = __webpack_require__(68);
+var punycode = __webpack_require__(65);
+var util = __webpack_require__(70);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -8773,7 +9030,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(66);
+    querystring = __webpack_require__(68);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -9409,7 +9666,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9432,7 +9689,7 @@ module.exports = {
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports) {
 
 var g;
@@ -9459,7 +9716,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
