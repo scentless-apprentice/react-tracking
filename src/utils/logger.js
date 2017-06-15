@@ -21,7 +21,7 @@ module.exports = {
         let msg = ` 👉  [${e.keyword} error]: ${formatDataPath(e.dataPath)} ${e.message}`;
 
         if (e.keyword === 'additionalProperties') {
-          msg += ` (it had ${Object.values(e.params).map(p => `'${p}'`).join(', ')})`;
+          msg += ` (it had ${Object.keys(e.params).map(p => `'${e.params[p]}'`).join(', ')})`;
         }
 
         console.log(msg);

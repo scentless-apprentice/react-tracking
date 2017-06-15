@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 47);
+/******/ 	return __webpack_require__(__webpack_require__.s = 45);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -82,14 +82,14 @@ module.exports = {
   toHash: toHash,
   getProperty: getProperty,
   escapeQuotes: escapeQuotes,
-  ucs2length: __webpack_require__(23),
+  equal: __webpack_require__(1),
+  ucs2length: __webpack_require__(22),
   varOccurences: varOccurences,
   varReplace: varReplace,
   cleanUpCode: cleanUpCode,
-  cleanUpVarErrors: cleanUpVarErrors,
+  finalCleanUpCode: finalCleanUpCode,
   schemaHasRules: schemaHasRules,
   schemaHasRulesExcept: schemaHasRulesExcept,
-  stableStringify: __webpack_require__(1),
   toQuotedString: toQuotedString,
   getPathExpr: getPathExpr,
   getPath: getPath,
@@ -222,26 +222,35 @@ var ERRORS_REGEXP = /[^v\.]errors/g
   , REMOVE_ERRORS_ASYNC = /var errors = 0;|var vErrors = null;/g
   , RETURN_VALID = 'return errors === 0;'
   , RETURN_TRUE = 'validate.errors = null; return true;'
-  , RETURN_ASYNC = /if \(errors === 0\) return true;\s*else throw new ValidationError\(vErrors\);/
-  , RETURN_TRUE_ASYNC = 'return true;';
+  , RETURN_ASYNC = /if \(errors === 0\) return data;\s*else throw new ValidationError\(vErrors\);/
+  , RETURN_DATA_ASYNC = 'return data;'
+  , ROOTDATA_REGEXP = /[^A-Za-z_$]rootData[^A-Za-z0-9_$]/g
+  , REMOVE_ROOTDATA = /if \(rootData === undefined\) rootData = data;/;
 
-function cleanUpVarErrors(out, async) {
+function finalCleanUpCode(out, async) {
   var matches = out.match(ERRORS_REGEXP);
-  if (!matches || matches.length !== 2) return out;
-  return async
+  if (matches && matches.length == 2) {
+    out = async
           ? out.replace(REMOVE_ERRORS_ASYNC, '')
-               .replace(RETURN_ASYNC, RETURN_TRUE_ASYNC)
+               .replace(RETURN_ASYNC, RETURN_DATA_ASYNC)
           : out.replace(REMOVE_ERRORS, '')
                .replace(RETURN_VALID, RETURN_TRUE);
+  }
+
+  matches = out.match(ROOTDATA_REGEXP);
+  if (!matches || matches.length !== 3) return out;
+  return out.replace(REMOVE_ROOTDATA, '');
 }
 
 
 function schemaHasRules(schema, rules) {
+  if (typeof schema == 'boolean') return !schema;
   for (var key in schema) if (rules[key]) return true;
 }
 
 
 function schemaHasRulesExcept(schema, rules, exceptKeyword) {
+  if (typeof schema == 'boolean') return !schema && exceptKeyword != 'not';
   for (var key in schema) if (key != exceptKeyword && rules[key]) return true;
 }
 
@@ -334,399 +343,6 @@ function unescapeJsonPointer(str) {
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var json = typeof JSON !== 'undefined' ? JSON : __webpack_require__(62);
-
-module.exports = function (obj, opts) {
-    if (!opts) opts = {};
-    if (typeof opts === 'function') opts = { cmp: opts };
-    var space = opts.space || '';
-    if (typeof space === 'number') space = Array(space+1).join(' ');
-    var cycles = (typeof opts.cycles === 'boolean') ? opts.cycles : false;
-    var replacer = opts.replacer || function(key, value) { return value; };
-
-    var cmp = opts.cmp && (function (f) {
-        return function (node) {
-            return function (a, b) {
-                var aobj = { key: a, value: node[a] };
-                var bobj = { key: b, value: node[b] };
-                return f(aobj, bobj);
-            };
-        };
-    })(opts.cmp);
-
-    var seen = [];
-    return (function stringify (parent, key, node, level) {
-        var indent = space ? ('\n' + new Array(level + 1).join(space)) : '';
-        var colonSeparator = space ? ': ' : ':';
-
-        if (node && node.toJSON && typeof node.toJSON === 'function') {
-            node = node.toJSON();
-        }
-
-        node = replacer.call(parent, key, node);
-
-        if (node === undefined) {
-            return;
-        }
-        if (typeof node !== 'object' || node === null) {
-            return json.stringify(node);
-        }
-        if (isArray(node)) {
-            var out = [];
-            for (var i = 0; i < node.length; i++) {
-                var item = stringify(node, i, node[i], level+1) || json.stringify(null);
-                out.push(indent + space + item);
-            }
-            return '[' + out.join(',') + indent + ']';
-        }
-        else {
-            if (seen.indexOf(node) !== -1) {
-                if (cycles) return json.stringify('__cycle__');
-                throw new TypeError('Converting circular structure to JSON');
-            }
-            else seen.push(node);
-
-            var keys = objectKeys(node).sort(cmp && cmp(node));
-            var out = [];
-            for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
-                var value = stringify(node, key, node[key], level+1);
-
-                if(!value) continue;
-
-                var keyValue = json.stringify(key)
-                    + colonSeparator
-                    + value;
-                ;
-                out.push(indent + space + keyValue);
-            }
-            seen.splice(seen.indexOf(node), 1);
-            return '{' + out.join(',') + indent + '}';
-        }
-    })({ '': obj }, '', obj, 0);
-};
-
-var isArray = Array.isArray || function (x) {
-    return {}.toString.call(x) === '[object Array]';
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var has = Object.prototype.hasOwnProperty || function () { return true };
-    var keys = [];
-    for (var key in obj) {
-        if (has.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Tracking Data schema, based off:
- * https://docs.google.com/document/d/1o0zbXibJlqmqk9ScYZGx0iq4jZ6IR8H_OdLU-8gZRlI/edit
- *
- * Schema definition semantics available at:
- * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
- */
-
-var event = __webpack_require__(50);
-var application = __webpack_require__(48);
-var user = __webpack_require__(57);
-var referrer = __webpack_require__(55);
-var interaction = __webpack_require__(52);
-var asset = __webpack_require__(49);
-var presentation = __webpack_require__(54);
-var marketing = __webpack_require__(53);
-var viewport = __webpack_require__(60);
-var session = __webpack_require__(56);
-var video = __webpack_require__(59);
-var heartbeat = __webpack_require__(51);
-
-var allProps = { // main "dataLayer" starts here
-  event: event,
-  application: application,
-  user: user,
-  referrer: referrer,
-  interaction: interaction,
-  asset: asset,
-  presentation: presentation,
-  marketing: marketing,
-  viewport: viewport,
-  video: video,
-  heartbeat: heartbeat,
-
-  // TODO: this is mostly empty
-  session: session
-
-};
-
-module.exports = {
-
-  get: function get(individualEvents) {
-
-    var schema = {
-      additionalProperties: false,
-      // top-level properties
-      properties: allProps
-    };
-
-    if (!individualEvents) {
-      // required top-level properties
-      schema.required = ['event', 'application', 'user', 'referrer'];
-    }
-
-    return schema;
-  }
-
-};
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-function webpackEmptyContext(req) {
-	throw new Error("Cannot find module '" + req + "'.");
-}
-webpackEmptyContext.keys = function() { return []; };
-webpackEmptyContext.resolve = webpackEmptyContext;
-module.exports = webpackEmptyContext;
-webpackEmptyContext.id = 3;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  setup: setupAsync,
-  compile: compileAsync
-};
-
-
-var util = __webpack_require__(0);
-
-var ASYNC = {
-  '*': checkGenerators,
-  'co*': checkGenerators,
-  'es7': checkAsyncFunction
-};
-
-var TRANSPILE = {
-  'nodent': getNodent,
-  'regenerator': getRegenerator
-};
-
-var MODES = [
-  { async: 'co*' },
-  { async: 'es7', transpile: 'nodent' },
-  { async: 'co*', transpile: 'regenerator' }
-];
-
-
-var regenerator, nodent;
-
-
-function setupAsync(opts, required) {
-  if (required !== false) required = true;
-  var async = opts.async
-    , transpile = opts.transpile
-    , check;
-
-  switch (typeof transpile) {
-    case 'string':
-      var get = TRANSPILE[transpile];
-      if (!get) throw new Error('bad transpiler: ' + transpile);
-      return (opts._transpileFunc = get(opts, required));
-    case 'undefined':
-    case 'boolean':
-      if (typeof async == 'string') {
-        check = ASYNC[async];
-        if (!check) throw new Error('bad async mode: ' + async);
-        return (opts.transpile = check(opts, required));
-      }
-
-      for (var i=0; i<MODES.length; i++) {
-        var _opts = MODES[i];
-        if (setupAsync(_opts, false)) {
-          util.copy(_opts, opts);
-          return opts.transpile;
-        }
-      }
-      /* istanbul ignore next */
-      throw new Error('generators, nodent and regenerator are not available');
-    case 'function':
-      return (opts._transpileFunc = opts.transpile);
-    default:
-      throw new Error('bad transpiler: ' + transpile);
-  }
-}
-
-
-function checkGenerators(opts, required) {
-  /* jshint evil: true */
-  try {
-    (new Function('(function*(){})()'))();
-    return true;
-  } catch(e) {
-    /* istanbul ignore next */
-    if (required) throw new Error('generators not supported');
-  }
-}
-
-
-function checkAsyncFunction(opts, required) {
-  /* jshint evil: true */
-  try {
-    (new Function('(async function(){})()'))();
-    /* istanbul ignore next */
-    return true;
-  } catch(e) {
-    if (required) throw new Error('es7 async functions not supported');
-  }
-}
-
-
-function getRegenerator(opts, required) {
-  try {
-    if (!regenerator) {
-      var name = 'regenerator';
-      regenerator = !(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-      regenerator.runtime();
-    }
-    if (!opts.async || opts.async === true)
-      opts.async = 'es7';
-    return regeneratorTranspile;
-  } catch(e) {
-    /* istanbul ignore next */
-    if (required) throw new Error('regenerator not available');
-  }
-}
-
-
-function regeneratorTranspile(code) {
-  return regenerator.compile(code).code;
-}
-
-
-function getNodent(opts, required) {
-  /* jshint evil: true */
-  try {
-    if (!nodent) {
-      var name = 'nodent';
-      nodent = !(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }())({ log: false, dontInstallRequireHook: true });
-    }
-    if (opts.async != 'es7') {
-      if (opts.async && opts.async !== true) console.warn('nodent transpiles only es7 async functions');
-      opts.async = 'es7';
-    }
-    return nodentTranspile;
-  } catch(e) {
-    /* istanbul ignore next */
-    if (required) throw new Error('nodent not available');
-  }
-}
-
-
-function nodentTranspile(code) {
-  return nodent.compile(code, '', { promises: true, sourcemap: false }).code;
-}
-
-
-/**
- * Creates validating function for passed schema with asynchronous loading of missing schemas.
- * `loadSchema` option should be a function that accepts schema uri and node-style callback.
- * @this  Ajv
- * @param {Object}   schema schema object
- * @param {Function} callback node-style callback, it is always called with 2 parameters: error (or null) and validating function.
- */
-function compileAsync(schema, callback) {
-  /* eslint no-shadow: 0 */
-  /* jshint validthis: true */
-  var schemaObj;
-  var self = this;
-  try {
-    schemaObj = this._addSchema(schema);
-  } catch(e) {
-    setTimeout(function() { callback(e); });
-    return;
-  }
-  if (schemaObj.validate) {
-    setTimeout(function() { callback(null, schemaObj.validate); });
-  } else {
-    if (typeof this._opts.loadSchema != 'function')
-      throw new Error('options.loadSchema should be a function');
-    _compileAsync(schema, callback, true);
-  }
-
-
-  function _compileAsync(schema, callback, firstCall) {
-    var validate;
-    try { validate = self.compile(schema); }
-    catch(e) {
-      if (e.missingSchema) loadMissingSchema(e);
-      else deferCallback(e);
-      return;
-    }
-    deferCallback(null, validate);
-
-    function loadMissingSchema(e) {
-      var ref = e.missingSchema;
-      if (self._refs[ref] || self._schemas[ref])
-        return callback(new Error('Schema ' + ref + ' is loaded but ' + e.missingRef + ' cannot be resolved'));
-      var _callbacks = self._loadingSchemas[ref];
-      if (_callbacks) {
-        if (typeof _callbacks == 'function')
-          self._loadingSchemas[ref] = [_callbacks, schemaLoaded];
-        else
-          _callbacks[_callbacks.length] = schemaLoaded;
-      } else {
-        self._loadingSchemas[ref] = schemaLoaded;
-        self._opts.loadSchema(ref, function (err, sch) {
-          var _callbacks = self._loadingSchemas[ref];
-          delete self._loadingSchemas[ref];
-          if (typeof _callbacks == 'function') {
-            _callbacks(err, sch);
-          } else {
-            for (var i=0; i<_callbacks.length; i++)
-              _callbacks[i](err, sch);
-          }
-        });
-      }
-
-      function schemaLoaded(err, sch) {
-        if (err) return callback(err);
-        if (!(self._refs[ref] || self._schemas[ref])) {
-          try {
-            self.addSchema(sch, ref);
-          } catch(e) {
-            callback(e);
-            return;
-          }
-        }
-        _compileAsync(schema, callback);
-      }
-    }
-
-    function deferCallback(err, validate) {
-      if (firstCall) setTimeout(function() { callback(err, validate); });
-      else return callback(err, validate);
-    }
-  }
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -776,16 +392,57 @@ module.exports = function equal(a, b) {
 
 
 /***/ }),
-/* 6 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var url = __webpack_require__(69)
-  , equal = __webpack_require__(5)
+var resolve = __webpack_require__(3);
+
+module.exports = {
+  Validation: errorSubclass(ValidationError),
+  MissingRef: errorSubclass(MissingRefError)
+};
+
+
+function ValidationError(errors) {
+  this.message = 'validation failed';
+  this.errors = errors;
+  this.ajv = this.validation = true;
+}
+
+
+MissingRefError.message = function (baseId, ref) {
+  return 'can\'t resolve reference ' + ref + ' from id ' + baseId;
+};
+
+
+function MissingRefError(baseId, ref, message) {
+  this.message = message || MissingRefError.message(baseId, ref);
+  this.missingRef = resolve.url(baseId, ref);
+  this.missingSchema = resolve.normalizeId(resolve.fullPath(this.missingRef));
+}
+
+
+function errorSubclass(Subclass) {
+  Subclass.prototype = Object.create(Error.prototype);
+  Subclass.prototype.constructor = Subclass;
+  return Subclass;
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var url = __webpack_require__(67)
+  , equal = __webpack_require__(1)
   , util = __webpack_require__(0)
-  , SchemaObject = __webpack_require__(7);
+  , SchemaObject = __webpack_require__(5);
 
 module.exports = resolve;
 
@@ -829,7 +486,7 @@ function resolve(compile, root, ref) {
 
   if (schema instanceof SchemaObject) {
     v = schema.validate || compile.call(this, schema.schema, root, undefined, baseId);
-  } else if (schema) {
+  } else if (schema !== undefined) {
     v = inlineRef(schema, this._opts.inlineRefs)
         ? schema
         : compile.call(this, schema, root, undefined, baseId);
@@ -850,7 +507,7 @@ function resolveSchema(root, ref) {
   /* jshint validthis: true */
   var p = url.parse(ref, false, true)
     , refPath = _getFullPath(p)
-    , baseId = getFullPath(root.schema.id);
+    , baseId = getFullPath(this._getId(root.schema));
   if (refPath !== baseId) {
     var id = normalizeId(refPath);
     var refVal = this._refs[id];
@@ -871,7 +528,7 @@ function resolveSchema(root, ref) {
       }
     }
     if (!root.schema) return;
-    baseId = getFullPath(root.schema.id);
+    baseId = getFullPath(this._getId(root.schema));
   }
   return getJsonPointer.call(this, p, baseId, root.schema, root);
 }
@@ -885,7 +542,8 @@ function resolveRecursive(root, ref, parsedRef) {
     var schema = res.schema;
     var baseId = res.baseId;
     root = res.root;
-    if (schema.id) baseId = resolveUrl(baseId, schema.id);
+    var id = this._getId(schema);
+    if (id) baseId = resolveUrl(baseId, id);
     return getJsonPointer.call(this, parsedRef, baseId, schema, root);
   }
 }
@@ -904,20 +562,24 @@ function getJsonPointer(parsedRef, baseId, schema, root) {
     if (part) {
       part = util.unescapeFragment(part);
       schema = schema[part];
-      if (!schema) break;
-      if (schema.id && !PREVENT_SCOPE_CHANGE[part]) baseId = resolveUrl(baseId, schema.id);
-      if (schema.$ref) {
-        var $ref = resolveUrl(baseId, schema.$ref);
-        var res = resolveSchema.call(this, root, $ref);
-        if (res) {
-          schema = res.schema;
-          root = res.root;
-          baseId = res.baseId;
+      if (schema === undefined) break;
+      var id;
+      if (!PREVENT_SCOPE_CHANGE[part]) {
+        id = this._getId(schema);
+        if (id) baseId = resolveUrl(baseId, id);
+        if (schema.$ref) {
+          var $ref = resolveUrl(baseId, schema.$ref);
+          var res = resolveSchema.call(this, root, $ref);
+          if (res) {
+            schema = res.schema;
+            root = res.root;
+            baseId = res.baseId;
+          }
         }
       }
     }
   }
-  if (schema && schema != root.schema)
+  if (schema !== undefined && schema !== root.schema)
     return { schema: schema, root: root, baseId: baseId };
 }
 
@@ -1009,7 +671,7 @@ function resolveUrl(baseId, id) {
 function resolveIds(schema) {
   /* eslint no-shadow: 0 */
   /* jshint validthis: true */
-  var id = normalizeId(schema.id);
+  var id = normalizeId(this._getId(schema));
   var localRefs = {};
   _resolveIds.call(this, schema, getFullPath(id, false), id);
   return localRefs;
@@ -1021,11 +683,9 @@ function resolveIds(schema) {
       for (var i=0; i<schema.length; i++)
         _resolveIds.call(this, schema[i], fullPath+'/'+i, baseId);
     } else if (schema && typeof schema == 'object') {
-      if (typeof schema.id == 'string') {
-        var id = baseId = baseId
-                          ? url.resolve(baseId, schema.id)
-                          : schema.id;
-        id = normalizeId(id);
+      var id = this._getId(schema);
+      if (typeof id == 'string') {
+        id = baseId = normalizeId(baseId ? url.resolve(baseId, id) : id);
 
         var refVal = this._refs[id];
         if (typeof refVal == 'string') refVal = this._refs[refVal];
@@ -1050,7 +710,73 @@ function resolveIds(schema) {
 
 
 /***/ }),
-/* 7 */
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Tracking Data schema, based off:
+ * https://docs.google.com/document/d/1o0zbXibJlqmqk9ScYZGx0iq4jZ6IR8H_OdLU-8gZRlI/edit
+ *
+ * Schema definition semantics available at:
+ * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
+ */
+
+var event = __webpack_require__(48);
+var application = __webpack_require__(46);
+var user = __webpack_require__(55);
+var referrer = __webpack_require__(53);
+var interaction = __webpack_require__(50);
+var asset = __webpack_require__(47);
+var presentation = __webpack_require__(52);
+var marketing = __webpack_require__(51);
+var viewport = __webpack_require__(58);
+var session = __webpack_require__(54);
+var video = __webpack_require__(57);
+var heartbeat = __webpack_require__(49);
+
+var allProps = { // main "dataLayer" starts here
+  event: event,
+  application: application,
+  user: user,
+  referrer: referrer,
+  interaction: interaction,
+  asset: asset,
+  presentation: presentation,
+  marketing: marketing,
+  viewport: viewport,
+  video: video,
+  heartbeat: heartbeat,
+
+  // TODO: this is mostly empty
+  session: session
+
+};
+
+module.exports = {
+
+  get: function get(individualEvents) {
+
+    var schema = {
+      additionalProperties: false,
+      // top-level properties
+      properties: allProps
+    };
+
+    if (!individualEvents) {
+      // required top-level properties
+      schema.required = ['event', 'application', 'user', 'referrer'];
+    }
+
+    return schema;
+  }
+
+};
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1066,33 +792,12 @@ function SchemaObject(obj) {
 
 
 /***/ }),
-/* 8 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-module.exports = ValidationError;
-
-
-function ValidationError(errors) {
-  this.message = 'validation failed';
-  this.errors = errors;
-  this.ajv = this.validation = true;
-}
-
-
-ValidationError.prototype = Object.create(Error.prototype);
-ValidationError.prototype.constructor = ValidationError;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function generate__limit(it, $keyword) {
+module.exports = function generate__limit(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -1102,7 +807,7 @@ module.exports = function generate__limit(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -1113,17 +818,20 @@ module.exports = function generate__limit(it, $keyword) {
   var $isMax = $keyword == 'maximum',
     $exclusiveKeyword = $isMax ? 'exclusiveMaximum' : 'exclusiveMinimum',
     $schemaExcl = it.schema[$exclusiveKeyword],
-    $isDataExcl = it.opts.v5 && $schemaExcl && $schemaExcl.$data,
+    $isDataExcl = it.opts.$data && $schemaExcl && $schemaExcl.$data,
     $op = $isMax ? '<' : '>',
-    $notOp = $isMax ? '>' : '<';
+    $notOp = $isMax ? '>' : '<',
+    $errorKeyword = undefined;
   if ($isDataExcl) {
     var $schemaValueExcl = it.util.getData($schemaExcl.$data, $dataLvl, it.dataPathArr),
       $exclusive = 'exclusive' + $lvl,
+      $exclType = 'exclType' + $lvl,
+      $exclIsNumber = 'exclIsNumber' + $lvl,
       $opExpr = 'op' + $lvl,
       $opStr = '\' + ' + $opExpr + ' + \'';
     out += ' var schemaExcl' + ($lvl) + ' = ' + ($schemaValueExcl) + '; ';
     $schemaValueExcl = 'schemaExcl' + $lvl;
-    out += ' var exclusive' + ($lvl) + '; if (typeof ' + ($schemaValueExcl) + ' != \'boolean\' && typeof ' + ($schemaValueExcl) + ' != \'undefined\') { ';
+    out += ' var ' + ($exclusive) + '; var ' + ($exclType) + ' = typeof ' + ($schemaValueExcl) + '; if (' + ($exclType) + ' != \'boolean\' && ' + ($exclType) + ' != \'undefined\' && ' + ($exclType) + ' != \'number\') { ';
     var $errorKeyword = $exclusiveKeyword;
     var $$outStack = $$outStack || [];
     $$outStack.push(out);
@@ -1151,27 +859,49 @@ module.exports = function generate__limit(it, $keyword) {
     } else {
       out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
     }
-    out += ' } else if( ';
+    out += ' } else if ( ';
     if ($isData) {
       out += ' (' + ($schemaValue) + ' !== undefined && typeof ' + ($schemaValue) + ' != \'number\') || ';
     }
-    out += ' ((exclusive' + ($lvl) + ' = ' + ($schemaValueExcl) + ' === true) ? ' + ($data) + ' ' + ($notOp) + '= ' + ($schemaValue) + ' : ' + ($data) + ' ' + ($notOp) + ' ' + ($schemaValue) + ') || ' + ($data) + ' !== ' + ($data) + ') { var op' + ($lvl) + ' = exclusive' + ($lvl) + ' ? \'' + ($op) + '\' : \'' + ($op) + '=\';';
+    out += ' ' + ($exclType) + ' == \'number\' ? ( (' + ($exclusive) + ' = ' + ($schemaValue) + ' === undefined || ' + ($schemaValueExcl) + ' ' + ($op) + '= ' + ($schemaValue) + ') ? ' + ($data) + ' ' + ($notOp) + '= ' + ($schemaValueExcl) + ' : ' + ($data) + ' ' + ($notOp) + ' ' + ($schemaValue) + ' ) : ( (' + ($exclusive) + ' = ' + ($schemaValueExcl) + ' === true) ? ' + ($data) + ' ' + ($notOp) + '= ' + ($schemaValue) + ' : ' + ($data) + ' ' + ($notOp) + ' ' + ($schemaValue) + ' ) || ' + ($data) + ' !== ' + ($data) + ') { var op' + ($lvl) + ' = ' + ($exclusive) + ' ? \'' + ($op) + '\' : \'' + ($op) + '=\';';
   } else {
-    var $exclusive = $schemaExcl === true,
+    var $exclIsNumber = typeof $schemaExcl == 'number',
       $opStr = $op;
-    if (!$exclusive) $opStr += '=';
-    var $opExpr = '\'' + $opStr + '\'';
-    out += ' if ( ';
-    if ($isData) {
-      out += ' (' + ($schemaValue) + ' !== undefined && typeof ' + ($schemaValue) + ' != \'number\') || ';
+    if ($exclIsNumber && $isData) {
+      var $opExpr = '\'' + $opStr + '\'';
+      out += ' if ( ';
+      if ($isData) {
+        out += ' (' + ($schemaValue) + ' !== undefined && typeof ' + ($schemaValue) + ' != \'number\') || ';
+      }
+      out += ' ( ' + ($schemaValue) + ' === undefined || ' + ($schemaExcl) + ' ' + ($op) + '= ' + ($schemaValue) + ' ? ' + ($data) + ' ' + ($notOp) + '= ' + ($schemaExcl) + ' : ' + ($data) + ' ' + ($notOp) + ' ' + ($schemaValue) + ' ) || ' + ($data) + ' !== ' + ($data) + ') { ';
+    } else {
+      if ($exclIsNumber && $schema === undefined) {
+        $exclusive = true;
+        $errorKeyword = $exclusiveKeyword;
+        $errSchemaPath = it.errSchemaPath + '/' + $exclusiveKeyword;
+        $schemaValue = $schemaExcl;
+        $notOp += '=';
+      } else {
+        if ($exclIsNumber) $schemaValue = Math[$isMax ? 'min' : 'max']($schemaExcl, $schema);
+        if ($schemaExcl === ($exclIsNumber ? $schemaValue : true)) {
+          $exclusive = true;
+          $errorKeyword = $exclusiveKeyword;
+          $errSchemaPath = it.errSchemaPath + '/' + $exclusiveKeyword;
+          $notOp += '=';
+        } else {
+          $exclusive = false;
+          $opStr += '=';
+        }
+      }
+      var $opExpr = '\'' + $opStr + '\'';
+      out += ' if ( ';
+      if ($isData) {
+        out += ' (' + ($schemaValue) + ' !== undefined && typeof ' + ($schemaValue) + ' != \'number\') || ';
+      }
+      out += ' ' + ($data) + ' ' + ($notOp) + ' ' + ($schemaValue) + ' || ' + ($data) + ' !== ' + ($data) + ') { ';
     }
-    out += ' ' + ($data) + ' ' + ($notOp);
-    if ($exclusive) {
-      out += '=';
-    }
-    out += ' ' + ($schemaValue) + ' || ' + ($data) + ' !== ' + ($data) + ') {';
   }
-  var $errorKeyword = $keyword;
+  $errorKeyword = $errorKeyword || $keyword;
   var $$outStack = $$outStack || [];
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
@@ -1182,7 +912,7 @@ module.exports = function generate__limit(it, $keyword) {
       if ($isData) {
         out += '\' + ' + ($schemaValue);
       } else {
-        out += '' + ($schema) + '\'';
+        out += '' + ($schemaValue) + '\'';
       }
     }
     if (it.opts.verbose) {
@@ -1218,12 +948,12 @@ module.exports = function generate__limit(it, $keyword) {
 
 
 /***/ }),
-/* 10 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate__limitItems(it, $keyword) {
+module.exports = function generate__limitItems(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -1233,7 +963,7 @@ module.exports = function generate__limitItems(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -1301,12 +1031,12 @@ module.exports = function generate__limitItems(it, $keyword) {
 
 
 /***/ }),
-/* 11 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate__limitLength(it, $keyword) {
+module.exports = function generate__limitLength(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -1316,7 +1046,7 @@ module.exports = function generate__limitLength(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -1389,12 +1119,12 @@ module.exports = function generate__limitLength(it, $keyword) {
 
 
 /***/ }),
-/* 12 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate__limitProperties(it, $keyword) {
+module.exports = function generate__limitProperties(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -1404,7 +1134,7 @@ module.exports = function generate__limitProperties(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $errorKeyword;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -1472,34 +1202,28 @@ module.exports = function generate__limitProperties(it, $keyword) {
 
 
 /***/ }),
-/* 13 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_validate(it, $keyword) {
+module.exports = function generate_validate(it, $keyword, $ruleType) {
   var out = '';
-  var $async = it.schema.$async === true;
+  var $async = it.schema.$async === true,
+    $refKeywords = it.util.schemaHasRulesExcept(it.schema, it.RULES.all, '$ref'),
+    $id = it.self._getId(it.schema);
   if (it.isTop) {
-    var $top = it.isTop,
-      $lvl = it.level = 0,
-      $dataLvl = it.dataLevel = 0,
-      $data = 'data';
-    it.rootId = it.resolve.fullPath(it.root.schema.id);
-    it.baseId = it.baseId || it.rootId;
     if ($async) {
       it.async = true;
       var $es7 = it.opts.async == 'es7';
       it.yieldAwait = $es7 ? 'await' : 'yield';
     }
-    delete it.isTop;
-    it.dataPathArr = [undefined];
     out += ' var validate = ';
     if ($async) {
       if ($es7) {
         out += ' (async function ';
       } else {
-        if (it.opts.async == 'co*') {
+        if (it.opts.async != '*') {
           out += 'co.wrap';
         }
         out += '(function* ';
@@ -1507,91 +1231,38 @@ module.exports = function generate_validate(it, $keyword) {
     } else {
       out += ' (function ';
     }
-    out += ' (data, dataPath, parentData, parentDataProperty, rootData) { \'use strict\'; var vErrors = null; ';
-    out += ' var errors = 0;     ';
-    out += ' if (rootData === undefined) rootData = data;';
-  } else {
-    var $lvl = it.level,
-      $dataLvl = it.dataLevel,
-      $data = 'data' + ($dataLvl || '');
-    if (it.schema.id) it.baseId = it.resolve.url(it.baseId, it.schema.id);
-    if ($async && !it.async) throw new Error('async schema in sync schema');
-    out += ' var errs_' + ($lvl) + ' = errors;';
+    out += ' (data, dataPath, parentData, parentDataProperty, rootData) { \'use strict\'; ';
+    if ($id && (it.opts.sourceCode || it.opts.processCode)) {
+      out += ' ' + ('/\*# sourceURL=' + $id + ' */') + ' ';
+    }
   }
-  var $valid = 'valid' + $lvl,
-    $breakOnError = !it.opts.allErrors,
-    $closingBraces1 = '',
-    $closingBraces2 = '';
-  var $typeSchema = it.schema.type,
-    $typeIsArray = Array.isArray($typeSchema);
-  if ($typeSchema && it.opts.coerceTypes) {
-    var $coerceToTypes = it.util.coerceToTypes(it.opts.coerceTypes, $typeSchema);
-    if ($coerceToTypes) {
-      var $schemaPath = it.schemaPath + '.type',
-        $errSchemaPath = it.errSchemaPath + '/type',
-        $method = $typeIsArray ? 'checkDataTypes' : 'checkDataType';
-      out += ' if (' + (it.util[$method]($typeSchema, $data, true)) + ') {  ';
-      var $dataType = 'dataType' + $lvl,
-        $coerced = 'coerced' + $lvl;
-      out += ' var ' + ($dataType) + ' = typeof ' + ($data) + '; ';
-      if (it.opts.coerceTypes == 'array') {
-        out += ' if (' + ($dataType) + ' == \'object\' && Array.isArray(' + ($data) + ')) ' + ($dataType) + ' = \'array\'; ';
+  if (typeof it.schema == 'boolean' || !($refKeywords || it.schema.$ref)) {
+    var $keyword = 'false schema';
+    var $lvl = it.level;
+    var $dataLvl = it.dataLevel;
+    var $schema = it.schema[$keyword];
+    var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
+    var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
+    var $breakOnError = !it.opts.allErrors;
+    var $errorKeyword;
+    var $data = 'data' + ($dataLvl || '');
+    var $valid = 'valid' + $lvl;
+    if (it.schema === false) {
+      if (it.isTop) {
+        $breakOnError = true;
+      } else {
+        out += ' var ' + ($valid) + ' = false; ';
       }
-      out += ' var ' + ($coerced) + ' = undefined; ';
-      var $bracesCoercion = '';
-      var arr1 = $coerceToTypes;
-      if (arr1) {
-        var $type, $i = -1,
-          l1 = arr1.length - 1;
-        while ($i < l1) {
-          $type = arr1[$i += 1];
-          if ($i) {
-            out += ' if (' + ($coerced) + ' === undefined) { ';
-            $bracesCoercion += '}';
-          }
-          if (it.opts.coerceTypes == 'array' && $type != 'array') {
-            out += ' if (' + ($dataType) + ' == \'array\' && ' + ($data) + '.length == 1) { ' + ($coerced) + ' = ' + ($data) + ' = ' + ($data) + '[0]; ' + ($dataType) + ' = typeof ' + ($data) + ';  } ';
-          }
-          if ($type == 'string') {
-            out += ' if (' + ($dataType) + ' == \'number\' || ' + ($dataType) + ' == \'boolean\') ' + ($coerced) + ' = \'\' + ' + ($data) + '; else if (' + ($data) + ' === null) ' + ($coerced) + ' = \'\'; ';
-          } else if ($type == 'number' || $type == 'integer') {
-            out += ' if (' + ($dataType) + ' == \'boolean\' || ' + ($data) + ' === null || (' + ($dataType) + ' == \'string\' && ' + ($data) + ' && ' + ($data) + ' == +' + ($data) + ' ';
-            if ($type == 'integer') {
-              out += ' && !(' + ($data) + ' % 1)';
-            }
-            out += ')) ' + ($coerced) + ' = +' + ($data) + '; ';
-          } else if ($type == 'boolean') {
-            out += ' if (' + ($data) + ' === \'false\' || ' + ($data) + ' === 0 || ' + ($data) + ' === null) ' + ($coerced) + ' = false; else if (' + ($data) + ' === \'true\' || ' + ($data) + ' === 1) ' + ($coerced) + ' = true; ';
-          } else if ($type == 'null') {
-            out += ' if (' + ($data) + ' === \'\' || ' + ($data) + ' === 0 || ' + ($data) + ' === false) ' + ($coerced) + ' = null; ';
-          } else if (it.opts.coerceTypes == 'array' && $type == 'array') {
-            out += ' if (' + ($dataType) + ' == \'string\' || ' + ($dataType) + ' == \'number\' || ' + ($dataType) + ' == \'boolean\' || ' + ($data) + ' == null) ' + ($coerced) + ' = [' + ($data) + ']; ';
-          }
-        }
-      }
-      out += ' ' + ($bracesCoercion) + ' if (' + ($coerced) + ' === undefined) {   ';
       var $$outStack = $$outStack || [];
       $$outStack.push(out);
       out = ''; /* istanbul ignore else */
       if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
-        if ($typeIsArray) {
-          out += '' + ($typeSchema.join(","));
-        } else {
-          out += '' + ($typeSchema);
-        }
-        out += '\' } ';
+        out += ' { keyword: \'' + ($errorKeyword || 'false schema') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
         if (it.opts.messages !== false) {
-          out += ' , message: \'should be ';
-          if ($typeIsArray) {
-            out += '' + ($typeSchema.join(","));
-          } else {
-            out += '' + ($typeSchema);
-          }
-          out += '\' ';
+          out += ' , message: \'boolean schema is false\' ';
         }
         if (it.opts.verbose) {
-          out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+          out += ' , schema: false , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
         }
         out += ' } ';
       } else {
@@ -1608,25 +1279,200 @@ module.exports = function generate_validate(it, $keyword) {
       } else {
         out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
       }
-      out += ' } else {  ';
-      var $parentData = $dataLvl ? 'data' + (($dataLvl - 1) || '') : 'parentData',
-        $parentDataProperty = $dataLvl ? it.dataPathArr[$dataLvl] : 'parentDataProperty';
-      out += ' ' + ($data) + ' = ' + ($coerced) + '; ';
-      if (!$dataLvl) {
-        out += 'if (' + ($parentData) + ' !== undefined)';
+    } else {
+      if (it.isTop) {
+        if ($async) {
+          out += ' return data; ';
+        } else {
+          out += ' validate.errors = null; return true; ';
+        }
+      } else {
+        out += ' var ' + ($valid) + ' = true; ';
       }
-      out += ' ' + ($parentData) + '[' + ($parentDataProperty) + '] = ' + ($coerced) + '; } } ';
+    }
+    if (it.isTop) {
+      out += ' }); return validate; ';
+    }
+    return out;
+  }
+  if (it.isTop) {
+    var $top = it.isTop,
+      $lvl = it.level = 0,
+      $dataLvl = it.dataLevel = 0,
+      $data = 'data';
+    it.rootId = it.resolve.fullPath(it.self._getId(it.root.schema));
+    it.baseId = it.baseId || it.rootId;
+    delete it.isTop;
+    it.dataPathArr = [undefined];
+    out += ' var vErrors = null; ';
+    out += ' var errors = 0;     ';
+    out += ' if (rootData === undefined) rootData = data; ';
+  } else {
+    var $lvl = it.level,
+      $dataLvl = it.dataLevel,
+      $data = 'data' + ($dataLvl || '');
+    if ($id) it.baseId = it.resolve.url(it.baseId, $id);
+    if ($async && !it.async) throw new Error('async schema in sync schema');
+    out += ' var errs_' + ($lvl) + ' = errors;';
+  }
+  var $valid = 'valid' + $lvl,
+    $breakOnError = !it.opts.allErrors,
+    $closingBraces1 = '',
+    $closingBraces2 = '';
+  var $errorKeyword;
+  var $typeSchema = it.schema.type,
+    $typeIsArray = Array.isArray($typeSchema);
+  if ($typeIsArray && $typeSchema.length == 1) {
+    $typeSchema = $typeSchema[0];
+    $typeIsArray = false;
+  }
+  if (it.schema.$ref && $refKeywords) {
+    if (it.opts.extendRefs == 'fail') {
+      throw new Error('$ref: validation keywords used in schema at path "' + it.errSchemaPath + '" (see option extendRefs)');
+    } else if (it.opts.extendRefs !== true) {
+      $refKeywords = false;
+      console.warn('$ref: keywords ignored in schema at path "' + it.errSchemaPath + '"');
     }
   }
-  var $refKeywords;
-  if (it.schema.$ref && ($refKeywords = it.util.schemaHasRulesExcept(it.schema, it.RULES.all, '$ref'))) {
-    if (it.opts.extendRefs == 'fail') {
-      throw new Error('$ref: validation keywords used in schema at path "' + it.errSchemaPath + '"');
-    } else if (it.opts.extendRefs == 'ignore') {
-      $refKeywords = false;
-      console.log('$ref: keywords ignored in schema at path "' + it.errSchemaPath + '"');
-    } else if (it.opts.extendRefs !== true) {
-      console.log('$ref: all keywords used in schema at path "' + it.errSchemaPath + '". It will change in the next major version, see issue #260. Use option { extendRefs: true } to keep current behaviour');
+  if ($typeSchema) {
+    if (it.opts.coerceTypes) {
+      var $coerceToTypes = it.util.coerceToTypes(it.opts.coerceTypes, $typeSchema);
+    }
+    var $rulesGroup = it.RULES.types[$typeSchema];
+    if ($coerceToTypes || $typeIsArray || $rulesGroup === true || ($rulesGroup && !$shouldUseGroup($rulesGroup))) {
+      var $schemaPath = it.schemaPath + '.type',
+        $errSchemaPath = it.errSchemaPath + '/type';
+      var $schemaPath = it.schemaPath + '.type',
+        $errSchemaPath = it.errSchemaPath + '/type',
+        $method = $typeIsArray ? 'checkDataTypes' : 'checkDataType';
+      out += ' if (' + (it.util[$method]($typeSchema, $data, true)) + ') { ';
+      if ($coerceToTypes) {
+        var $dataType = 'dataType' + $lvl,
+          $coerced = 'coerced' + $lvl;
+        out += ' var ' + ($dataType) + ' = typeof ' + ($data) + '; ';
+        if (it.opts.coerceTypes == 'array') {
+          out += ' if (' + ($dataType) + ' == \'object\' && Array.isArray(' + ($data) + ')) ' + ($dataType) + ' = \'array\'; ';
+        }
+        out += ' var ' + ($coerced) + ' = undefined; ';
+        var $bracesCoercion = '';
+        var arr1 = $coerceToTypes;
+        if (arr1) {
+          var $type, $i = -1,
+            l1 = arr1.length - 1;
+          while ($i < l1) {
+            $type = arr1[$i += 1];
+            if ($i) {
+              out += ' if (' + ($coerced) + ' === undefined) { ';
+              $bracesCoercion += '}';
+            }
+            if (it.opts.coerceTypes == 'array' && $type != 'array') {
+              out += ' if (' + ($dataType) + ' == \'array\' && ' + ($data) + '.length == 1) { ' + ($coerced) + ' = ' + ($data) + ' = ' + ($data) + '[0]; ' + ($dataType) + ' = typeof ' + ($data) + ';  } ';
+            }
+            if ($type == 'string') {
+              out += ' if (' + ($dataType) + ' == \'number\' || ' + ($dataType) + ' == \'boolean\') ' + ($coerced) + ' = \'\' + ' + ($data) + '; else if (' + ($data) + ' === null) ' + ($coerced) + ' = \'\'; ';
+            } else if ($type == 'number' || $type == 'integer') {
+              out += ' if (' + ($dataType) + ' == \'boolean\' || ' + ($data) + ' === null || (' + ($dataType) + ' == \'string\' && ' + ($data) + ' && ' + ($data) + ' == +' + ($data) + ' ';
+              if ($type == 'integer') {
+                out += ' && !(' + ($data) + ' % 1)';
+              }
+              out += ')) ' + ($coerced) + ' = +' + ($data) + '; ';
+            } else if ($type == 'boolean') {
+              out += ' if (' + ($data) + ' === \'false\' || ' + ($data) + ' === 0 || ' + ($data) + ' === null) ' + ($coerced) + ' = false; else if (' + ($data) + ' === \'true\' || ' + ($data) + ' === 1) ' + ($coerced) + ' = true; ';
+            } else if ($type == 'null') {
+              out += ' if (' + ($data) + ' === \'\' || ' + ($data) + ' === 0 || ' + ($data) + ' === false) ' + ($coerced) + ' = null; ';
+            } else if (it.opts.coerceTypes == 'array' && $type == 'array') {
+              out += ' if (' + ($dataType) + ' == \'string\' || ' + ($dataType) + ' == \'number\' || ' + ($dataType) + ' == \'boolean\' || ' + ($data) + ' == null) ' + ($coerced) + ' = [' + ($data) + ']; ';
+            }
+          }
+        }
+        out += ' ' + ($bracesCoercion) + ' if (' + ($coerced) + ' === undefined) {   ';
+        var $$outStack = $$outStack || [];
+        $$outStack.push(out);
+        out = ''; /* istanbul ignore else */
+        if (it.createErrors !== false) {
+          out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+          if ($typeIsArray) {
+            out += '' + ($typeSchema.join(","));
+          } else {
+            out += '' + ($typeSchema);
+          }
+          out += '\' } ';
+          if (it.opts.messages !== false) {
+            out += ' , message: \'should be ';
+            if ($typeIsArray) {
+              out += '' + ($typeSchema.join(","));
+            } else {
+              out += '' + ($typeSchema);
+            }
+            out += '\' ';
+          }
+          if (it.opts.verbose) {
+            out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+          }
+          out += ' } ';
+        } else {
+          out += ' {} ';
+        }
+        var __err = out;
+        out = $$outStack.pop();
+        if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+          if (it.async) {
+            out += ' throw new ValidationError([' + (__err) + ']); ';
+          } else {
+            out += ' validate.errors = [' + (__err) + ']; return false; ';
+          }
+        } else {
+          out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+        }
+        out += ' } else {  ';
+        var $parentData = $dataLvl ? 'data' + (($dataLvl - 1) || '') : 'parentData',
+          $parentDataProperty = $dataLvl ? it.dataPathArr[$dataLvl] : 'parentDataProperty';
+        out += ' ' + ($data) + ' = ' + ($coerced) + '; ';
+        if (!$dataLvl) {
+          out += 'if (' + ($parentData) + ' !== undefined)';
+        }
+        out += ' ' + ($parentData) + '[' + ($parentDataProperty) + '] = ' + ($coerced) + '; } ';
+      } else {
+        var $$outStack = $$outStack || [];
+        $$outStack.push(out);
+        out = ''; /* istanbul ignore else */
+        if (it.createErrors !== false) {
+          out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+          if ($typeIsArray) {
+            out += '' + ($typeSchema.join(","));
+          } else {
+            out += '' + ($typeSchema);
+          }
+          out += '\' } ';
+          if (it.opts.messages !== false) {
+            out += ' , message: \'should be ';
+            if ($typeIsArray) {
+              out += '' + ($typeSchema.join(","));
+            } else {
+              out += '' + ($typeSchema);
+            }
+            out += '\' ';
+          }
+          if (it.opts.verbose) {
+            out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+          }
+          out += ' } ';
+        } else {
+          out += ' {} ';
+        }
+        var __err = out;
+        out = $$outStack.pop();
+        if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+          if (it.async) {
+            out += ' throw new ValidationError([' + (__err) + ']); ';
+          } else {
+            out += ' validate.errors = [' + (__err) + ']; return false; ';
+          }
+        } else {
+          out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+        }
+      }
+      out += ' } ';
     }
   }
   if (it.schema.$ref && !$refKeywords) {
@@ -1642,6 +1488,9 @@ module.exports = function generate_validate(it, $keyword) {
       $closingBraces2 += '}';
     }
   } else {
+    if (it.opts.v5 && it.schema.patternGroups) {
+      console.warn('keyword "patternGroups" is deprecated and disabled. Use option patternGroups: true to enable.');
+    }
     var arr2 = it.RULES;
     if (arr2) {
       var $rulesGroup, i2 = -1,
@@ -1703,9 +1552,12 @@ module.exports = function generate_validate(it, $keyword) {
             while (i5 < l5) {
               $rule = arr5[i5 += 1];
               if ($shouldUseRule($rule)) {
-                out += ' ' + ($rule.code(it, $rule.keyword)) + ' ';
-                if ($breakOnError) {
-                  $closingBraces1 += '}';
+                var $code = $rule.code(it, $rule.keyword, $rulesGroup.type);
+                if ($code) {
+                  out += ' ' + ($code) + ' ';
+                  if ($breakOnError) {
+                    $closingBraces1 += '}';
+                  }
                 }
               }
             }
@@ -1717,7 +1569,6 @@ module.exports = function generate_validate(it, $keyword) {
           if ($rulesGroup.type) {
             out += ' } ';
             if ($typeSchema && $typeSchema === $rulesGroup.type && !$coerceToTypes) {
-              var $typeChecked = true;
               out += ' else { ';
               var $schemaPath = it.schemaPath + '.type',
                 $errSchemaPath = it.errSchemaPath + '/type';
@@ -1725,7 +1576,7 @@ module.exports = function generate_validate(it, $keyword) {
               $$outStack.push(out);
               out = ''; /* istanbul ignore else */
               if (it.createErrors !== false) {
-                out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
+                out += ' { keyword: \'' + ($errorKeyword || 'type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
                 if ($typeIsArray) {
                   out += '' + ($typeSchema.join(","));
                 } else {
@@ -1776,57 +1627,12 @@ module.exports = function generate_validate(it, $keyword) {
       }
     }
   }
-  if ($typeSchema && !$typeChecked && !$coerceToTypes) {
-    var $schemaPath = it.schemaPath + '.type',
-      $errSchemaPath = it.errSchemaPath + '/type',
-      $method = $typeIsArray ? 'checkDataTypes' : 'checkDataType';
-    out += ' if (' + (it.util[$method]($typeSchema, $data, true)) + ') {   ';
-    var $$outStack = $$outStack || [];
-    $$outStack.push(out);
-    out = ''; /* istanbul ignore else */
-    if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ('type') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { type: \'';
-      if ($typeIsArray) {
-        out += '' + ($typeSchema.join(","));
-      } else {
-        out += '' + ($typeSchema);
-      }
-      out += '\' } ';
-      if (it.opts.messages !== false) {
-        out += ' , message: \'should be ';
-        if ($typeIsArray) {
-          out += '' + ($typeSchema.join(","));
-        } else {
-          out += '' + ($typeSchema);
-        }
-        out += '\' ';
-      }
-      if (it.opts.verbose) {
-        out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-      }
-      out += ' } ';
-    } else {
-      out += ' {} ';
-    }
-    var __err = out;
-    out = $$outStack.pop();
-    if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-      if (it.async) {
-        out += ' throw new ValidationError([' + (__err) + ']); ';
-      } else {
-        out += ' validate.errors = [' + (__err) + ']; return false; ';
-      }
-    } else {
-      out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-    }
-    out += ' }';
-  }
   if ($breakOnError) {
     out += ' ' + ($closingBraces2) + ' ';
   }
   if ($top) {
     if ($async) {
-      out += ' if (errors === 0) return true;           ';
+      out += ' if (errors === 0) return data;           ';
       out += ' else throw new ValidationError(vErrors); ';
     } else {
       out += ' validate.errors = vErrors; ';
@@ -1837,24 +1643,31 @@ module.exports = function generate_validate(it, $keyword) {
     out += ' var ' + ($valid) + ' = errors === errs_' + ($lvl) + ';';
   }
   out = it.util.cleanUpCode(out);
-  if ($top && $breakOnError) {
-    out = it.util.cleanUpVarErrors(out, $async);
+  if ($top) {
+    out = it.util.finalCleanUpCode(out, $async);
   }
 
   function $shouldUseGroup($rulesGroup) {
-    for (var i = 0; i < $rulesGroup.rules.length; i++)
-      if ($shouldUseRule($rulesGroup.rules[i])) return true;
+    var rules = $rulesGroup.rules;
+    for (var i = 0; i < rules.length; i++)
+      if ($shouldUseRule(rules[i])) return true;
   }
 
   function $shouldUseRule($rule) {
-    return it.schema[$rule.keyword] !== undefined || ($rule.keyword == 'properties' && (it.schema.additionalProperties === false || typeof it.schema.additionalProperties == 'object' || (it.schema.patternProperties && Object.keys(it.schema.patternProperties).length) || (it.opts.v5 && it.schema.patternGroups && Object.keys(it.schema.patternGroups).length)));
+    return it.schema[$rule.keyword] !== undefined || ($rule.implements && $ruleImlementsSomeKeyword($rule));
+  }
+
+  function $ruleImlementsSomeKeyword($rule) {
+    var impl = $rule.implements;
+    for (var i = 0; i < impl.length; i++)
+      if (it.schema[impl[i]] !== undefined) return true;
   }
   return out;
 }
 
 
 /***/ }),
-/* 14 */
+/* 11 */
 /***/ (function(module, exports) {
 
 
@@ -2097,16 +1910,106 @@ function isObject(val) {
 
 
 /***/ }),
-/* 15 */
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var json = typeof JSON !== 'undefined' ? JSON : __webpack_require__(60);
+
+module.exports = function (obj, opts) {
+    if (!opts) opts = {};
+    if (typeof opts === 'function') opts = { cmp: opts };
+    var space = opts.space || '';
+    if (typeof space === 'number') space = Array(space+1).join(' ');
+    var cycles = (typeof opts.cycles === 'boolean') ? opts.cycles : false;
+    var replacer = opts.replacer || function(key, value) { return value; };
+
+    var cmp = opts.cmp && (function (f) {
+        return function (node) {
+            return function (a, b) {
+                var aobj = { key: a, value: node[a] };
+                var bobj = { key: b, value: node[b] };
+                return f(aobj, bobj);
+            };
+        };
+    })(opts.cmp);
+
+    var seen = [];
+    return (function stringify (parent, key, node, level) {
+        var indent = space ? ('\n' + new Array(level + 1).join(space)) : '';
+        var colonSeparator = space ? ': ' : ':';
+
+        if (node && node.toJSON && typeof node.toJSON === 'function') {
+            node = node.toJSON();
+        }
+
+        node = replacer.call(parent, key, node);
+
+        if (node === undefined) {
+            return;
+        }
+        if (typeof node !== 'object' || node === null) {
+            return json.stringify(node);
+        }
+        if (isArray(node)) {
+            var out = [];
+            for (var i = 0; i < node.length; i++) {
+                var item = stringify(node, i, node[i], level+1) || json.stringify(null);
+                out.push(indent + space + item);
+            }
+            return '[' + out.join(',') + indent + ']';
+        }
+        else {
+            if (seen.indexOf(node) !== -1) {
+                if (cycles) return json.stringify('__cycle__');
+                throw new TypeError('Converting circular structure to JSON');
+            }
+            else seen.push(node);
+
+            var keys = objectKeys(node).sort(cmp && cmp(node));
+            var out = [];
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var value = stringify(node, key, node[key], level+1);
+
+                if(!value) continue;
+
+                var keyValue = json.stringify(key)
+                    + colonSeparator
+                    + value;
+                ;
+                out.push(indent + space + keyValue);
+            }
+            seen.splice(seen.indexOf(node), 1);
+            return '{' + out.join(',') + indent + '}';
+        }
+    })({ '': obj }, '', obj, 0);
+};
+
+var isArray = Array.isArray || function (x) {
+    return {}.toString.call(x) === '[object Array]';
+};
+
+var objectKeys = Object.keys || function (obj) {
+    var has = Object.prototype.hasOwnProperty || function () { return true };
+    var keys = [];
+    for (var key in obj) {
+        if (has.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 /* eslint-disable no-console */
-var Ajv = __webpack_require__(16);
-var schemaGenerator = __webpack_require__(2);
-var logger = __webpack_require__(61);
+var Ajv = __webpack_require__(15);
+var schemaGenerator = __webpack_require__(4);
+var logger = __webpack_require__(59);
 var ajv = new Ajv({
   allErrors: true
 });
@@ -2142,41 +2045,110 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var compileSchema = __webpack_require__(21)
-  , resolve = __webpack_require__(6)
-  , Cache = __webpack_require__(17)
-  , SchemaObject = __webpack_require__(7)
-  , stableStringify = __webpack_require__(1)
-  , formats = __webpack_require__(20)
-  , rules = __webpack_require__(22)
-  , v5 = __webpack_require__(46)
+var KEYWORDS = [
+  'multipleOf',
+  'maximum',
+  'exclusiveMaximum',
+  'minimum',
+  'exclusiveMinimum',
+  'maxLength',
+  'minLength',
+  'pattern',
+  'additionalItems',
+  'maxItems',
+  'minItems',
+  'uniqueItems',
+  'maxProperties',
+  'minProperties',
+  'required',
+  'additionalProperties',
+  'enum',
+  'format',
+  'const'
+];
+
+module.exports = function (metaSchema, keywordsJsonPointers) {
+  for (var i=0; i<keywordsJsonPointers.length; i++) {
+    metaSchema = JSON.parse(JSON.stringify(metaSchema));
+    var segments = keywordsJsonPointers[i].split('/');
+    var keywords = metaSchema;
+    var j;
+    for (j=1; j<segments.length; j++)
+      keywords = keywords[segments[j]];
+
+    for (j=0; j<KEYWORDS.length; j++) {
+      var key = KEYWORDS[j];
+      var schema = keywords[key];
+      if (schema) {
+        keywords[key] = {
+          anyOf: [
+            schema,
+            { $ref: 'https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/$data.json#' }
+          ]
+        };
+      }
+    }
+  }
+
+  return metaSchema;
+};
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var compileSchema = __webpack_require__(20)
+  , resolve = __webpack_require__(3)
+  , Cache = __webpack_require__(16)
+  , SchemaObject = __webpack_require__(5)
+  , stableStringify = __webpack_require__(12)
+  , formats = __webpack_require__(19)
+  , rules = __webpack_require__(21)
+  , $dataMetaSchema = __webpack_require__(14)
+  , patternGroups = __webpack_require__(42)
   , util = __webpack_require__(0)
-  , async = __webpack_require__(4)
-  , co = __webpack_require__(14);
+  , co = __webpack_require__(11);
 
 module.exports = Ajv;
 
-Ajv.prototype.compileAsync = async.compile;
+Ajv.prototype.validate = validate;
+Ajv.prototype.compile = compile;
+Ajv.prototype.addSchema = addSchema;
+Ajv.prototype.addMetaSchema = addMetaSchema;
+Ajv.prototype.validateSchema = validateSchema;
+Ajv.prototype.getSchema = getSchema;
+Ajv.prototype.removeSchema = removeSchema;
+Ajv.prototype.addFormat = addFormat;
+Ajv.prototype.errorsText = errorsText;
 
-var customKeyword = __webpack_require__(43);
+Ajv.prototype._addSchema = _addSchema;
+Ajv.prototype._compile = _compile;
+
+Ajv.prototype.compileAsync = __webpack_require__(18);
+var customKeyword = __webpack_require__(41);
 Ajv.prototype.addKeyword = customKeyword.add;
 Ajv.prototype.getKeyword = customKeyword.get;
 Ajv.prototype.removeKeyword = customKeyword.remove;
-Ajv.ValidationError = __webpack_require__(8);
 
-var META_SCHEMA_ID = 'http://json-schema.org/draft-04/schema';
-var SCHEMA_URI_FORMAT = /^(?:(?:[a-z][a-z0-9+-.]*:)?\/\/)?[^\s]*$/i;
-function SCHEMA_URI_FORMAT_FUNC(str) {
-  return SCHEMA_URI_FORMAT.test(str);
-}
+var errorClasses = __webpack_require__(2);
+Ajv.ValidationError = errorClasses.Validation;
+Ajv.MissingRefError = errorClasses.MissingRef;
+Ajv.$dataMetaSchema = $dataMetaSchema;
+
+var META_SCHEMA_ID = 'http://json-schema.org/draft-06/schema';
 
 var META_IGNORE_OPTIONS = [ 'removeAdditional', 'useDefaults', 'coerceTypes' ];
+var META_SUPPORT_DATA = ['/properties'];
 
 /**
  * Creates validator instance.
@@ -2186,390 +2158,434 @@ var META_IGNORE_OPTIONS = [ 'removeAdditional', 'useDefaults', 'coerceTypes' ];
  */
 function Ajv(opts) {
   if (!(this instanceof Ajv)) return new Ajv(opts);
-  var self = this;
-
   opts = this._opts = util.copy(opts) || {};
   this._schemas = {};
   this._refs = {};
   this._fragments = {};
   this._formats = formats(opts.format);
+  var schemaUriFormat = this._schemaUriFormat = this._formats['uri-reference'];
+  this._schemaUriFormatFunc = function (str) { return schemaUriFormat.test(str); };
+
   this._cache = opts.cache || new Cache;
   this._loadingSchemas = {};
   this._compilations = [];
   this.RULES = rules();
-
-  // this is done on purpose, so that methods are bound to the instance
-  // (without using bind) so that they can be used without the instance
-  this.validate = validate;
-  this.compile = compile;
-  this.addSchema = addSchema;
-  this.addMetaSchema = addMetaSchema;
-  this.validateSchema = validateSchema;
-  this.getSchema = getSchema;
-  this.removeSchema = removeSchema;
-  this.addFormat = addFormat;
-  this.errorsText = errorsText;
-
-  this._addSchema = _addSchema;
-  this._compile = _compile;
+  this._getId = chooseGetId(opts);
 
   opts.loopRequired = opts.loopRequired || Infinity;
-  if (opts.async || opts.transpile) async.setup(opts);
-  if (opts.beautify === true) opts.beautify = { indent_size: 2 };
   if (opts.errorDataPath == 'property') opts._errorDataPathProperty = true;
-  this._metaOpts = getMetaSchemaOptions();
+  if (opts.serialize === undefined) opts.serialize = stableStringify;
+  this._metaOpts = getMetaSchemaOptions(this);
 
-  if (opts.formats) addInitialFormats();
-  addDraft4MetaSchema();
-  if (opts.v5) v5.enable(this);
-  if (typeof opts.meta == 'object') addMetaSchema(opts.meta);
-  addInitialSchemas();
+  if (opts.formats) addInitialFormats(this);
+  addDraft6MetaSchema(this);
+  if (typeof opts.meta == 'object') this.addMetaSchema(opts.meta);
+  addInitialSchemas(this);
+  if (opts.patternGroups) patternGroups(this);
+}
 
 
-  /**
-   * Validate data using schema
-   * Schema will be compiled and cached (using serialized JSON as key. [json-stable-stringify](https://github.com/substack/json-stable-stringify) is used to serialize.
-   * @param  {String|Object} schemaKeyRef key, ref or schema object
-   * @param  {Any} data to be validated
-   * @return {Boolean} validation result. Errors from the last validation will be available in `ajv.errors` (and also in compiled schema: `schema.errors`).
-   */
-  function validate(schemaKeyRef, data) {
-    var v;
-    if (typeof schemaKeyRef == 'string') {
-      v = getSchema(schemaKeyRef);
-      if (!v) throw new Error('no schema with key or ref "' + schemaKeyRef + '"');
-    } else {
-      var schemaObj = _addSchema(schemaKeyRef);
-      v = schemaObj.validate || _compile(schemaObj);
-    }
 
-    var valid = v(data);
-    if (v.$async === true)
-      return self._opts.async == '*' ? co(valid) : valid;
-    self.errors = v.errors;
-    return valid;
+/**
+ * Validate data using schema
+ * Schema will be compiled and cached (using serialized JSON as key. [json-stable-stringify](https://github.com/substack/json-stable-stringify) is used to serialize.
+ * @this   Ajv
+ * @param  {String|Object} schemaKeyRef key, ref or schema object
+ * @param  {Any} data to be validated
+ * @return {Boolean} validation result. Errors from the last validation will be available in `ajv.errors` (and also in compiled schema: `schema.errors`).
+ */
+function validate(schemaKeyRef, data) {
+  var v;
+  if (typeof schemaKeyRef == 'string') {
+    v = this.getSchema(schemaKeyRef);
+    if (!v) throw new Error('no schema with key or ref "' + schemaKeyRef + '"');
+  } else {
+    var schemaObj = this._addSchema(schemaKeyRef);
+    v = schemaObj.validate || this._compile(schemaObj);
   }
 
+  var valid = v(data);
+  if (v.$async === true)
+    return this._opts.async == '*' ? co(valid) : valid;
+  this.errors = v.errors;
+  return valid;
+}
 
-  /**
-   * Create validating function for passed schema.
-   * @param  {Object} schema schema object
-   * @param  {Boolean} _meta true if schema is a meta-schema. Used internally to compile meta schemas of custom keywords.
-   * @return {Function} validating function
-   */
-  function compile(schema, _meta) {
-    var schemaObj = _addSchema(schema, undefined, _meta);
-    return schemaObj.validate || _compile(schemaObj);
+
+/**
+ * Create validating function for passed schema.
+ * @this   Ajv
+ * @param  {Object} schema schema object
+ * @param  {Boolean} _meta true if schema is a meta-schema. Used internally to compile meta schemas of custom keywords.
+ * @return {Function} validating function
+ */
+function compile(schema, _meta) {
+  var schemaObj = this._addSchema(schema, undefined, _meta);
+  return schemaObj.validate || this._compile(schemaObj);
+}
+
+
+/**
+ * Adds schema to the instance.
+ * @this   Ajv
+ * @param {Object|Array} schema schema or array of schemas. If array is passed, `key` and other parameters will be ignored.
+ * @param {String} key Optional schema key. Can be passed to `validate` method instead of schema object or id/ref. One schema per instance can have empty `id` and `key`.
+ * @param {Boolean} _skipValidation true to skip schema validation. Used internally, option validateSchema should be used instead.
+ * @param {Boolean} _meta true if schema is a meta-schema. Used internally, addMetaSchema should be used instead.
+ */
+function addSchema(schema, key, _skipValidation, _meta) {
+  if (Array.isArray(schema)){
+    for (var i=0; i<schema.length; i++) this.addSchema(schema[i], undefined, _skipValidation, _meta);
+    return;
   }
+  var id = this._getId(schema);
+  if (id !== undefined && typeof id != 'string')
+    throw new Error('schema id must be string');
+  key = resolve.normalizeId(key || id);
+  checkUnique(this, key);
+  this._schemas[key] = this._addSchema(schema, _skipValidation, _meta, true);
+}
 
 
-  /**
-   * Adds schema to the instance.
-   * @param {Object|Array} schema schema or array of schemas. If array is passed, `key` and other parameters will be ignored.
-   * @param {String} key Optional schema key. Can be passed to `validate` method instead of schema object or id/ref. One schema per instance can have empty `id` and `key`.
-   * @param {Boolean} _skipValidation true to skip schema validation. Used internally, option validateSchema should be used instead.
-   * @param {Boolean} _meta true if schema is a meta-schema. Used internally, addMetaSchema should be used instead.
-   */
-  function addSchema(schema, key, _skipValidation, _meta) {
-    if (Array.isArray(schema)){
-      for (var i=0; i<schema.length; i++) addSchema(schema[i], undefined, _skipValidation, _meta);
-      return;
-    }
-    // can key/id have # inside?
-    key = resolve.normalizeId(key || schema.id);
-    checkUnique(key);
-    self._schemas[key] = _addSchema(schema, _skipValidation, _meta, true);
+/**
+ * Add schema that will be used to validate other schemas
+ * options in META_IGNORE_OPTIONS are alway set to false
+ * @this   Ajv
+ * @param {Object} schema schema object
+ * @param {String} key optional schema key
+ * @param {Boolean} skipValidation true to skip schema validation, can be used to override validateSchema option for meta-schema
+ */
+function addMetaSchema(schema, key, skipValidation) {
+  this.addSchema(schema, key, skipValidation, true);
+}
+
+
+/**
+ * Validate schema
+ * @this   Ajv
+ * @param {Object} schema schema to validate
+ * @param {Boolean} throwOrLogError pass true to throw (or log) an error if invalid
+ * @return {Boolean} true if schema is valid
+ */
+function validateSchema(schema, throwOrLogError) {
+  var $schema = schema.$schema;
+  if ($schema !== undefined && typeof $schema != 'string')
+    throw new Error('$schema must be a string');
+  $schema = $schema || this._opts.defaultMeta || defaultMeta(this);
+  if (!$schema) {
+    console.warn('meta-schema not available');
+    this.errors = null;
+    return true;
   }
-
-
-  /**
-   * Add schema that will be used to validate other schemas
-   * options in META_IGNORE_OPTIONS are alway set to false
-   * @param {Object} schema schema object
-   * @param {String} key optional schema key
-   * @param {Boolean} skipValidation true to skip schema validation, can be used to override validateSchema option for meta-schema
-   */
-  function addMetaSchema(schema, key, skipValidation) {
-    addSchema(schema, key, skipValidation, true);
+  var currentUriFormat = this._formats.uri;
+  this._formats.uri = typeof currentUriFormat == 'function'
+                      ? this._schemaUriFormatFunc
+                      : this._schemaUriFormat;
+  var valid;
+  try { valid = this.validate($schema, schema); }
+  finally { this._formats.uri = currentUriFormat; }
+  if (!valid && throwOrLogError) {
+    var message = 'schema is invalid: ' + this.errorsText();
+    if (this._opts.validateSchema == 'log') console.error(message);
+    else throw new Error(message);
   }
+  return valid;
+}
 
 
-  /**
-   * Validate schema
-   * @param {Object} schema schema to validate
-   * @param {Boolean} throwOrLogError pass true to throw (or log) an error if invalid
-   * @return {Boolean} true if schema is valid
-   */
-  function validateSchema(schema, throwOrLogError) {
-    var $schema = schema.$schema || self._opts.defaultMeta || defaultMeta();
-    var currentUriFormat = self._formats.uri;
-    self._formats.uri = typeof currentUriFormat == 'function'
-                        ? SCHEMA_URI_FORMAT_FUNC
-                        : SCHEMA_URI_FORMAT;
-    var valid;
-    try { valid = validate($schema, schema); }
-    finally { self._formats.uri = currentUriFormat; }
-    if (!valid && throwOrLogError) {
-      var message = 'schema is invalid: ' + errorsText();
-      if (self._opts.validateSchema == 'log') console.error(message);
-      else throw new Error(message);
-    }
-    return valid;
-  }
+function defaultMeta(self) {
+  var meta = self._opts.meta;
+  self._opts.defaultMeta = typeof meta == 'object'
+                            ? self._getId(meta) || meta
+                            : self.getSchema(META_SCHEMA_ID)
+                              ? META_SCHEMA_ID
+                              : undefined;
+  return self._opts.defaultMeta;
+}
 
 
-  function defaultMeta() {
-    var meta = self._opts.meta;
-    self._opts.defaultMeta = typeof meta == 'object'
-                              ? meta.id || meta
-                              : self._opts.v5
-                                ? v5.META_SCHEMA_ID
-                                : META_SCHEMA_ID;
-    return self._opts.defaultMeta;
-  }
-
-
-  /**
-   * Get compiled schema from the instance by `key` or `ref`.
-   * @param  {String} keyRef `key` that was passed to `addSchema` or full schema reference (`schema.id` or resolved id).
-   * @return {Function} schema validating function (with property `schema`).
-   */
-  function getSchema(keyRef) {
-    var schemaObj = _getSchemaObj(keyRef);
-    switch (typeof schemaObj) {
-      case 'object': return schemaObj.validate || _compile(schemaObj);
-      case 'string': return getSchema(schemaObj);
-      case 'undefined': return _getSchemaFragment(keyRef);
-    }
-  }
-
-
-  function _getSchemaFragment(ref) {
-    var res = resolve.schema.call(self, { schema: {} }, ref);
-    if (res) {
-      var schema = res.schema
-        , root = res.root
-        , baseId = res.baseId;
-      var v = compileSchema.call(self, schema, root, undefined, baseId);
-      self._fragments[ref] = new SchemaObject({
-        ref: ref,
-        fragment: true,
-        schema: schema,
-        root: root,
-        baseId: baseId,
-        validate: v
-      });
-      return v;
-    }
-  }
-
-
-  function _getSchemaObj(keyRef) {
-    keyRef = resolve.normalizeId(keyRef);
-    return self._schemas[keyRef] || self._refs[keyRef] || self._fragments[keyRef];
-  }
-
-
-  /**
-   * Remove cached schema(s).
-   * If no parameter is passed all schemas but meta-schemas are removed.
-   * If RegExp is passed all schemas with key/id matching pattern but meta-schemas are removed.
-   * Even if schema is referenced by other schemas it still can be removed as other schemas have local references.
-   * @param  {String|Object|RegExp} schemaKeyRef key, ref, pattern to match key/ref or schema object
-   */
-  function removeSchema(schemaKeyRef) {
-    if (schemaKeyRef instanceof RegExp) {
-      _removeAllSchemas(self._schemas, schemaKeyRef);
-      _removeAllSchemas(self._refs, schemaKeyRef);
-      return;
-    }
-    switch (typeof schemaKeyRef) {
-      case 'undefined':
-        _removeAllSchemas(self._schemas);
-        _removeAllSchemas(self._refs);
-        self._cache.clear();
-        return;
-      case 'string':
-        var schemaObj = _getSchemaObj(schemaKeyRef);
-        if (schemaObj) self._cache.del(schemaObj.jsonStr);
-        delete self._schemas[schemaKeyRef];
-        delete self._refs[schemaKeyRef];
-        return;
-      case 'object':
-        var jsonStr = stableStringify(schemaKeyRef);
-        self._cache.del(jsonStr);
-        var id = schemaKeyRef.id;
-        if (id) {
-          id = resolve.normalizeId(id);
-          delete self._schemas[id];
-          delete self._refs[id];
-        }
-    }
-  }
-
-
-  function _removeAllSchemas(schemas, regex) {
-    for (var keyRef in schemas) {
-      var schemaObj = schemas[keyRef];
-      if (!schemaObj.meta && (!regex || regex.test(keyRef))) {
-        self._cache.del(schemaObj.jsonStr);
-        delete schemas[keyRef];
-      }
-    }
-  }
-
-
-  function _addSchema(schema, skipValidation, meta, shouldAddSchema) {
-    if (typeof schema != 'object') throw new Error('schema should be object');
-    var jsonStr = stableStringify(schema);
-    var cached = self._cache.get(jsonStr);
-    if (cached) return cached;
-
-    shouldAddSchema = shouldAddSchema || self._opts.addUsedSchema !== false;
-
-    var id = resolve.normalizeId(schema.id);
-    if (id && shouldAddSchema) checkUnique(id);
-
-    var willValidate = self._opts.validateSchema !== false && !skipValidation;
-    var recursiveMeta;
-    if (willValidate && !(recursiveMeta = schema.id && schema.id == schema.$schema))
-      validateSchema(schema, true);
-
-    var localRefs = resolve.ids.call(self, schema);
-
-    var schemaObj = new SchemaObject({
-      id: id,
-      schema: schema,
-      localRefs: localRefs,
-      jsonStr: jsonStr,
-      meta: meta
-    });
-
-    if (id[0] != '#' && shouldAddSchema) self._refs[id] = schemaObj;
-    self._cache.put(jsonStr, schemaObj);
-
-    if (willValidate && recursiveMeta) validateSchema(schema, true);
-
-    return schemaObj;
-  }
-
-
-  function _compile(schemaObj, root) {
-    if (schemaObj.compiling) {
-      schemaObj.validate = callValidate;
-      callValidate.schema = schemaObj.schema;
-      callValidate.errors = null;
-      callValidate.root = root ? root : callValidate;
-      if (schemaObj.schema.$async === true)
-        callValidate.$async = true;
-      return callValidate;
-    }
-    schemaObj.compiling = true;
-
-    var currentOpts;
-    if (schemaObj.meta) {
-      currentOpts = self._opts;
-      self._opts = self._metaOpts;
-    }
-
-    var v;
-    try { v = compileSchema.call(self, schemaObj.schema, root, schemaObj.localRefs); }
-    finally {
-      schemaObj.compiling = false;
-      if (schemaObj.meta) self._opts = currentOpts;
-    }
-
-    schemaObj.validate = v;
-    schemaObj.refs = v.refs;
-    schemaObj.refVal = v.refVal;
-    schemaObj.root = v.root;
-    return v;
-
-
-    function callValidate() {
-      var _validate = schemaObj.validate;
-      var result = _validate.apply(null, arguments);
-      callValidate.errors = _validate.errors;
-      return result;
-    }
-  }
-
-
-  /**
-   * Convert array of error message objects to string
-   * @param  {Array<Object>} errors optional array of validation errors, if not passed errors from the instance are used.
-   * @param  {Object} options optional options with properties `separator` and `dataVar`.
-   * @return {String} human readable string with all errors descriptions
-   */
-  function errorsText(errors, options) {
-    errors = errors || self.errors;
-    if (!errors) return 'No errors';
-    options = options || {};
-    var separator = options.separator === undefined ? ', ' : options.separator;
-    var dataVar = options.dataVar === undefined ? 'data' : options.dataVar;
-
-    var text = '';
-    for (var i=0; i<errors.length; i++) {
-      var e = errors[i];
-      if (e) text += dataVar + e.dataPath + ' ' + e.message + separator;
-    }
-    return text.slice(0, -separator.length);
-  }
-
-
-  /**
-   * Add custom format
-   * @param {String} name format name
-   * @param {String|RegExp|Function} format string is converted to RegExp; function should return boolean (true when valid)
-   */
-  function addFormat(name, format) {
-    if (typeof format == 'string') format = new RegExp(format);
-    self._formats[name] = format;
-  }
-
-
-  function addDraft4MetaSchema() {
-    if (self._opts.meta !== false) {
-      var metaSchema = __webpack_require__(44);
-      addMetaSchema(metaSchema, META_SCHEMA_ID, true);
-      self._refs['http://json-schema.org/schema'] = META_SCHEMA_ID;
-    }
-  }
-
-
-  function addInitialSchemas() {
-    var optsSchemas = self._opts.schemas;
-    if (!optsSchemas) return;
-    if (Array.isArray(optsSchemas)) addSchema(optsSchemas);
-    else for (var key in optsSchemas) addSchema(optsSchemas[key], key);
-  }
-
-
-  function addInitialFormats() {
-    for (var name in self._opts.formats) {
-      var format = self._opts.formats[name];
-      addFormat(name, format);
-    }
-  }
-
-
-  function checkUnique(id) {
-    if (self._schemas[id] || self._refs[id])
-      throw new Error('schema with key or id "' + id + '" already exists');
-  }
-
-
-  function getMetaSchemaOptions() {
-    var metaOpts = util.copy(self._opts);
-    for (var i=0; i<META_IGNORE_OPTIONS.length; i++)
-      delete metaOpts[META_IGNORE_OPTIONS[i]];
-    return metaOpts;
+/**
+ * Get compiled schema from the instance by `key` or `ref`.
+ * @this   Ajv
+ * @param  {String} keyRef `key` that was passed to `addSchema` or full schema reference (`schema.id` or resolved id).
+ * @return {Function} schema validating function (with property `schema`).
+ */
+function getSchema(keyRef) {
+  var schemaObj = _getSchemaObj(this, keyRef);
+  switch (typeof schemaObj) {
+    case 'object': return schemaObj.validate || this._compile(schemaObj);
+    case 'string': return this.getSchema(schemaObj);
+    case 'undefined': return _getSchemaFragment(this, keyRef);
   }
 }
 
 
+function _getSchemaFragment(self, ref) {
+  var res = resolve.schema.call(self, { schema: {} }, ref);
+  if (res) {
+    var schema = res.schema
+      , root = res.root
+      , baseId = res.baseId;
+    var v = compileSchema.call(self, schema, root, undefined, baseId);
+    self._fragments[ref] = new SchemaObject({
+      ref: ref,
+      fragment: true,
+      schema: schema,
+      root: root,
+      baseId: baseId,
+      validate: v
+    });
+    return v;
+  }
+}
+
+
+function _getSchemaObj(self, keyRef) {
+  keyRef = resolve.normalizeId(keyRef);
+  return self._schemas[keyRef] || self._refs[keyRef] || self._fragments[keyRef];
+}
+
+
+/**
+ * Remove cached schema(s).
+ * If no parameter is passed all schemas but meta-schemas are removed.
+ * If RegExp is passed all schemas with key/id matching pattern but meta-schemas are removed.
+ * Even if schema is referenced by other schemas it still can be removed as other schemas have local references.
+ * @this   Ajv
+ * @param  {String|Object|RegExp} schemaKeyRef key, ref, pattern to match key/ref or schema object
+ */
+function removeSchema(schemaKeyRef) {
+  if (schemaKeyRef instanceof RegExp) {
+    _removeAllSchemas(this, this._schemas, schemaKeyRef);
+    _removeAllSchemas(this, this._refs, schemaKeyRef);
+    return;
+  }
+  switch (typeof schemaKeyRef) {
+    case 'undefined':
+      _removeAllSchemas(this, this._schemas);
+      _removeAllSchemas(this, this._refs);
+      this._cache.clear();
+      return;
+    case 'string':
+      var schemaObj = _getSchemaObj(this, schemaKeyRef);
+      if (schemaObj) this._cache.del(schemaObj.cacheKey);
+      delete this._schemas[schemaKeyRef];
+      delete this._refs[schemaKeyRef];
+      return;
+    case 'object':
+      var serialize = this._opts.serialize;
+      var cacheKey = serialize ? serialize(schemaKeyRef) : schemaKeyRef;
+      this._cache.del(cacheKey);
+      var id = this._getId(schemaKeyRef);
+      if (id) {
+        id = resolve.normalizeId(id);
+        delete this._schemas[id];
+        delete this._refs[id];
+      }
+  }
+}
+
+
+function _removeAllSchemas(self, schemas, regex) {
+  for (var keyRef in schemas) {
+    var schemaObj = schemas[keyRef];
+    if (!schemaObj.meta && (!regex || regex.test(keyRef))) {
+      self._cache.del(schemaObj.cacheKey);
+      delete schemas[keyRef];
+    }
+  }
+}
+
+
+/* @this   Ajv */
+function _addSchema(schema, skipValidation, meta, shouldAddSchema) {
+  if (typeof schema != 'object' && typeof schema != 'boolean')
+    throw new Error('schema should be object or boolean');
+  var serialize = this._opts.serialize;
+  var cacheKey = serialize ? serialize(schema) : schema;
+  var cached = this._cache.get(cacheKey);
+  if (cached) return cached;
+
+  shouldAddSchema = shouldAddSchema || this._opts.addUsedSchema !== false;
+
+  var id = resolve.normalizeId(this._getId(schema));
+  if (id && shouldAddSchema) checkUnique(this, id);
+
+  var willValidate = this._opts.validateSchema !== false && !skipValidation;
+  var recursiveMeta;
+  if (willValidate && !(recursiveMeta = id && id == resolve.normalizeId(schema.$schema)))
+    this.validateSchema(schema, true);
+
+  var localRefs = resolve.ids.call(this, schema);
+
+  var schemaObj = new SchemaObject({
+    id: id,
+    schema: schema,
+    localRefs: localRefs,
+    cacheKey: cacheKey,
+    meta: meta
+  });
+
+  if (id[0] != '#' && shouldAddSchema) this._refs[id] = schemaObj;
+  this._cache.put(cacheKey, schemaObj);
+
+  if (willValidate && recursiveMeta) this.validateSchema(schema, true);
+
+  return schemaObj;
+}
+
+
+/* @this   Ajv */
+function _compile(schemaObj, root) {
+  if (schemaObj.compiling) {
+    schemaObj.validate = callValidate;
+    callValidate.schema = schemaObj.schema;
+    callValidate.errors = null;
+    callValidate.root = root ? root : callValidate;
+    if (schemaObj.schema.$async === true)
+      callValidate.$async = true;
+    return callValidate;
+  }
+  schemaObj.compiling = true;
+
+  var currentOpts;
+  if (schemaObj.meta) {
+    currentOpts = this._opts;
+    this._opts = this._metaOpts;
+  }
+
+  var v;
+  try { v = compileSchema.call(this, schemaObj.schema, root, schemaObj.localRefs); }
+  finally {
+    schemaObj.compiling = false;
+    if (schemaObj.meta) this._opts = currentOpts;
+  }
+
+  schemaObj.validate = v;
+  schemaObj.refs = v.refs;
+  schemaObj.refVal = v.refVal;
+  schemaObj.root = v.root;
+  return v;
+
+
+  function callValidate() {
+    var _validate = schemaObj.validate;
+    var result = _validate.apply(null, arguments);
+    callValidate.errors = _validate.errors;
+    return result;
+  }
+}
+
+
+function chooseGetId(opts) {
+  switch (opts.schemaId) {
+    case '$id': return _get$Id;
+    case 'id': return _getId;
+    default: return _get$IdOrId;
+  }
+}
+
+
+function _getId(schema) {
+  if (schema.$id) console.warn('schema $id ignored', schema.$id);
+  return schema.id;
+}
+
+
+function _get$Id(schema) {
+  if (schema.id) console.warn('schema id ignored', schema.id);
+  return schema.$id;
+}
+
+
+function _get$IdOrId(schema) {
+  if (schema.$id && schema.id && schema.$id != schema.id)
+    throw new Error('schema $id is different from id');
+  return schema.$id || schema.id;
+}
+
+
+/**
+ * Convert array of error message objects to string
+ * @this   Ajv
+ * @param  {Array<Object>} errors optional array of validation errors, if not passed errors from the instance are used.
+ * @param  {Object} options optional options with properties `separator` and `dataVar`.
+ * @return {String} human readable string with all errors descriptions
+ */
+function errorsText(errors, options) {
+  errors = errors || this.errors;
+  if (!errors) return 'No errors';
+  options = options || {};
+  var separator = options.separator === undefined ? ', ' : options.separator;
+  var dataVar = options.dataVar === undefined ? 'data' : options.dataVar;
+
+  var text = '';
+  for (var i=0; i<errors.length; i++) {
+    var e = errors[i];
+    if (e) text += dataVar + e.dataPath + ' ' + e.message + separator;
+  }
+  return text.slice(0, -separator.length);
+}
+
+
+/**
+ * Add custom format
+ * @this   Ajv
+ * @param {String} name format name
+ * @param {String|RegExp|Function} format string is converted to RegExp; function should return boolean (true when valid)
+ */
+function addFormat(name, format) {
+  if (typeof format == 'string') format = new RegExp(format);
+  this._formats[name] = format;
+}
+
+
+function addDraft6MetaSchema(self) {
+  var $dataSchema;
+  if (self._opts.$data) {
+    $dataSchema = __webpack_require__(43);
+    self.addMetaSchema($dataSchema, $dataSchema.$id, true);
+  }
+  if (self._opts.meta === false) return;
+  var metaSchema = __webpack_require__(44);
+  if (self._opts.$data) metaSchema = $dataMetaSchema(metaSchema, META_SUPPORT_DATA);
+  self.addMetaSchema(metaSchema, META_SCHEMA_ID, true);
+  self._refs['http://json-schema.org/schema'] = META_SCHEMA_ID;
+}
+
+
+function addInitialSchemas(self) {
+  var optsSchemas = self._opts.schemas;
+  if (!optsSchemas) return;
+  if (Array.isArray(optsSchemas)) self.addSchema(optsSchemas);
+  else for (var key in optsSchemas) self.addSchema(optsSchemas[key], key);
+}
+
+
+function addInitialFormats(self) {
+  for (var name in self._opts.formats) {
+    var format = self._opts.formats[name];
+    self.addFormat(name, format);
+  }
+}
+
+
+function checkUnique(self, id) {
+  if (self._schemas[id] || self._refs[id])
+    throw new Error('schema with key or id "' + id + '" already exists');
+}
+
+
+function getMetaSchemaOptions(self) {
+  var metaOpts = util.copy(self._opts);
+  for (var i=0; i<META_IGNORE_OPTIONS.length; i++)
+    delete metaOpts[META_IGNORE_OPTIONS[i]];
+  return metaOpts;
+}
+
+
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2602,19 +2618,7 @@ Cache.prototype.clear = function Cache_clear() {
 
 
 /***/ }),
-/* 18 */
-/***/ (function(module, exports) {
-
-function webpackEmptyContext(req) {
-	throw new Error("Cannot find module '" + req + "'.");
-}
-webpackEmptyContext.keys = function() { return []; };
-webpackEmptyContext.resolve = webpackEmptyContext;
-module.exports = webpackEmptyContext;
-webpackEmptyContext.id = 18;
-
-/***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2622,34 +2626,134 @@ webpackEmptyContext.id = 18;
 
 //all requires must be explicit because browserify won't work with dynamic requires
 module.exports = {
-  '$ref': __webpack_require__(39),
-  allOf: __webpack_require__(25),
-  anyOf: __webpack_require__(26),
-  dependencies: __webpack_require__(29),
-  'enum': __webpack_require__(30),
-  format: __webpack_require__(31),
-  items: __webpack_require__(32),
-  maximum: __webpack_require__(9),
-  minimum: __webpack_require__(9),
-  maxItems: __webpack_require__(10),
-  minItems: __webpack_require__(10),
-  maxLength: __webpack_require__(11),
-  minLength: __webpack_require__(11),
-  maxProperties: __webpack_require__(12),
-  minProperties: __webpack_require__(12),
-  multipleOf: __webpack_require__(33),
-  not: __webpack_require__(34),
-  oneOf: __webpack_require__(35),
-  pattern: __webpack_require__(36),
-  properties: __webpack_require__(38),
-  required: __webpack_require__(40),
-  uniqueItems: __webpack_require__(42),
-  validate: __webpack_require__(13)
+  '$ref': __webpack_require__(38),
+  allOf: __webpack_require__(23),
+  anyOf: __webpack_require__(24),
+  const: __webpack_require__(25),
+  contains: __webpack_require__(26),
+  dependencies: __webpack_require__(28),
+  'enum': __webpack_require__(29),
+  format: __webpack_require__(30),
+  items: __webpack_require__(31),
+  maximum: __webpack_require__(6),
+  minimum: __webpack_require__(6),
+  maxItems: __webpack_require__(7),
+  minItems: __webpack_require__(7),
+  maxLength: __webpack_require__(8),
+  minLength: __webpack_require__(8),
+  maxProperties: __webpack_require__(9),
+  minProperties: __webpack_require__(9),
+  multipleOf: __webpack_require__(32),
+  not: __webpack_require__(33),
+  oneOf: __webpack_require__(34),
+  pattern: __webpack_require__(35),
+  properties: __webpack_require__(36),
+  propertyNames: __webpack_require__(37),
+  required: __webpack_require__(39),
+  uniqueItems: __webpack_require__(40),
+  validate: __webpack_require__(10)
 };
 
 
 /***/ }),
-/* 20 */
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var MissingRefError = __webpack_require__(2).MissingRef;
+
+module.exports = compileAsync;
+
+
+/**
+ * Creates validating function for passed schema with asynchronous loading of missing schemas.
+ * `loadSchema` option should be a function that accepts schema uri and returns promise that resolves with the schema.
+ * @this  Ajv
+ * @param {Object}   schema schema object
+ * @param {Boolean}  meta optional true to compile meta-schema; this parameter can be skipped
+ * @param {Function} callback an optional node-style callback, it is called with 2 parameters: error (or null) and validating function.
+ * @return {Promise} promise that resolves with a validating function.
+ */
+function compileAsync(schema, meta, callback) {
+  /* eslint no-shadow: 0 */
+  /* global Promise */
+  /* jshint validthis: true */
+  var self = this;
+  if (typeof this._opts.loadSchema != 'function')
+    throw new Error('options.loadSchema should be a function');
+
+  if (typeof meta == 'function') {
+    callback = meta;
+    meta = undefined;
+  }
+
+  var p = loadMetaSchemaOf(schema).then(function () {
+    var schemaObj = self._addSchema(schema, undefined, meta);
+    return schemaObj.validate || _compileAsync(schemaObj);
+  });
+
+  if (callback) {
+    p.then(
+      function(v) { callback(null, v); },
+      callback
+    );
+  }
+
+  return p;
+
+
+  function loadMetaSchemaOf(sch) {
+    var $schema = sch.$schema;
+    return $schema && !self.getSchema($schema)
+            ? compileAsync.call(self, { $ref: $schema }, true)
+            : Promise.resolve();
+  }
+
+
+  function _compileAsync(schemaObj) {
+    try { return self._compile(schemaObj); }
+    catch(e) {
+      if (e instanceof MissingRefError) return loadMissingSchema(e);
+      throw e;
+    }
+
+
+    function loadMissingSchema(e) {
+      var ref = e.missingSchema;
+      if (added(ref)) throw new Error('Schema ' + ref + ' is loaded but ' + e.missingRef + ' cannot be resolved');
+
+      var schemaPromise = self._loadingSchemas[ref];
+      if (!schemaPromise) {
+        schemaPromise = self._loadingSchemas[ref] = self._opts.loadSchema(ref);
+        schemaPromise.then(removePromise, removePromise);
+      }
+
+      return schemaPromise.then(function (sch) {
+        if (!added(ref)) {
+          return loadMetaSchemaOf(sch).then(function () {
+            if (!added(ref)) self.addSchema(sch, ref, undefined, meta);
+          });
+        }
+      }).then(function() {
+        return _compileAsync(schemaObj);
+      });
+
+      function removePromise() {
+        delete self._loadingSchemas[ref];
+      }
+
+      function added(ref) {
+        return self._refs[ref] || self._schemas[ref];
+      }
+    }
+  }
+}
+
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2661,7 +2765,15 @@ var DATE = /^\d\d\d\d-(\d\d)-(\d\d)$/;
 var DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31];
 var TIME = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d:\d\d)?$/i;
 var HOSTNAME = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[-0-9a-z]{0,61}[0-9a-z])?)*$/i;
-var URI = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?$/i;
+var URI = /^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'()*+,;=:@\/?]|%[0-9a-f]{2})*)?$/i;
+var URIREF = /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'"()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?(?:\?(?:[a-z0-9\-._~!$&'"()*+,;=:@\/?]|%[0-9a-f]{2})*)?(?:\#(?:[a-z0-9\-._~!$&'"()*+,;=:@\/?]|%[0-9a-f]{2})*)?$/i;
+// uri-template: https://tools.ietf.org/html/rfc6570
+var URITEMPLATE = /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#.\/;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?:\:[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?:\:[1-9][0-9]{0,3}|\*)?)*\})*$/i;
+// For the source: https://gist.github.com/dperini/729294
+// For test cases: https://mathiasbynens.be/demo/url-regex
+// @todo Delete current URL in favour of the commented out URL rule when this issue is fixed https://github.com/eslint/eslint/issues/7983.
+// var URL = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u{00a1}-\u{ffff}0-9]+-?)*[a-z\u{00a1}-\u{ffff}0-9]+)(?:\.(?:[a-z\u{00a1}-\u{ffff}0-9]+-?)*[a-z\u{00a1}-\u{ffff}0-9]+)*(?:\.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/iu;
+var URL = /^(?:(?:http[s\u017F]?|ftp):\/\/)(?:(?:[\0-\x08\x0E-\x1F!-\x9F\xA1-\u167F\u1681-\u1FFF\u200B-\u2027\u202A-\u202E\u2030-\u205E\u2060-\u2FFF\u3001-\uD7FF\uE000-\uFEFE\uFF00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])+(?::(?:[\0-\x08\x0E-\x1F!-\x9F\xA1-\u167F\u1681-\u1FFF\u200B-\u2027\u202A-\u202E\u2030-\u205E\u2060-\u2FFF\u3001-\uD7FF\uE000-\uFEFE\uFF00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])*)?@)?(?:(?!10(?:\.[0-9]{1,3}){3})(?!127(?:\.[0-9]{1,3}){3})(?!169\.254(?:\.[0-9]{1,3}){2})(?!192\.168(?:\.[0-9]{1,3}){2})(?!172\.(?:1[6-9]|2[0-9]|3[01])(?:\.[0-9]{1,3}){2})(?:[1-9][0-9]?|1[0-9][0-9]|2[01][0-9]|22[0-3])(?:\.(?:1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])){2}(?:\.(?:[1-9][0-9]?|1[0-9][0-9]|2[0-4][0-9]|25[0-4]))|(?:(?:(?:[0-9KSa-z\xA1-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])+\-?)*(?:[0-9KSa-z\xA1-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])+)(?:\.(?:(?:[0-9KSa-z\xA1-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])+\-?)*(?:[0-9KSa-z\xA1-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])+)*(?:\.(?:(?:[KSa-z\xA1-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]){2,})))(?::[0-9]{2,5})?(?:\/(?:[\0-\x08\x0E-\x1F!-\x9F\xA1-\u167F\u1681-\u1FFF\u200B-\u2027\u202A-\u202E\u2030-\u205E\u2060-\u2FFF\u3001-\uD7FF\uE000-\uFEFE\uFF00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF])*)?$/i;
 var UUID = /^(?:urn\:uuid\:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 var JSON_POINTER = /^(?:\/(?:[^~\/]|~0|~1)*)*$|^\#(?:\/(?:[a-z0-9_\-\.!$&'()*+,;:=@]|%[0-9a-f]{2}|~0|~1)*)*$/i;
 var RELATIVE_JSON_POINTER = /^(?:0|[1-9][0-9]*)(?:\#|(?:\/(?:[^~\/]|~0|~1)*)*)$/;
@@ -2671,14 +2783,7 @@ module.exports = formats;
 
 function formats(mode) {
   mode = mode == 'full' ? 'full' : 'fast';
-  var formatDefs = util.copy(formats[mode]);
-  for (var fName in formats.compare) {
-    formatDefs[fName] = {
-      validate: formatDefs[fName],
-      compare: formats.compare[fName]
-    };
-  }
-  return formatDefs;
+  return util.copy(formats[mode]);
 }
 
 
@@ -2689,7 +2794,10 @@ formats.fast = {
   time: /^[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?(?:z|[+-]\d\d:\d\d)?$/i,
   'date-time': /^\d\d\d\d-[0-1]\d-[0-3]\d[t\s][0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?(?:z|[+-]\d\d:\d\d)$/i,
   // uri: https://github.com/mafintosh/is-my-json-valid/blob/master/formats.js
-  uri: /^(?:[a-z][a-z0-9+-.]*)?(?:\:|\/)\/?[^\s]*$/i,
+  uri: /^(?:[a-z][a-z0-9+-.]*)(?:\:|\/)\/?[^\s]*$/i,
+  'uri-reference': /^(?:(?:[a-z][a-z0-9+-.]*:)?\/\/)?[^\s]*$/i,
+  'uri-template': URITEMPLATE,
+  url: URL,
   // email (sources from jsen validator):
   // http://stackoverflow.com/questions/201323/using-a-regular-expression-to-validate-an-email-address#answer-8829363
   // http://www.w3.org/TR/html5/forms.html#valid-e-mail-address (search for 'willful violation')
@@ -2715,6 +2823,9 @@ formats.full = {
   time: time,
   'date-time': date_time,
   uri: uri,
+  'uri-reference': URIREF,
+  'uri-template': URITEMPLATE,
+  url: URL,
   email: /^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&''*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i,
   hostname: hostname,
   ipv4: /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/,
@@ -2723,13 +2834,6 @@ formats.full = {
   uuid: UUID,
   'json-pointer': JSON_POINTER,
   'relative-json-pointer': RELATIVE_JSON_POINTER
-};
-
-
-formats.compare = {
-  date: compareDate,
-  time: compareTime,
-  'date-time': compareDateTime
 };
 
 
@@ -2778,7 +2882,9 @@ function uri(str) {
 }
 
 
+var Z_ANCHOR = /[^\\]\\Z/;
 function regex(str) {
+  if (Z_ANCHOR.test(str)) return false;
   try {
     new RegExp(str);
     return true;
@@ -2788,71 +2894,30 @@ function regex(str) {
 }
 
 
-function compareDate(d1, d2) {
-  if (!(d1 && d2)) return;
-  if (d1 > d2) return 1;
-  if (d1 < d2) return -1;
-  if (d1 === d2) return 0;
-}
-
-
-function compareTime(t1, t2) {
-  if (!(t1 && t2)) return;
-  t1 = t1.match(TIME);
-  t2 = t2.match(TIME);
-  if (!(t1 && t2)) return;
-  t1 = t1[1] + t1[2] + t1[3] + (t1[4]||'');
-  t2 = t2[1] + t2[2] + t2[3] + (t2[4]||'');
-  if (t1 > t2) return 1;
-  if (t1 < t2) return -1;
-  if (t1 === t2) return 0;
-}
-
-
-function compareDateTime(dt1, dt2) {
-  if (!(dt1 && dt2)) return;
-  dt1 = dt1.split(DATE_TIME_SEPARATOR);
-  dt2 = dt2.split(DATE_TIME_SEPARATOR);
-  var res = compareDate(dt1[0], dt2[0]);
-  if (res === undefined) return;
-  return res || compareTime(dt1[1], dt2[1]);
-}
-
-
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var resolve = __webpack_require__(6)
+var resolve = __webpack_require__(3)
   , util = __webpack_require__(0)
-  , stableStringify = __webpack_require__(1)
-  , async = __webpack_require__(4);
+  , errorClasses = __webpack_require__(2)
+  , stableStringify = __webpack_require__(12);
 
-var beautify;
-
-function loadBeautify(){
-  if (beautify === undefined) {
-    var name = 'js-beautify';
-    try { beautify = !(function webpackMissingModule() { var e = new Error("Cannot find module \".\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()).js_beautify; }
-    catch(e) { beautify = false; }
-  }
-}
-
-var validateGenerator = __webpack_require__(13);
+var validateGenerator = __webpack_require__(10);
 
 /**
  * Functions below are used inside compiled validations function
  */
 
-var co = __webpack_require__(14);
+var co = __webpack_require__(11);
 var ucs2length = util.ucs2length;
-var equal = __webpack_require__(5);
+var equal = __webpack_require__(1);
 
 // this error is thrown by async schemas to return validation errors via exception
-var ValidationError = __webpack_require__(8);
+var ValidationError = errorClasses.Validation;
 
 module.exports = compile;
 
@@ -2877,8 +2942,7 @@ function compile(schema, root, localRefs, baseId) {
     , patternsHash = {}
     , defaults = []
     , defaultsHash = {}
-    , customRules = []
-    , keepSourceCode = opts.sourceCode !== false;
+    , customRules = [];
 
   root = root || { schema: schema, refVal: refVal, refs: refs };
 
@@ -2900,7 +2964,7 @@ function compile(schema, root, localRefs, baseId) {
       cv.refVal = v.refVal;
       cv.root = v.root;
       cv.$async = v.$async;
-      if (keepSourceCode) cv.sourceCode = v.sourceCode;
+      if (opts.sourceCode) cv.source = v.source;
     }
     return v;
   } finally {
@@ -2920,7 +2984,6 @@ function compile(schema, root, localRefs, baseId) {
       return compile.call(self, _schema, _root, localRefs, baseId);
 
     var $async = _schema.$async === true;
-    if ($async && !opts.transpile) async.setup(opts);
 
     var sourceCode = validateGenerator({
       isTop: true,
@@ -2931,6 +2994,7 @@ function compile(schema, root, localRefs, baseId) {
       schemaPath: '',
       errSchemaPath: '#',
       errorPath: '""',
+      MissingRefError: errorClasses.MissingRef,
       RULES: RULES,
       validate: validateGenerator,
       util: util,
@@ -2948,20 +3012,10 @@ function compile(schema, root, localRefs, baseId) {
                    + vars(defaults, defaultCode) + vars(customRules, customRuleCode)
                    + sourceCode;
 
-    if (opts.beautify) {
-      loadBeautify();
-      /* istanbul ignore else */
-      if (beautify) sourceCode = beautify(sourceCode, opts.beautify);
-      else console.error('"npm install js-beautify" to use beautify option');
-    }
-    // console.log('\n\n\n *** \n', sourceCode);
-    var validate, validateCode
-      , transpile = opts._transpileFunc;
+    if (opts.processCode) sourceCode = opts.processCode(sourceCode);
+    // console.log('\n\n\n *** \n', JSON.stringify(sourceCode));
+    var validate;
     try {
-      validateCode = $async && transpile
-                      ? transpile(sourceCode)
-                      : sourceCode;
-
       var makeValidate = new Function(
         'self',
         'RULES',
@@ -2974,7 +3028,7 @@ function compile(schema, root, localRefs, baseId) {
         'equal',
         'ucs2length',
         'ValidationError',
-        validateCode
+        sourceCode
       );
 
       validate = makeValidate(
@@ -2993,7 +3047,7 @@ function compile(schema, root, localRefs, baseId) {
 
       refVal[0] = validate;
     } catch(e) {
-      console.error('Error compiling schema, function code:', validateCode);
+      console.error('Error compiling schema, function code:', sourceCode);
       throw e;
     }
 
@@ -3003,9 +3057,9 @@ function compile(schema, root, localRefs, baseId) {
     validate.refVal = refVal;
     validate.root = isRoot ? validate : _root;
     if ($async) validate.$async = true;
-    if (keepSourceCode) validate.sourceCode = sourceCode;
     if (opts.sourceCode === true) {
       validate.source = {
+        code: sourceCode,
         patterns: patterns,
         defaults: defaults
       };
@@ -3034,7 +3088,7 @@ function compile(schema, root, localRefs, baseId) {
 
     refCode = addLocalRef(ref);
     var v = resolve.call(self, localCompile, root, ref);
-    if (!v) {
+    if (v === undefined) {
       var localSchema = localRefs && localRefs[ref];
       if (localSchema) {
         v = resolve.inlineRef(localSchema, opts.inlineRefs)
@@ -3043,7 +3097,7 @@ function compile(schema, root, localRefs, baseId) {
       }
     }
 
-    if (v) {
+    if (v !== undefined) {
       replaceLocalRef(ref, v);
       return resolvedRef(v, refCode);
     }
@@ -3062,7 +3116,7 @@ function compile(schema, root, localRefs, baseId) {
   }
 
   function resolvedRef(refVal, code) {
-    return typeof refVal == 'object'
+    return typeof refVal == 'object' || typeof refVal == 'boolean'
             ? { code: code, schema: refVal, inline: true }
             : { code: code, $async: refVal && refVal.$async };
   }
@@ -3120,7 +3174,11 @@ function compile(schema, root, localRefs, baseId) {
       validate = inline.call(self, it, rule.keyword, schema, parentSchema);
     } else {
       validate = rule.definition.validate;
+      if (!validate) return;
     }
+
+    if (validate === undefined)
+      throw new Error('custom keyword "' + rule.keyword + '"failed to compile');
 
     var index = customRules.length;
     customRules[index] = validate;
@@ -3198,7 +3256,7 @@ function defaultCode(i) {
 
 
 function refValCode(i, refVal) {
-  return refVal[i] ? 'var refVal' + i + ' = refVal[' + i + '];' : '';
+  return refVal[i] === undefined ? '' : 'var refVal' + i + ' = refVal[' + i + '];';
 }
 
 
@@ -3217,46 +3275,64 @@ function vars(arr, statement) {
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var ruleModules = __webpack_require__(19)
+var ruleModules = __webpack_require__(17)
   , toHash = __webpack_require__(0).toHash;
 
 module.exports = function rules() {
   var RULES = [
     { type: 'number',
-      rules: [ 'maximum', 'minimum', 'multipleOf'] },
+      rules: [ { 'maximum': ['exclusiveMaximum'] },
+               { 'minimum': ['exclusiveMinimum'] }, 'multipleOf', 'format'] },
     { type: 'string',
       rules: [ 'maxLength', 'minLength', 'pattern', 'format' ] },
     { type: 'array',
-      rules: [ 'maxItems', 'minItems', 'uniqueItems', 'items' ] },
+      rules: [ 'maxItems', 'minItems', 'uniqueItems', 'contains', 'items' ] },
     { type: 'object',
-      rules: [ 'maxProperties', 'minProperties', 'required', 'dependencies', 'properties' ] },
-    { rules: [ '$ref', 'enum', 'not', 'anyOf', 'oneOf', 'allOf' ] }
+      rules: [ 'maxProperties', 'minProperties', 'required', 'dependencies', 'propertyNames',
+               { 'properties': ['additionalProperties', 'patternProperties'] } ] },
+    { rules: [ '$ref', 'const', 'enum', 'not', 'anyOf', 'oneOf', 'allOf' ] }
   ];
 
-  var ALL = [ 'type', 'additionalProperties', 'patternProperties' ];
-  var KEYWORDS = [ 'additionalItems', '$schema', 'id', 'title', 'description', 'default' ];
+  var ALL = [ 'type' ];
+  var KEYWORDS = [
+    'additionalItems', '$schema', 'id', 'title',
+    'description', 'default', 'definitions'
+  ];
   var TYPES = [ 'number', 'integer', 'string', 'array', 'object', 'boolean', 'null' ];
   RULES.all = toHash(ALL);
+  RULES.types = toHash(TYPES);
 
   RULES.forEach(function (group) {
     group.rules = group.rules.map(function (keyword) {
+      var implKeywords;
+      if (typeof keyword == 'object') {
+        var key = Object.keys(keyword)[0];
+        implKeywords = keyword[key];
+        keyword = key;
+        implKeywords.forEach(function (k) {
+          ALL.push(k);
+          RULES.all[k] = true;
+        });
+      }
       ALL.push(keyword);
       var rule = RULES.all[keyword] = {
         keyword: keyword,
-        code: ruleModules[keyword]
+        code: ruleModules[keyword],
+        implements: implKeywords
       };
       return rule;
     });
+
+    if (group.type) RULES.types[group.type] = group;
   });
 
   RULES.keywords = toHash(ALL.concat(KEYWORDS));
-  RULES.types = toHash(TYPES);
   RULES.custom = {};
 
   return RULES;
@@ -3264,7 +3340,7 @@ module.exports = function rules() {
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3291,195 +3367,12 @@ module.exports = function ucs2length(str) {
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate__formatLimit(it, $keyword) {
-  var out = ' ';
-  var $lvl = it.level;
-  var $dataLvl = it.dataLevel;
-  var $schema = it.schema[$keyword];
-  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
-  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
-  var $breakOnError = !it.opts.allErrors;
-  var $errorKeyword;
-  var $data = 'data' + ($dataLvl || '');
-  var $valid = 'valid' + $lvl;
-  out += 'var ' + ($valid) + ' = undefined;';
-  if (it.opts.format === false) {
-    out += ' ' + ($valid) + ' = true; ';
-    return out;
-  }
-  var $schemaFormat = it.schema.format,
-    $isDataFormat = it.opts.v5 && $schemaFormat.$data,
-    $closingBraces = '';
-  if ($isDataFormat) {
-    var $schemaValueFormat = it.util.getData($schemaFormat.$data, $dataLvl, it.dataPathArr),
-      $format = 'format' + $lvl,
-      $compare = 'compare' + $lvl;
-    out += ' var ' + ($format) + ' = formats[' + ($schemaValueFormat) + '] , ' + ($compare) + ' = ' + ($format) + ' && ' + ($format) + '.compare;';
-  } else {
-    var $format = it.formats[$schemaFormat];
-    if (!($format && $format.compare)) {
-      out += '  ' + ($valid) + ' = true; ';
-      return out;
-    }
-    var $compare = 'formats' + it.util.getProperty($schemaFormat) + '.compare';
-  }
-  var $isMax = $keyword == 'formatMaximum',
-    $exclusiveKeyword = 'formatExclusive' + ($isMax ? 'Maximum' : 'Minimum'),
-    $schemaExcl = it.schema[$exclusiveKeyword],
-    $isDataExcl = it.opts.v5 && $schemaExcl && $schemaExcl.$data,
-    $op = $isMax ? '<' : '>',
-    $result = 'result' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
-    $schemaValue;
-  if ($isData) {
-    out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
-    $schemaValue = 'schema' + $lvl;
-  } else {
-    $schemaValue = $schema;
-  }
-  if ($isDataExcl) {
-    var $schemaValueExcl = it.util.getData($schemaExcl.$data, $dataLvl, it.dataPathArr),
-      $exclusive = 'exclusive' + $lvl,
-      $opExpr = 'op' + $lvl,
-      $opStr = '\' + ' + $opExpr + ' + \'';
-    out += ' var schemaExcl' + ($lvl) + ' = ' + ($schemaValueExcl) + '; ';
-    $schemaValueExcl = 'schemaExcl' + $lvl;
-    out += ' if (typeof ' + ($schemaValueExcl) + ' != \'boolean\' && ' + ($schemaValueExcl) + ' !== undefined) { ' + ($valid) + ' = false; ';
-    var $errorKeyword = $exclusiveKeyword;
-    var $$outStack = $$outStack || [];
-    $$outStack.push(out);
-    out = ''; /* istanbul ignore else */
-    if (it.createErrors !== false) {
-      out += ' { keyword: \'' + ($errorKeyword || '_formatExclusiveLimit') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
-      if (it.opts.messages !== false) {
-        out += ' , message: \'' + ($exclusiveKeyword) + ' should be boolean\' ';
-      }
-      if (it.opts.verbose) {
-        out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-      }
-      out += ' } ';
-    } else {
-      out += ' {} ';
-    }
-    var __err = out;
-    out = $$outStack.pop();
-    if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-      if (it.async) {
-        out += ' throw new ValidationError([' + (__err) + ']); ';
-      } else {
-        out += ' validate.errors = [' + (__err) + ']; return false; ';
-      }
-    } else {
-      out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-    }
-    out += ' }  ';
-    if ($breakOnError) {
-      $closingBraces += '}';
-      out += ' else { ';
-    }
-    if ($isData) {
-      out += ' if (' + ($schemaValue) + ' === undefined) ' + ($valid) + ' = true; else if (typeof ' + ($schemaValue) + ' != \'string\') ' + ($valid) + ' = false; else { ';
-      $closingBraces += '}';
-    }
-    if ($isDataFormat) {
-      out += ' if (!' + ($compare) + ') ' + ($valid) + ' = true; else { ';
-      $closingBraces += '}';
-    }
-    out += ' var ' + ($result) + ' = ' + ($compare) + '(' + ($data) + ',  ';
-    if ($isData) {
-      out += '' + ($schemaValue);
-    } else {
-      out += '' + (it.util.toQuotedString($schema));
-    }
-    out += ' ); if (' + ($result) + ' === undefined) ' + ($valid) + ' = false; var ' + ($exclusive) + ' = ' + ($schemaValueExcl) + ' === true; if (' + ($valid) + ' === undefined) { ' + ($valid) + ' = ' + ($exclusive) + ' ? ' + ($result) + ' ' + ($op) + ' 0 : ' + ($result) + ' ' + ($op) + '= 0; } if (!' + ($valid) + ') var op' + ($lvl) + ' = ' + ($exclusive) + ' ? \'' + ($op) + '\' : \'' + ($op) + '=\';';
-  } else {
-    var $exclusive = $schemaExcl === true,
-      $opStr = $op;
-    if (!$exclusive) $opStr += '=';
-    var $opExpr = '\'' + $opStr + '\'';
-    if ($isData) {
-      out += ' if (' + ($schemaValue) + ' === undefined) ' + ($valid) + ' = true; else if (typeof ' + ($schemaValue) + ' != \'string\') ' + ($valid) + ' = false; else { ';
-      $closingBraces += '}';
-    }
-    if ($isDataFormat) {
-      out += ' if (!' + ($compare) + ') ' + ($valid) + ' = true; else { ';
-      $closingBraces += '}';
-    }
-    out += ' var ' + ($result) + ' = ' + ($compare) + '(' + ($data) + ',  ';
-    if ($isData) {
-      out += '' + ($schemaValue);
-    } else {
-      out += '' + (it.util.toQuotedString($schema));
-    }
-    out += ' ); if (' + ($result) + ' === undefined) ' + ($valid) + ' = false; if (' + ($valid) + ' === undefined) ' + ($valid) + ' = ' + ($result) + ' ' + ($op);
-    if (!$exclusive) {
-      out += '=';
-    }
-    out += ' 0;';
-  }
-  out += '' + ($closingBraces) + 'if (!' + ($valid) + ') { ';
-  var $errorKeyword = $keyword;
-  var $$outStack = $$outStack || [];
-  $$outStack.push(out);
-  out = ''; /* istanbul ignore else */
-  if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ($errorKeyword || '_formatLimit') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { comparison: ' + ($opExpr) + ', limit:  ';
-    if ($isData) {
-      out += '' + ($schemaValue);
-    } else {
-      out += '' + (it.util.toQuotedString($schema));
-    }
-    out += ' , exclusive: ' + ($exclusive) + ' } ';
-    if (it.opts.messages !== false) {
-      out += ' , message: \'should be ' + ($opStr) + ' "';
-      if ($isData) {
-        out += '\' + ' + ($schemaValue) + ' + \'';
-      } else {
-        out += '' + (it.util.escapeQuotes($schema));
-      }
-      out += '"\' ';
-    }
-    if (it.opts.verbose) {
-      out += ' , schema:  ';
-      if ($isData) {
-        out += 'validate.schema' + ($schemaPath);
-      } else {
-        out += '' + (it.util.toQuotedString($schema));
-      }
-      out += '         , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-    }
-    out += ' } ';
-  } else {
-    out += ' {} ';
-  }
-  var __err = out;
-  out = $$outStack.pop();
-  if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-    if (it.async) {
-      out += ' throw new ValidationError([' + (__err) + ']); ';
-    } else {
-      out += ' validate.errors = [' + (__err) + ']; return false; ';
-    }
-  } else {
-    out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-  }
-  out += '}';
-  return out;
-}
-
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function generate_allOf(it, $keyword) {
+module.exports = function generate_allOf(it, $keyword, $ruleType) {
   var out = ' ';
   var $schema = it.schema[$keyword];
   var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
@@ -3524,12 +3417,12 @@ module.exports = function generate_allOf(it, $keyword) {
 
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_anyOf(it, $keyword) {
+module.exports = function generate_anyOf(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -3568,7 +3461,7 @@ module.exports = function generate_anyOf(it, $keyword) {
       }
     }
     it.compositeRule = $it.compositeRule = $wasComposite;
-    out += ' ' + ($closingBraces) + ' if (!' + ($valid) + ') {  var err =   '; /* istanbul ignore else */
+    out += ' ' + ($closingBraces) + ' if (!' + ($valid) + ') {   var err =   '; /* istanbul ignore else */
     if (it.createErrors !== false) {
       out += ' { keyword: \'' + ('anyOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
       if (it.opts.messages !== false) {
@@ -3581,7 +3474,15 @@ module.exports = function generate_anyOf(it, $keyword) {
     } else {
       out += ' {} ';
     }
-    out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; } else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; } ';
+    out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+    if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+      if (it.async) {
+        out += ' throw new ValidationError(vErrors); ';
+      } else {
+        out += ' validate.errors = vErrors; return false; ';
+      }
+    }
+    out += ' } else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; } ';
     if (it.opts.allErrors) {
       out += ' } ';
     }
@@ -3596,12 +3497,12 @@ module.exports = function generate_anyOf(it, $keyword) {
 
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_constant(it, $keyword) {
+module.exports = function generate_const(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -3611,7 +3512,7 @@ module.exports = function generate_constant(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -3627,7 +3528,7 @@ module.exports = function generate_constant(it, $keyword) {
   $$outStack.push(out);
   out = ''; /* istanbul ignore else */
   if (it.createErrors !== false) {
-    out += ' { keyword: \'' + ('constant') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+    out += ' { keyword: \'' + ('const') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
     if (it.opts.messages !== false) {
       out += ' , message: \'should be equal to constant\' ';
     }
@@ -3650,17 +3551,108 @@ module.exports = function generate_constant(it, $keyword) {
     out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
   }
   out += ' }';
+  if ($breakOnError) {
+    out += ' else { ';
+  }
   return out;
 }
 
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_custom(it, $keyword) {
+module.exports = function generate_contains(it, $keyword, $ruleType) {
+  var out = ' ';
+  var $lvl = it.level;
+  var $dataLvl = it.dataLevel;
+  var $schema = it.schema[$keyword];
+  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
+  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
+  var $breakOnError = !it.opts.allErrors;
+  var $data = 'data' + ($dataLvl || '');
+  var $valid = 'valid' + $lvl;
+  var $errs = 'errs__' + $lvl;
+  var $it = it.util.copy(it);
+  var $closingBraces = '';
+  $it.level++;
+  var $nextValid = 'valid' + $it.level;
+  var $idx = 'i' + $lvl,
+    $dataNxt = $it.dataLevel = it.dataLevel + 1,
+    $nextData = 'data' + $dataNxt,
+    $currentBaseId = it.baseId,
+    $nonEmptySchema = it.util.schemaHasRules($schema, it.RULES.all);
+  out += 'var ' + ($errs) + ' = errors;var ' + ($valid) + ';';
+  if ($nonEmptySchema) {
+    var $wasComposite = it.compositeRule;
+    it.compositeRule = $it.compositeRule = true;
+    $it.schema = $schema;
+    $it.schemaPath = $schemaPath;
+    $it.errSchemaPath = $errSchemaPath;
+    out += ' var ' + ($nextValid) + ' = false; for (var ' + ($idx) + ' = 0; ' + ($idx) + ' < ' + ($data) + '.length; ' + ($idx) + '++) { ';
+    $it.errorPath = it.util.getPathExpr(it.errorPath, $idx, it.opts.jsonPointers, true);
+    var $passData = $data + '[' + $idx + ']';
+    $it.dataPathArr[$dataNxt] = $idx;
+    var $code = it.validate($it);
+    $it.baseId = $currentBaseId;
+    if (it.util.varOccurences($code, $nextData) < 2) {
+      out += ' ' + (it.util.varReplace($code, $nextData, $passData)) + ' ';
+    } else {
+      out += ' var ' + ($nextData) + ' = ' + ($passData) + '; ' + ($code) + ' ';
+    }
+    out += ' if (' + ($nextValid) + ') break; }  ';
+    it.compositeRule = $it.compositeRule = $wasComposite;
+    out += ' ' + ($closingBraces) + ' if (!' + ($nextValid) + ') {';
+  } else {
+    out += ' if (' + ($data) + '.length == 0) {';
+  }
+  var $$outStack = $$outStack || [];
+  $$outStack.push(out);
+  out = ''; /* istanbul ignore else */
+  if (it.createErrors !== false) {
+    out += ' { keyword: \'' + ('contains') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
+    if (it.opts.messages !== false) {
+      out += ' , message: \'should contain a valid item\' ';
+    }
+    if (it.opts.verbose) {
+      out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+    }
+    out += ' } ';
+  } else {
+    out += ' {} ';
+  }
+  var __err = out;
+  out = $$outStack.pop();
+  if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+    if (it.async) {
+      out += ' throw new ValidationError([' + (__err) + ']); ';
+    } else {
+      out += ' validate.errors = [' + (__err) + ']; return false; ';
+    }
+  } else {
+    out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+  }
+  out += ' } else { ';
+  if ($nonEmptySchema) {
+    out += '  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; } ';
+  }
+  if (it.opts.allErrors) {
+    out += ' } ';
+  }
+  out = it.util.cleanUpCode(out);
+  return out;
+}
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = function generate_custom(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -3672,7 +3664,7 @@ module.exports = function generate_custom(it, $keyword) {
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
   var $errs = 'errs__' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -3682,7 +3674,8 @@ module.exports = function generate_custom(it, $keyword) {
   }
   var $rule = this,
     $definition = 'definition' + $lvl,
-    $rDef = $rule.definition;
+    $rDef = $rule.definition,
+    $closingBraces = '';
   var $compile, $inline, $macro, $ruleValidate, $validateCode;
   if ($isData && $rDef.$data) {
     $validateCode = 'keywordValidate' + $lvl;
@@ -3690,6 +3683,7 @@ module.exports = function generate_custom(it, $keyword) {
     out += ' var ' + ($definition) + ' = RULES.custom[\'' + ($keyword) + '\'].definition; var ' + ($validateCode) + ' = ' + ($definition) + '.validate;';
   } else {
     $ruleValidate = it.useCustomRule($rule, $schema, it.schema, it);
+    if (!$ruleValidate) return;
     $schemaValue = 'validate.schema' + $schemaPath;
     $validateCode = $ruleValidate.code;
     $compile = $rDef.compile;
@@ -3705,8 +3699,13 @@ module.exports = function generate_custom(it, $keyword) {
     out += '' + ($ruleErrs) + ' = null;';
   }
   out += 'var ' + ($errs) + ' = errors;var ' + ($valid) + ';';
-  if ($validateSchema) {
-    out += ' ' + ($valid) + ' = ' + ($definition) + '.validateSchema(' + ($schemaValue) + '); if (' + ($valid) + ') {';
+  if ($isData && $rDef.$data) {
+    $closingBraces += '}';
+    out += ' if (' + ($schemaValue) + ' === undefined) { ' + ($valid) + ' = true; } else { ';
+    if ($validateSchema) {
+      $closingBraces += '}';
+      out += ' ' + ($valid) + ' = ' + ($definition) + '.validateSchema(' + ($schemaValue) + '); if (' + ($valid) + ') { ';
+    }
   }
   if ($inline) {
     if ($rDef.statements) {
@@ -3716,6 +3715,7 @@ module.exports = function generate_custom(it, $keyword) {
     }
   } else if ($macro) {
     var $it = it.util.copy(it);
+    var $closingBraces = '';
     $it.level++;
     var $nextValid = 'valid' + $it.level;
     $it.schema = $ruleValidate.validate;
@@ -3765,11 +3765,9 @@ module.exports = function generate_custom(it, $keyword) {
     }
   }
   if ($rDef.modifying) {
-    out += ' ' + ($data) + ' = ' + ($parentData) + '[' + ($parentDataProperty) + '];';
+    out += ' if (' + ($parentData) + ') ' + ($data) + ' = ' + ($parentData) + '[' + ($parentDataProperty) + '];';
   }
-  if ($validateSchema) {
-    out += ' }';
-  }
+  out += '' + ($closingBraces);
   if ($rDef.valid) {
     if ($breakOnError) {
       out += ' if (true) { ';
@@ -3882,12 +3880,12 @@ module.exports = function generate_custom(it, $keyword) {
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_dependencies(it, $keyword) {
+module.exports = function generate_dependencies(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -3902,7 +3900,8 @@ module.exports = function generate_dependencies(it, $keyword) {
   $it.level++;
   var $nextValid = 'valid' + $it.level;
   var $schemaDeps = {},
-    $propertyDeps = {};
+    $propertyDeps = {},
+    $ownProperties = it.opts.ownProperties;
   for ($property in $schema) {
     var $sch = $schema[$property];
     var $deps = Array.isArray($sch) ? $propertyDeps : $schemaDeps;
@@ -3913,100 +3912,115 @@ module.exports = function generate_dependencies(it, $keyword) {
   out += 'var missing' + ($lvl) + ';';
   for (var $property in $propertyDeps) {
     $deps = $propertyDeps[$property];
-    out += ' if (' + ($data) + (it.util.getProperty($property)) + ' !== undefined ';
-    if ($breakOnError) {
-      out += ' && ( ';
-      var arr1 = $deps;
-      if (arr1) {
-        var _$property, $i = -1,
-          l1 = arr1.length - 1;
-        while ($i < l1) {
-          _$property = arr1[$i += 1];
-          if ($i) {
-            out += ' || ';
+    if ($deps.length) {
+      out += ' if ( ' + ($data) + (it.util.getProperty($property)) + ' !== undefined ';
+      if ($ownProperties) {
+        out += ' && Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($property)) + '\') ';
+      }
+      if ($breakOnError) {
+        out += ' && ( ';
+        var arr1 = $deps;
+        if (arr1) {
+          var $propertyKey, $i = -1,
+            l1 = arr1.length - 1;
+          while ($i < l1) {
+            $propertyKey = arr1[$i += 1];
+            if ($i) {
+              out += ' || ';
+            }
+            var $prop = it.util.getProperty($propertyKey),
+              $useData = $data + $prop;
+            out += ' ( ( ' + ($useData) + ' === undefined ';
+            if ($ownProperties) {
+              out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+            }
+            out += ') && (missing' + ($lvl) + ' = ' + (it.util.toQuotedString(it.opts.jsonPointers ? $propertyKey : $prop)) + ') ) ';
           }
-          var $prop = it.util.getProperty(_$property);
-          out += ' ( ' + ($data) + ($prop) + ' === undefined && (missing' + ($lvl) + ' = ' + (it.util.toQuotedString(it.opts.jsonPointers ? _$property : $prop)) + ') ) ';
         }
-      }
-      out += ')) {  ';
-      var $propertyPath = 'missing' + $lvl,
-        $missingProperty = '\' + ' + $propertyPath + ' + \'';
-      if (it.opts._errorDataPathProperty) {
-        it.errorPath = it.opts.jsonPointers ? it.util.getPathExpr($currentErrorPath, $propertyPath, true) : $currentErrorPath + ' + ' + $propertyPath;
-      }
-      var $$outStack = $$outStack || [];
-      $$outStack.push(out);
-      out = ''; /* istanbul ignore else */
-      if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
-        if (it.opts.messages !== false) {
-          out += ' , message: \'should have ';
-          if ($deps.length == 1) {
-            out += 'property ' + (it.util.escapeQuotes($deps[0]));
-          } else {
-            out += 'properties ' + (it.util.escapeQuotes($deps.join(", ")));
+        out += ')) {  ';
+        var $propertyPath = 'missing' + $lvl,
+          $missingProperty = '\' + ' + $propertyPath + ' + \'';
+        if (it.opts._errorDataPathProperty) {
+          it.errorPath = it.opts.jsonPointers ? it.util.getPathExpr($currentErrorPath, $propertyPath, true) : $currentErrorPath + ' + ' + $propertyPath;
+        }
+        var $$outStack = $$outStack || [];
+        $$outStack.push(out);
+        out = ''; /* istanbul ignore else */
+        if (it.createErrors !== false) {
+          out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
+          if (it.opts.messages !== false) {
+            out += ' , message: \'should have ';
+            if ($deps.length == 1) {
+              out += 'property ' + (it.util.escapeQuotes($deps[0]));
+            } else {
+              out += 'properties ' + (it.util.escapeQuotes($deps.join(", ")));
+            }
+            out += ' when property ' + (it.util.escapeQuotes($property)) + ' is present\' ';
           }
-          out += ' when property ' + (it.util.escapeQuotes($property)) + ' is present\' ';
-        }
-        if (it.opts.verbose) {
-          out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-        }
-        out += ' } ';
-      } else {
-        out += ' {} ';
-      }
-      var __err = out;
-      out = $$outStack.pop();
-      if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-        if (it.async) {
-          out += ' throw new ValidationError([' + (__err) + ']); ';
+          if (it.opts.verbose) {
+            out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+          }
+          out += ' } ';
         } else {
-          out += ' validate.errors = [' + (__err) + ']; return false; ';
+          out += ' {} ';
+        }
+        var __err = out;
+        out = $$outStack.pop();
+        if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+          if (it.async) {
+            out += ' throw new ValidationError([' + (__err) + ']); ';
+          } else {
+            out += ' validate.errors = [' + (__err) + ']; return false; ';
+          }
+        } else {
+          out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
         }
       } else {
-        out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-      }
-    } else {
-      out += ' ) { ';
-      var arr2 = $deps;
-      if (arr2) {
-        var $reqProperty, i2 = -1,
-          l2 = arr2.length - 1;
-        while (i2 < l2) {
-          $reqProperty = arr2[i2 += 1];
-          var $prop = it.util.getProperty($reqProperty),
-            $missingProperty = it.util.escapeQuotes($reqProperty);
-          if (it.opts._errorDataPathProperty) {
-            it.errorPath = it.util.getPath($currentErrorPath, $reqProperty, it.opts.jsonPointers);
-          }
-          out += ' if (' + ($data) + ($prop) + ' === undefined) {  var err =   '; /* istanbul ignore else */
-          if (it.createErrors !== false) {
-            out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
-            if (it.opts.messages !== false) {
-              out += ' , message: \'should have ';
-              if ($deps.length == 1) {
-                out += 'property ' + (it.util.escapeQuotes($deps[0]));
-              } else {
-                out += 'properties ' + (it.util.escapeQuotes($deps.join(", ")));
+        out += ' ) { ';
+        var arr2 = $deps;
+        if (arr2) {
+          var $propertyKey, i2 = -1,
+            l2 = arr2.length - 1;
+          while (i2 < l2) {
+            $propertyKey = arr2[i2 += 1];
+            var $prop = it.util.getProperty($propertyKey),
+              $missingProperty = it.util.escapeQuotes($propertyKey),
+              $useData = $data + $prop;
+            if (it.opts._errorDataPathProperty) {
+              it.errorPath = it.util.getPath($currentErrorPath, $propertyKey, it.opts.jsonPointers);
+            }
+            out += ' if ( ' + ($useData) + ' === undefined ';
+            if ($ownProperties) {
+              out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+            }
+            out += ') {  var err =   '; /* istanbul ignore else */
+            if (it.createErrors !== false) {
+              out += ' { keyword: \'' + ('dependencies') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { property: \'' + (it.util.escapeQuotes($property)) + '\', missingProperty: \'' + ($missingProperty) + '\', depsCount: ' + ($deps.length) + ', deps: \'' + (it.util.escapeQuotes($deps.length == 1 ? $deps[0] : $deps.join(", "))) + '\' } ';
+              if (it.opts.messages !== false) {
+                out += ' , message: \'should have ';
+                if ($deps.length == 1) {
+                  out += 'property ' + (it.util.escapeQuotes($deps[0]));
+                } else {
+                  out += 'properties ' + (it.util.escapeQuotes($deps.join(", ")));
+                }
+                out += ' when property ' + (it.util.escapeQuotes($property)) + ' is present\' ';
               }
-              out += ' when property ' + (it.util.escapeQuotes($property)) + ' is present\' ';
+              if (it.opts.verbose) {
+                out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+              }
+              out += ' } ';
+            } else {
+              out += ' {} ';
             }
-            if (it.opts.verbose) {
-              out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-            }
-            out += ' } ';
-          } else {
-            out += ' {} ';
+            out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; } ';
           }
-          out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; } ';
         }
       }
-    }
-    out += ' }   ';
-    if ($breakOnError) {
-      $closingBraces += '}';
-      out += ' else { ';
+      out += ' }   ';
+      if ($breakOnError) {
+        $closingBraces += '}';
+        out += ' else { ';
+      }
     }
   }
   it.errorPath = $currentErrorPath;
@@ -4014,7 +4028,11 @@ module.exports = function generate_dependencies(it, $keyword) {
   for (var $property in $schemaDeps) {
     var $sch = $schemaDeps[$property];
     if (it.util.schemaHasRules($sch, it.RULES.all)) {
-      out += ' ' + ($nextValid) + ' = true; if (' + ($data) + (it.util.getProperty($property)) + ' !== undefined) { ';
+      out += ' ' + ($nextValid) + ' = true; if ( ' + ($data) + (it.util.getProperty($property)) + ' !== undefined ';
+      if ($ownProperties) {
+        out += ' && Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($property)) + '\') ';
+      }
+      out += ') { ';
       $it.schema = $sch;
       $it.schemaPath = $schemaPath + it.util.getProperty($property);
       $it.errSchemaPath = $errSchemaPath + '/' + it.util.escapeFragment($property);
@@ -4036,12 +4054,12 @@ module.exports = function generate_dependencies(it, $keyword) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_enum(it, $keyword) {
+module.exports = function generate_enum(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4051,7 +4069,7 @@ module.exports = function generate_enum(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -4108,12 +4126,12 @@ module.exports = function generate_enum(it, $keyword) {
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_format(it, $keyword) {
+module.exports = function generate_format(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4128,7 +4146,7 @@ module.exports = function generate_format(it, $keyword) {
     }
     return out;
   }
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -4139,8 +4157,10 @@ module.exports = function generate_format(it, $keyword) {
   var $unknownFormats = it.opts.unknownFormats,
     $allowUnknown = Array.isArray($unknownFormats);
   if ($isData) {
-    var $format = 'format' + $lvl;
-    out += ' var ' + ($format) + ' = formats[' + ($schemaValue) + ']; var isObject' + ($lvl) + ' = typeof ' + ($format) + ' == \'object\' && !(' + ($format) + ' instanceof RegExp) && ' + ($format) + '.validate; if (isObject' + ($lvl) + ') { ';
+    var $format = 'format' + $lvl,
+      $isObject = 'isObject' + $lvl,
+      $formatType = 'formatType' + $lvl;
+    out += ' var ' + ($format) + ' = formats[' + ($schemaValue) + ']; var ' + ($isObject) + ' = typeof ' + ($format) + ' == \'object\' && !(' + ($format) + ' instanceof RegExp) && ' + ($format) + '.validate; var ' + ($formatType) + ' = ' + ($isObject) + ' && ' + ($format) + '.type || \'string\'; if (' + ($isObject) + ') { ';
     if (it.async) {
       out += ' var async' + ($lvl) + ' = ' + ($format) + '.async; ';
     }
@@ -4149,14 +4169,14 @@ module.exports = function generate_format(it, $keyword) {
       out += ' (' + ($schemaValue) + ' !== undefined && typeof ' + ($schemaValue) + ' != \'string\') || ';
     }
     out += ' (';
-    if ($unknownFormats === true || $allowUnknown) {
+    if ($unknownFormats != 'ignore') {
       out += ' (' + ($schemaValue) + ' && !' + ($format) + ' ';
       if ($allowUnknown) {
         out += ' && self._opts.unknownFormats.indexOf(' + ($schemaValue) + ') == -1 ';
       }
       out += ') || ';
     }
-    out += ' (' + ($format) + ' && !(typeof ' + ($format) + ' == \'function\' ? ';
+    out += ' (' + ($format) + ' && ' + ($formatType) + ' == \'' + ($ruleType) + '\' && !(typeof ' + ($format) + ' == \'function\' ? ';
     if (it.async) {
       out += ' (async' + ($lvl) + ' ? ' + (it.yieldAwait) + ' ' + ($format) + '(' + ($data) + ') : ' + ($format) + '(' + ($data) + ')) ';
     } else {
@@ -4166,23 +4186,32 @@ module.exports = function generate_format(it, $keyword) {
   } else {
     var $format = it.formats[$schema];
     if (!$format) {
-      if ($unknownFormats === true || ($allowUnknown && $unknownFormats.indexOf($schema) == -1)) {
-        throw new Error('unknown format "' + $schema + '" is used in schema at path "' + it.errSchemaPath + '"');
-      } else {
-        if (!$allowUnknown) {
-          console.warn('unknown format "' + $schema + '" ignored in schema at path "' + it.errSchemaPath + '"');
-          if ($unknownFormats !== 'ignore') console.warn('In the next major version it will throw exception. See option unknownFormats for more information');
-        }
+      if ($unknownFormats == 'ignore') {
+        console.warn('unknown format "' + $schema + '" ignored in schema at path "' + it.errSchemaPath + '"');
         if ($breakOnError) {
           out += ' if (true) { ';
         }
         return out;
+      } else if ($allowUnknown && $unknownFormats.indexOf($schema) >= 0) {
+        if ($breakOnError) {
+          out += ' if (true) { ';
+        }
+        return out;
+      } else {
+        throw new Error('unknown format "' + $schema + '" is used in schema at path "' + it.errSchemaPath + '"');
       }
     }
     var $isObject = typeof $format == 'object' && !($format instanceof RegExp) && $format.validate;
+    var $formatType = $isObject && $format.type || 'string';
     if ($isObject) {
       var $async = $format.async === true;
       $format = $format.validate;
+    }
+    if ($formatType != $ruleType) {
+      if ($breakOnError) {
+        out += ' if (true) { ';
+      }
+      return out;
     }
     if ($async) {
       if (!it.async) throw new Error('async format in sync schema');
@@ -4253,12 +4282,12 @@ module.exports = function generate_format(it, $keyword) {
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_items(it, $keyword) {
+module.exports = function generate_items(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4389,11 +4418,7 @@ module.exports = function generate_items(it, $keyword) {
     if ($breakOnError) {
       out += ' if (!' + ($nextValid) + ') break; ';
     }
-    out += ' }  ';
-    if ($breakOnError) {
-      out += ' if (' + ($nextValid) + ') { ';
-      $closingBraces += '}';
-    }
+    out += ' }';
   }
   if ($breakOnError) {
     out += ' ' + ($closingBraces) + ' if (' + ($errs) + ' == errors) {';
@@ -4404,12 +4429,12 @@ module.exports = function generate_items(it, $keyword) {
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_multipleOf(it, $keyword) {
+module.exports = function generate_multipleOf(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4418,7 +4443,7 @@ module.exports = function generate_multipleOf(it, $keyword) {
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -4451,7 +4476,7 @@ module.exports = function generate_multipleOf(it, $keyword) {
       if ($isData) {
         out += '\' + ' + ($schemaValue);
       } else {
-        out += '' + ($schema) + '\'';
+        out += '' + ($schemaValue) + '\'';
       }
     }
     if (it.opts.verbose) {
@@ -4487,12 +4512,12 @@ module.exports = function generate_multipleOf(it, $keyword) {
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_not(it, $keyword) {
+module.exports = function generate_not(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4577,12 +4602,12 @@ module.exports = function generate_not(it, $keyword) {
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_oneOf(it, $keyword) {
+module.exports = function generate_oneOf(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4624,10 +4649,7 @@ module.exports = function generate_oneOf(it, $keyword) {
     }
   }
   it.compositeRule = $it.compositeRule = $wasComposite;
-  out += '' + ($closingBraces) + 'if (!' + ($valid) + ') {   ';
-  var $$outStack = $$outStack || [];
-  $$outStack.push(out);
-  out = ''; /* istanbul ignore else */
+  out += '' + ($closingBraces) + 'if (!' + ($valid) + ') {   var err =   '; /* istanbul ignore else */
   if (it.createErrors !== false) {
     out += ' { keyword: \'' + ('oneOf') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: {} ';
     if (it.opts.messages !== false) {
@@ -4640,16 +4662,13 @@ module.exports = function generate_oneOf(it, $keyword) {
   } else {
     out += ' {} ';
   }
-  var __err = out;
-  out = $$outStack.pop();
+  out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
   if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
     if (it.async) {
-      out += ' throw new ValidationError([' + (__err) + ']); ';
+      out += ' throw new ValidationError(vErrors); ';
     } else {
-      out += ' validate.errors = [' + (__err) + ']; return false; ';
+      out += ' validate.errors = vErrors; return false; ';
     }
-  } else {
-    out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
   }
   out += '} else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; }';
   if (it.opts.allErrors) {
@@ -4660,12 +4679,12 @@ module.exports = function generate_oneOf(it, $keyword) {
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_pattern(it, $keyword) {
+module.exports = function generate_pattern(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4674,7 +4693,7 @@ module.exports = function generate_pattern(it, $keyword) {
   var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -4741,70 +4760,12 @@ module.exports = function generate_pattern(it, $keyword) {
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_patternRequired(it, $keyword) {
-  var out = ' ';
-  var $lvl = it.level;
-  var $dataLvl = it.dataLevel;
-  var $schema = it.schema[$keyword];
-  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
-  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
-  var $breakOnError = !it.opts.allErrors;
-  var $data = 'data' + ($dataLvl || '');
-  var $valid = 'valid' + $lvl;
-  var $key = 'key' + $lvl,
-    $matched = 'patternMatched' + $lvl,
-    $closingBraces = '',
-    $ownProperties = it.opts.ownProperties;
-  out += 'var ' + ($valid) + ' = true;';
-  var arr1 = $schema;
-  if (arr1) {
-    var $pProperty, i1 = -1,
-      l1 = arr1.length - 1;
-    while (i1 < l1) {
-      $pProperty = arr1[i1 += 1];
-      out += ' var ' + ($matched) + ' = false; for (var ' + ($key) + ' in ' + ($data) + ') {  ';
-      if ($ownProperties) {
-        out += ' if (!Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($key) + ')) continue; ';
-      }
-      out += ' ' + ($matched) + ' = ' + (it.usePattern($pProperty)) + '.test(' + ($key) + '); if (' + ($matched) + ') break; } ';
-      var $missingPattern = it.util.escapeQuotes($pProperty);
-      out += ' if (!' + ($matched) + ') { ' + ($valid) + ' = false;  var err =   '; /* istanbul ignore else */
-      if (it.createErrors !== false) {
-        out += ' { keyword: \'' + ('patternRequired') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingPattern: \'' + ($missingPattern) + '\' } ';
-        if (it.opts.messages !== false) {
-          out += ' , message: \'should have property matching pattern \\\'' + ($missingPattern) + '\\\'\' ';
-        }
-        if (it.opts.verbose) {
-          out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-        }
-        out += ' } ';
-      } else {
-        out += ' {} ';
-      }
-      out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; }   ';
-      if ($breakOnError) {
-        $closingBraces += '}';
-        out += ' else { ';
-      }
-    }
-  }
-  out += '' + ($closingBraces);
-  return out;
-}
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function generate_properties(it, $keyword) {
+module.exports = function generate_properties(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -4820,8 +4781,10 @@ module.exports = function generate_properties(it, $keyword) {
   $it.level++;
   var $nextValid = 'valid' + $it.level;
   var $key = 'key' + $lvl,
+    $idx = 'idx' + $lvl,
     $dataNxt = $it.dataLevel = it.dataLevel + 1,
-    $nextData = 'data' + $dataNxt;
+    $nextData = 'data' + $dataNxt,
+    $dataProperties = 'dataProperties' + $lvl;
   var $schemaKeys = Object.keys($schema || {}),
     $pProperties = it.schema.patternProperties || {},
     $pPropertyKeys = Object.keys($pProperties),
@@ -4835,15 +4798,19 @@ module.exports = function generate_properties(it, $keyword) {
     $currentBaseId = it.baseId;
   var $required = it.schema.required;
   if ($required && !(it.opts.v5 && $required.$data) && $required.length < it.opts.loopRequired) var $requiredHash = it.util.toHash($required);
-  if (it.opts.v5) {
+  if (it.opts.patternGroups) {
     var $pgProperties = it.schema.patternGroups || {},
       $pgPropertyKeys = Object.keys($pgProperties);
   }
   out += 'var ' + ($errs) + ' = errors;var ' + ($nextValid) + ' = true;';
+  if ($ownProperties) {
+    out += ' var ' + ($dataProperties) + ' = undefined;';
+  }
   if ($checkAdditional) {
-    out += ' for (var ' + ($key) + ' in ' + ($data) + ') {  ';
     if ($ownProperties) {
-      out += ' if (!Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($key) + ')) continue; ';
+      out += ' ' + ($dataProperties) + ' = ' + ($dataProperties) + ' || Object.keys(' + ($data) + '); for (var ' + ($idx) + '=0; ' + ($idx) + '<' + ($dataProperties) + '.length; ' + ($idx) + '++) { var ' + ($key) + ' = ' + ($dataProperties) + '[' + ($idx) + ']; ';
+    } else {
+      out += ' for (var ' + ($key) + ' in ' + ($data) + ') { ';
     }
     if ($someProperties) {
       out += ' var isAdditional' + ($lvl) + ' = !(false ';
@@ -4873,7 +4840,7 @@ module.exports = function generate_properties(it, $keyword) {
           }
         }
       }
-      if (it.opts.v5 && $pgPropertyKeys && $pgPropertyKeys.length) {
+      if (it.opts.patternGroups && $pgPropertyKeys.length) {
         var arr3 = $pgPropertyKeys;
         if (arr3) {
           var $pgProperty, $i = -1,
@@ -5013,7 +4980,11 @@ module.exports = function generate_properties(it, $keyword) {
             out += ' ' + ($code) + ' ';
           } else {
             if ($requiredHash && $requiredHash[$propertyKey]) {
-              out += ' if (' + ($useData) + ' === undefined) { ' + ($nextValid) + ' = false; ';
+              out += ' if ( ' + ($useData) + ' === undefined ';
+              if ($ownProperties) {
+                out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+              }
+              out += ') { ' + ($nextValid) + ' = false; ';
               var $currentErrorPath = it.errorPath,
                 $currErrSchemaPath = $errSchemaPath,
                 $missingProperty = it.util.escapeQuotes($propertyKey);
@@ -5058,9 +5029,17 @@ module.exports = function generate_properties(it, $keyword) {
               out += ' } else { ';
             } else {
               if ($breakOnError) {
-                out += ' if (' + ($useData) + ' === undefined) { ' + ($nextValid) + ' = true; } else { ';
+                out += ' if ( ' + ($useData) + ' === undefined ';
+                if ($ownProperties) {
+                  out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+                }
+                out += ') { ' + ($nextValid) + ' = true; } else { ';
               } else {
-                out += ' if (' + ($useData) + ' !== undefined) { ';
+                out += ' if (' + ($useData) + ' !== undefined ';
+                if ($ownProperties) {
+                  out += ' &&   Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+                }
+                out += ' ) { ';
               }
             }
             out += ' ' + ($code) + ' } ';
@@ -5073,48 +5052,51 @@ module.exports = function generate_properties(it, $keyword) {
       }
     }
   }
-  var arr5 = $pPropertyKeys;
-  if (arr5) {
-    var $pProperty, i5 = -1,
-      l5 = arr5.length - 1;
-    while (i5 < l5) {
-      $pProperty = arr5[i5 += 1];
-      var $sch = $pProperties[$pProperty];
-      if (it.util.schemaHasRules($sch, it.RULES.all)) {
-        $it.schema = $sch;
-        $it.schemaPath = it.schemaPath + '.patternProperties' + it.util.getProperty($pProperty);
-        $it.errSchemaPath = it.errSchemaPath + '/patternProperties/' + it.util.escapeFragment($pProperty);
-        out += ' for (var ' + ($key) + ' in ' + ($data) + ') {  ';
-        if ($ownProperties) {
-          out += ' if (!Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($key) + ')) continue; ';
-        }
-        out += ' if (' + (it.usePattern($pProperty)) + '.test(' + ($key) + ')) { ';
-        $it.errorPath = it.util.getPathExpr(it.errorPath, $key, it.opts.jsonPointers);
-        var $passData = $data + '[' + $key + ']';
-        $it.dataPathArr[$dataNxt] = $key;
-        var $code = it.validate($it);
-        $it.baseId = $currentBaseId;
-        if (it.util.varOccurences($code, $nextData) < 2) {
-          out += ' ' + (it.util.varReplace($code, $nextData, $passData)) + ' ';
-        } else {
-          out += ' var ' + ($nextData) + ' = ' + ($passData) + '; ' + ($code) + ' ';
-        }
-        if ($breakOnError) {
-          out += ' if (!' + ($nextValid) + ') break; ';
-        }
-        out += ' } ';
-        if ($breakOnError) {
-          out += ' else ' + ($nextValid) + ' = true; ';
-        }
-        out += ' }  ';
-        if ($breakOnError) {
-          out += ' if (' + ($nextValid) + ') { ';
-          $closingBraces += '}';
+  if ($pPropertyKeys.length) {
+    var arr5 = $pPropertyKeys;
+    if (arr5) {
+      var $pProperty, i5 = -1,
+        l5 = arr5.length - 1;
+      while (i5 < l5) {
+        $pProperty = arr5[i5 += 1];
+        var $sch = $pProperties[$pProperty];
+        if (it.util.schemaHasRules($sch, it.RULES.all)) {
+          $it.schema = $sch;
+          $it.schemaPath = it.schemaPath + '.patternProperties' + it.util.getProperty($pProperty);
+          $it.errSchemaPath = it.errSchemaPath + '/patternProperties/' + it.util.escapeFragment($pProperty);
+          if ($ownProperties) {
+            out += ' ' + ($dataProperties) + ' = ' + ($dataProperties) + ' || Object.keys(' + ($data) + '); for (var ' + ($idx) + '=0; ' + ($idx) + '<' + ($dataProperties) + '.length; ' + ($idx) + '++) { var ' + ($key) + ' = ' + ($dataProperties) + '[' + ($idx) + ']; ';
+          } else {
+            out += ' for (var ' + ($key) + ' in ' + ($data) + ') { ';
+          }
+          out += ' if (' + (it.usePattern($pProperty)) + '.test(' + ($key) + ')) { ';
+          $it.errorPath = it.util.getPathExpr(it.errorPath, $key, it.opts.jsonPointers);
+          var $passData = $data + '[' + $key + ']';
+          $it.dataPathArr[$dataNxt] = $key;
+          var $code = it.validate($it);
+          $it.baseId = $currentBaseId;
+          if (it.util.varOccurences($code, $nextData) < 2) {
+            out += ' ' + (it.util.varReplace($code, $nextData, $passData)) + ' ';
+          } else {
+            out += ' var ' + ($nextData) + ' = ' + ($passData) + '; ' + ($code) + ' ';
+          }
+          if ($breakOnError) {
+            out += ' if (!' + ($nextValid) + ') break; ';
+          }
+          out += ' } ';
+          if ($breakOnError) {
+            out += ' else ' + ($nextValid) + ' = true; ';
+          }
+          out += ' }  ';
+          if ($breakOnError) {
+            out += ' if (' + ($nextValid) + ') { ';
+            $closingBraces += '}';
+          }
         }
       }
     }
   }
-  if (it.opts.v5) {
+  if (it.opts.patternGroups && $pgPropertyKeys.length) {
     var arr6 = $pgPropertyKeys;
     if (arr6) {
       var $pgProperty, i6 = -1,
@@ -5127,9 +5109,11 @@ module.exports = function generate_properties(it, $keyword) {
           $it.schema = $sch;
           $it.schemaPath = it.schemaPath + '.patternGroups' + it.util.getProperty($pgProperty) + '.schema';
           $it.errSchemaPath = it.errSchemaPath + '/patternGroups/' + it.util.escapeFragment($pgProperty) + '/schema';
-          out += ' var pgPropCount' + ($lvl) + ' = 0; for (var ' + ($key) + ' in ' + ($data) + ') {  ';
+          out += ' var pgPropCount' + ($lvl) + ' = 0;  ';
           if ($ownProperties) {
-            out += ' if (!Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($key) + ')) continue; ';
+            out += ' ' + ($dataProperties) + ' = ' + ($dataProperties) + ' || Object.keys(' + ($data) + '); for (var ' + ($idx) + '=0; ' + ($idx) + '<' + ($dataProperties) + '.length; ' + ($idx) + '++) { var ' + ($key) + ' = ' + ($dataProperties) + '[' + ($idx) + ']; ';
+          } else {
+            out += ' for (var ' + ($key) + ' in ' + ($data) + ') { ';
           }
           out += ' if (' + (it.usePattern($pgProperty)) + '.test(' + ($key) + ')) { pgPropCount' + ($lvl) + '++; ';
           $it.errorPath = it.util.getPathExpr(it.errorPath, $key, it.opts.jsonPointers);
@@ -5251,12 +5235,100 @@ module.exports = function generate_properties(it, $keyword) {
 
 
 /***/ }),
-/* 39 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_ref(it, $keyword) {
+module.exports = function generate_propertyNames(it, $keyword, $ruleType) {
+  var out = ' ';
+  var $lvl = it.level;
+  var $dataLvl = it.dataLevel;
+  var $schema = it.schema[$keyword];
+  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
+  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
+  var $breakOnError = !it.opts.allErrors;
+  var $data = 'data' + ($dataLvl || '');
+  var $errs = 'errs__' + $lvl;
+  var $it = it.util.copy(it);
+  var $closingBraces = '';
+  $it.level++;
+  var $nextValid = 'valid' + $it.level;
+  if (it.util.schemaHasRules($schema, it.RULES.all)) {
+    $it.schema = $schema;
+    $it.schemaPath = $schemaPath;
+    $it.errSchemaPath = $errSchemaPath;
+    var $key = 'key' + $lvl,
+      $idx = 'idx' + $lvl,
+      $i = 'i' + $lvl,
+      $invalidName = '\' + ' + $key + ' + \'',
+      $dataNxt = $it.dataLevel = it.dataLevel + 1,
+      $nextData = 'data' + $dataNxt,
+      $dataProperties = 'dataProperties' + $lvl,
+      $ownProperties = it.opts.ownProperties,
+      $currentBaseId = it.baseId;
+    out += ' var ' + ($errs) + ' = errors; ';
+    if ($ownProperties) {
+      out += ' var ' + ($dataProperties) + ' = undefined; ';
+    }
+    if ($ownProperties) {
+      out += ' ' + ($dataProperties) + ' = ' + ($dataProperties) + ' || Object.keys(' + ($data) + '); for (var ' + ($idx) + '=0; ' + ($idx) + '<' + ($dataProperties) + '.length; ' + ($idx) + '++) { var ' + ($key) + ' = ' + ($dataProperties) + '[' + ($idx) + ']; ';
+    } else {
+      out += ' for (var ' + ($key) + ' in ' + ($data) + ') { ';
+    }
+    out += ' var startErrs' + ($lvl) + ' = errors; ';
+    var $passData = $key;
+    var $wasComposite = it.compositeRule;
+    it.compositeRule = $it.compositeRule = true;
+    var $code = it.validate($it);
+    $it.baseId = $currentBaseId;
+    if (it.util.varOccurences($code, $nextData) < 2) {
+      out += ' ' + (it.util.varReplace($code, $nextData, $passData)) + ' ';
+    } else {
+      out += ' var ' + ($nextData) + ' = ' + ($passData) + '; ' + ($code) + ' ';
+    }
+    it.compositeRule = $it.compositeRule = $wasComposite;
+    out += ' if (!' + ($nextValid) + ') { for (var ' + ($i) + '=startErrs' + ($lvl) + '; ' + ($i) + '<errors; ' + ($i) + '++) { vErrors[' + ($i) + '].propertyName = ' + ($key) + '; }   var err =   '; /* istanbul ignore else */
+    if (it.createErrors !== false) {
+      out += ' { keyword: \'' + ('propertyNames') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { propertyName: \'' + ($invalidName) + '\' } ';
+      if (it.opts.messages !== false) {
+        out += ' , message: \'property name \\\'' + ($invalidName) + '\\\' is invalid\' ';
+      }
+      if (it.opts.verbose) {
+        out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
+      }
+      out += ' } ';
+    } else {
+      out += ' {} ';
+    }
+    out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
+    if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
+      if (it.async) {
+        out += ' throw new ValidationError(vErrors); ';
+      } else {
+        out += ' validate.errors = vErrors; return false; ';
+      }
+    }
+    if ($breakOnError) {
+      out += ' break; ';
+    }
+    out += ' } }';
+  }
+  if ($breakOnError) {
+    out += ' ' + ($closingBraces) + ' if (' + ($errs) + ' == errors) {';
+  }
+  out = it.util.cleanUpCode(out);
+  return out;
+}
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = function generate_ref(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -5277,9 +5349,9 @@ module.exports = function generate_ref(it, $keyword) {
   } else {
     var $refVal = it.resolveRef(it.baseId, $schema, it.isRoot);
     if ($refVal === undefined) {
-      var $message = 'can\'t resolve reference ' + $schema + ' from id ' + it.baseId;
+      var $message = it.MissingRefError.message(it.baseId, $schema);
       if (it.opts.missingRefs == 'fail') {
-        console.log($message);
+        console.error($message);
         var $$outStack = $$outStack || [];
         $$outStack.push(out);
         out = ''; /* istanbul ignore else */
@@ -5310,15 +5382,12 @@ module.exports = function generate_ref(it, $keyword) {
           out += ' if (false) { ';
         }
       } else if (it.opts.missingRefs == 'ignore') {
-        console.log($message);
+        console.warn($message);
         if ($breakOnError) {
           out += ' if (true) { ';
         }
       } else {
-        var $error = new Error($message);
-        $error.missingRef = it.resolve.url(it.baseId, $schema);
-        $error.missingSchema = it.resolve.normalizeId(it.resolve.fullPath($error.missingRef));
-        throw $error;
+        throw new it.MissingRefError(it.baseId, $schema, $message);
       }
     } else if ($refVal.inline) {
       var $it = it.util.copy(it);
@@ -5357,11 +5426,18 @@ module.exports = function generate_ref(it, $keyword) {
     out = $$outStack.pop();
     if ($async) {
       if (!it.async) throw new Error('async schema referenced by sync schema');
-      out += ' try { ';
       if ($breakOnError) {
-        out += 'var ' + ($valid) + ' =';
+        out += ' var ' + ($valid) + '; ';
       }
-      out += ' ' + (it.yieldAwait) + ' ' + (__callValidate) + '; } catch (e) { if (!(e instanceof ValidationError)) throw e; if (vErrors === null) vErrors = e.errors; else vErrors = vErrors.concat(e.errors); errors = vErrors.length; } ';
+      out += ' try { ' + (it.yieldAwait) + ' ' + (__callValidate) + '; ';
+      if ($breakOnError) {
+        out += ' ' + ($valid) + ' = true; ';
+      }
+      out += ' } catch (e) { if (!(e instanceof ValidationError)) throw e; if (vErrors === null) vErrors = e.errors; else vErrors = vErrors.concat(e.errors); errors = vErrors.length; ';
+      if ($breakOnError) {
+        out += ' ' + ($valid) + ' = false; ';
+      }
+      out += ' } ';
       if ($breakOnError) {
         out += ' if (' + ($valid) + ') { ';
       }
@@ -5377,12 +5453,12 @@ module.exports = function generate_ref(it, $keyword) {
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_required(it, $keyword) {
+module.exports = function generate_required(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -5392,7 +5468,7 @@ module.exports = function generate_required(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -5422,7 +5498,8 @@ module.exports = function generate_required(it, $keyword) {
   }
   if ($isData || $required.length) {
     var $currentErrorPath = it.errorPath,
-      $loopRequired = $isData || $required.length >= it.opts.loopRequired;
+      $loopRequired = $isData || $required.length >= it.opts.loopRequired,
+      $ownProperties = it.opts.ownProperties;
     if ($breakOnError) {
       out += ' var missing' + ($lvl) + '; ';
       if ($loopRequired) {
@@ -5439,7 +5516,11 @@ module.exports = function generate_required(it, $keyword) {
         if ($isData) {
           out += ' if (schema' + ($lvl) + ' === undefined) ' + ($valid) + ' = true; else if (!Array.isArray(schema' + ($lvl) + ')) ' + ($valid) + ' = false; else {';
         }
-        out += ' for (var ' + ($i) + ' = 0; ' + ($i) + ' < ' + ($vSchema) + '.length; ' + ($i) + '++) { ' + ($valid) + ' = ' + ($data) + '[' + ($vSchema) + '[' + ($i) + ']] !== undefined; if (!' + ($valid) + ') break; } ';
+        out += ' for (var ' + ($i) + ' = 0; ' + ($i) + ' < ' + ($vSchema) + '.length; ' + ($i) + '++) { ' + ($valid) + ' = ' + ($data) + '[' + ($vSchema) + '[' + ($i) + ']] !== undefined ';
+        if ($ownProperties) {
+          out += ' &&   Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($vSchema) + '[' + ($i) + ']) ';
+        }
+        out += '; if (!' + ($valid) + ') break; } ';
         if ($isData) {
           out += '  }  ';
         }
@@ -5481,15 +5562,20 @@ module.exports = function generate_required(it, $keyword) {
         out += ' if ( ';
         var arr2 = $required;
         if (arr2) {
-          var _$property, $i = -1,
+          var $propertyKey, $i = -1,
             l2 = arr2.length - 1;
           while ($i < l2) {
-            _$property = arr2[$i += 1];
+            $propertyKey = arr2[$i += 1];
             if ($i) {
               out += ' || ';
             }
-            var $prop = it.util.getProperty(_$property);
-            out += ' ( ' + ($data) + ($prop) + ' === undefined && (missing' + ($lvl) + ' = ' + (it.util.toQuotedString(it.opts.jsonPointers ? _$property : $prop)) + ') ) ';
+            var $prop = it.util.getProperty($propertyKey),
+              $useData = $data + $prop;
+            out += ' ( ( ' + ($useData) + ' === undefined ';
+            if ($ownProperties) {
+              out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+            }
+            out += ') && (missing' + ($lvl) + ' = ' + (it.util.toQuotedString(it.opts.jsonPointers ? $propertyKey : $prop)) + ') ) ';
           }
         }
         out += ') {  ';
@@ -5565,7 +5651,11 @@ module.exports = function generate_required(it, $keyword) {
           }
           out += ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; } else if (' + ($vSchema) + ' !== undefined) { ';
         }
-        out += ' for (var ' + ($i) + ' = 0; ' + ($i) + ' < ' + ($vSchema) + '.length; ' + ($i) + '++) { if (' + ($data) + '[' + ($vSchema) + '[' + ($i) + ']] === undefined) {  var err =   '; /* istanbul ignore else */
+        out += ' for (var ' + ($i) + ' = 0; ' + ($i) + ' < ' + ($vSchema) + '.length; ' + ($i) + '++) { if (' + ($data) + '[' + ($vSchema) + '[' + ($i) + ']] === undefined ';
+        if ($ownProperties) {
+          out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', ' + ($vSchema) + '[' + ($i) + ']) ';
+        }
+        out += ') {  var err =   '; /* istanbul ignore else */
         if (it.createErrors !== false) {
           out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
           if (it.opts.messages !== false) {
@@ -5591,16 +5681,21 @@ module.exports = function generate_required(it, $keyword) {
       } else {
         var arr3 = $required;
         if (arr3) {
-          var $reqProperty, i3 = -1,
+          var $propertyKey, i3 = -1,
             l3 = arr3.length - 1;
           while (i3 < l3) {
-            $reqProperty = arr3[i3 += 1];
-            var $prop = it.util.getProperty($reqProperty),
-              $missingProperty = it.util.escapeQuotes($reqProperty);
+            $propertyKey = arr3[i3 += 1];
+            var $prop = it.util.getProperty($propertyKey),
+              $missingProperty = it.util.escapeQuotes($propertyKey),
+              $useData = $data + $prop;
             if (it.opts._errorDataPathProperty) {
-              it.errorPath = it.util.getPath($currentErrorPath, $reqProperty, it.opts.jsonPointers);
+              it.errorPath = it.util.getPath($currentErrorPath, $propertyKey, it.opts.jsonPointers);
             }
-            out += ' if (' + ($data) + ($prop) + ' === undefined) {  var err =   '; /* istanbul ignore else */
+            out += ' if ( ' + ($useData) + ' === undefined ';
+            if ($ownProperties) {
+              out += ' || ! Object.prototype.hasOwnProperty.call(' + ($data) + ', \'' + (it.util.escapeQuotes($propertyKey)) + '\') ';
+            }
+            out += ') {  var err =   '; /* istanbul ignore else */
             if (it.createErrors !== false) {
               out += ' { keyword: \'' + ('required') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { missingProperty: \'' + ($missingProperty) + '\' } ';
               if (it.opts.messages !== false) {
@@ -5633,12 +5728,12 @@ module.exports = function generate_required(it, $keyword) {
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-module.exports = function generate_switch(it, $keyword) {
+module.exports = function generate_uniqueItems(it, $keyword, $ruleType) {
   var out = ' ';
   var $lvl = it.level;
   var $dataLvl = it.dataLevel;
@@ -5648,142 +5743,7 @@ module.exports = function generate_switch(it, $keyword) {
   var $breakOnError = !it.opts.allErrors;
   var $data = 'data' + ($dataLvl || '');
   var $valid = 'valid' + $lvl;
-  var $errs = 'errs__' + $lvl;
-  var $it = it.util.copy(it);
-  var $closingBraces = '';
-  $it.level++;
-  var $nextValid = 'valid' + $it.level;
-  var $ifPassed = 'ifPassed' + it.level,
-    $currentBaseId = $it.baseId,
-    $shouldContinue;
-  out += 'var ' + ($ifPassed) + ';';
-  var arr1 = $schema;
-  if (arr1) {
-    var $sch, $caseIndex = -1,
-      l1 = arr1.length - 1;
-    while ($caseIndex < l1) {
-      $sch = arr1[$caseIndex += 1];
-      if ($caseIndex && !$shouldContinue) {
-        out += ' if (!' + ($ifPassed) + ') { ';
-        $closingBraces += '}';
-      }
-      if ($sch.if && it.util.schemaHasRules($sch.if, it.RULES.all)) {
-        out += ' var ' + ($errs) + ' = errors;   ';
-        var $wasComposite = it.compositeRule;
-        it.compositeRule = $it.compositeRule = true;
-        $it.createErrors = false;
-        $it.schema = $sch.if;
-        $it.schemaPath = $schemaPath + '[' + $caseIndex + '].if';
-        $it.errSchemaPath = $errSchemaPath + '/' + $caseIndex + '/if';
-        out += '  ' + (it.validate($it)) + ' ';
-        $it.baseId = $currentBaseId;
-        $it.createErrors = true;
-        it.compositeRule = $it.compositeRule = $wasComposite;
-        out += ' ' + ($ifPassed) + ' = ' + ($nextValid) + '; if (' + ($ifPassed) + ') {  ';
-        if (typeof $sch.then == 'boolean') {
-          if ($sch.then === false) {
-            var $$outStack = $$outStack || [];
-            $$outStack.push(out);
-            out = ''; /* istanbul ignore else */
-            if (it.createErrors !== false) {
-              out += ' { keyword: \'' + ('switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
-              if (it.opts.messages !== false) {
-                out += ' , message: \'should pass "switch" keyword validation\' ';
-              }
-              if (it.opts.verbose) {
-                out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-              }
-              out += ' } ';
-            } else {
-              out += ' {} ';
-            }
-            var __err = out;
-            out = $$outStack.pop();
-            if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-              if (it.async) {
-                out += ' throw new ValidationError([' + (__err) + ']); ';
-              } else {
-                out += ' validate.errors = [' + (__err) + ']; return false; ';
-              }
-            } else {
-              out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-            }
-          }
-          out += ' var ' + ($nextValid) + ' = ' + ($sch.then) + '; ';
-        } else {
-          $it.schema = $sch.then;
-          $it.schemaPath = $schemaPath + '[' + $caseIndex + '].then';
-          $it.errSchemaPath = $errSchemaPath + '/' + $caseIndex + '/then';
-          out += '  ' + (it.validate($it)) + ' ';
-          $it.baseId = $currentBaseId;
-        }
-        out += '  } else {  errors = ' + ($errs) + '; if (vErrors !== null) { if (' + ($errs) + ') vErrors.length = ' + ($errs) + '; else vErrors = null; } } ';
-      } else {
-        out += ' ' + ($ifPassed) + ' = true;  ';
-        if (typeof $sch.then == 'boolean') {
-          if ($sch.then === false) {
-            var $$outStack = $$outStack || [];
-            $$outStack.push(out);
-            out = ''; /* istanbul ignore else */
-            if (it.createErrors !== false) {
-              out += ' { keyword: \'' + ('switch') + '\' , dataPath: (dataPath || \'\') + ' + (it.errorPath) + ' , schemaPath: ' + (it.util.toQuotedString($errSchemaPath)) + ' , params: { caseIndex: ' + ($caseIndex) + ' } ';
-              if (it.opts.messages !== false) {
-                out += ' , message: \'should pass "switch" keyword validation\' ';
-              }
-              if (it.opts.verbose) {
-                out += ' , schema: validate.schema' + ($schemaPath) + ' , parentSchema: validate.schema' + (it.schemaPath) + ' , data: ' + ($data) + ' ';
-              }
-              out += ' } ';
-            } else {
-              out += ' {} ';
-            }
-            var __err = out;
-            out = $$outStack.pop();
-            if (!it.compositeRule && $breakOnError) { /* istanbul ignore if */
-              if (it.async) {
-                out += ' throw new ValidationError([' + (__err) + ']); ';
-              } else {
-                out += ' validate.errors = [' + (__err) + ']; return false; ';
-              }
-            } else {
-              out += ' var err = ' + (__err) + ';  if (vErrors === null) vErrors = [err]; else vErrors.push(err); errors++; ';
-            }
-          }
-          out += ' var ' + ($nextValid) + ' = ' + ($sch.then) + '; ';
-        } else {
-          $it.schema = $sch.then;
-          $it.schemaPath = $schemaPath + '[' + $caseIndex + '].then';
-          $it.errSchemaPath = $errSchemaPath + '/' + $caseIndex + '/then';
-          out += '  ' + (it.validate($it)) + ' ';
-          $it.baseId = $currentBaseId;
-        }
-      }
-      $shouldContinue = $sch.continue
-    }
-  }
-  out += '' + ($closingBraces) + 'var ' + ($valid) + ' = ' + ($nextValid) + '; ';
-  out = it.util.cleanUpCode(out);
-  return out;
-}
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function generate_uniqueItems(it, $keyword) {
-  var out = ' ';
-  var $lvl = it.level;
-  var $dataLvl = it.dataLevel;
-  var $schema = it.schema[$keyword];
-  var $schemaPath = it.schemaPath + it.util.getProperty($keyword);
-  var $errSchemaPath = it.errSchemaPath + '/' + $keyword;
-  var $breakOnError = !it.opts.allErrors;
-  var $data = 'data' + ($dataLvl || '');
-  var $valid = 'valid' + $lvl;
-  var $isData = it.opts.v5 && $schema && $schema.$data,
+  var $isData = it.opts.$data && $schema && $schema.$data,
     $schemaValue;
   if ($isData) {
     out += ' var schema' + ($lvl) + ' = ' + (it.util.getData($schema.$data, $dataLvl, it.dataPathArr)) + '; ';
@@ -5846,14 +5806,14 @@ module.exports = function generate_uniqueItems(it, $keyword) {
 
 
 /***/ }),
-/* 43 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var IDENTIFIER = /^[a-z_$][a-z0-9_$\-]*$/i;
-var customRuleCode = __webpack_require__(28);
+var customRuleCode = __webpack_require__(27);
 
 module.exports = {
   add: addKeyword,
@@ -5892,7 +5852,7 @@ function addKeyword(keyword, definition) {
       _addRule(keyword, dataType, definition);
     }
 
-    var $data = definition.$data === true && this._opts.v5;
+    var $data = definition.$data === true && this._opts.$data;
     if ($data && !definition.validate)
       throw new Error('$data support: "validate" function is not defined');
 
@@ -5902,7 +5862,7 @@ function addKeyword(keyword, definition) {
         metaSchema = {
           anyOf: [
             metaSchema,
-            { '$ref': 'https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#/definitions/$data' }
+            { '$ref': 'https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/$data.json#' }
           ]
         };
       }
@@ -5932,7 +5892,8 @@ function addKeyword(keyword, definition) {
       keyword: keyword,
       definition: definition,
       custom: true,
-      code: customRuleCode
+      code: customRuleCode,
+      implements: definition.implements
     };
     ruleGroup.rules.push(rule);
     RULES.custom[keyword] = rule;
@@ -5982,13 +5943,84 @@ function removeKeyword(keyword) {
 
 
 /***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var META_SCHEMA_ID = 'http://json-schema.org/draft-06/schema';
+
+module.exports = function (ajv) {
+  var defaultMeta = ajv._opts.defaultMeta;
+  var metaSchemaRef = typeof defaultMeta == 'string'
+                      ? { $ref: defaultMeta }
+                      : ajv.getSchema(META_SCHEMA_ID)
+                        ? { $ref: META_SCHEMA_ID }
+                        : {};
+
+  ajv.addKeyword('patternGroups', {
+    // implemented in properties.jst
+    metaSchema: {
+      type: 'object',
+      additionalProperties: {
+        type: 'object',
+        required: [ 'schema' ],
+        properties: {
+          maximum: {
+            type: 'integer',
+            minimum: 0
+          },
+          minimum: {
+            type: 'integer',
+            minimum: 0
+          },
+          schema: metaSchemaRef
+        },
+        additionalProperties: false
+      }
+    }
+  });
+  ajv.RULES.all.properties.implements.push('patternGroups');
+};
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports) {
+
+module.exports = {
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"$id": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/$data.json#",
+	"description": "Meta-schema for $data reference (JSON-schema extension proposal)",
+	"type": "object",
+	"required": [
+		"$data"
+	],
+	"properties": {
+		"$data": {
+			"type": "string",
+			"anyOf": [
+				{
+					"format": "relative-json-pointer"
+				},
+				{
+					"format": "json-pointer"
+				}
+			]
+		}
+	},
+	"additionalProperties": false
+};
+
+/***/ }),
 /* 44 */
 /***/ (function(module, exports) {
 
 module.exports = {
-	"id": "http://json-schema.org/draft-04/schema#",
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "Core schema meta-schema",
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"$id": "http://json-schema.org/draft-06/schema#",
+	"title": "Core schema meta-schema",
 	"definitions": {
 		"schemaArray": {
 			"type": "array",
@@ -5997,14 +6029,14 @@ module.exports = {
 				"$ref": "#"
 			}
 		},
-		"positiveInteger": {
+		"nonNegativeInteger": {
 			"type": "integer",
 			"minimum": 0
 		},
-		"positiveIntegerDefault0": {
+		"nonNegativeIntegerDefault0": {
 			"allOf": [
 				{
-					"$ref": "#/definitions/positiveInteger"
+					"$ref": "#/definitions/nonNegativeInteger"
 				},
 				{
 					"default": 0
@@ -6027,19 +6059,26 @@ module.exports = {
 			"items": {
 				"type": "string"
 			},
-			"minItems": 1,
-			"uniqueItems": true
+			"uniqueItems": true,
+			"default": []
 		}
 	},
-	"type": "object",
+	"type": [
+		"object",
+		"boolean"
+	],
 	"properties": {
-		"id": {
+		"$id": {
 			"type": "string",
-			"format": "uri"
+			"format": "uri-reference"
 		},
 		"$schema": {
 			"type": "string",
 			"format": "uri"
+		},
+		"$ref": {
+			"type": "string",
+			"format": "uri-reference"
 		},
 		"title": {
 			"type": "string"
@@ -6050,43 +6089,32 @@ module.exports = {
 		"default": {},
 		"multipleOf": {
 			"type": "number",
-			"minimum": 0,
-			"exclusiveMinimum": true
+			"exclusiveMinimum": 0
 		},
 		"maximum": {
 			"type": "number"
 		},
 		"exclusiveMaximum": {
-			"type": "boolean",
-			"default": false
+			"type": "number"
 		},
 		"minimum": {
 			"type": "number"
 		},
 		"exclusiveMinimum": {
-			"type": "boolean",
-			"default": false
+			"type": "number"
 		},
 		"maxLength": {
-			"$ref": "#/definitions/positiveInteger"
+			"$ref": "#/definitions/nonNegativeInteger"
 		},
 		"minLength": {
-			"$ref": "#/definitions/positiveIntegerDefault0"
+			"$ref": "#/definitions/nonNegativeIntegerDefault0"
 		},
 		"pattern": {
 			"type": "string",
 			"format": "regex"
 		},
 		"additionalItems": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"$ref": "#"
-				}
-			],
-			"default": {}
+			"$ref": "#"
 		},
 		"items": {
 			"anyOf": [
@@ -6100,34 +6128,29 @@ module.exports = {
 			"default": {}
 		},
 		"maxItems": {
-			"$ref": "#/definitions/positiveInteger"
+			"$ref": "#/definitions/nonNegativeInteger"
 		},
 		"minItems": {
-			"$ref": "#/definitions/positiveIntegerDefault0"
+			"$ref": "#/definitions/nonNegativeIntegerDefault0"
 		},
 		"uniqueItems": {
 			"type": "boolean",
 			"default": false
 		},
+		"contains": {
+			"$ref": "#"
+		},
 		"maxProperties": {
-			"$ref": "#/definitions/positiveInteger"
+			"$ref": "#/definitions/nonNegativeInteger"
 		},
 		"minProperties": {
-			"$ref": "#/definitions/positiveIntegerDefault0"
+			"$ref": "#/definitions/nonNegativeIntegerDefault0"
 		},
 		"required": {
 			"$ref": "#/definitions/stringArray"
 		},
 		"additionalProperties": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"$ref": "#"
-				}
-			],
-			"default": {}
+			"$ref": "#"
 		},
 		"definitions": {
 			"type": "object",
@@ -6163,6 +6186,10 @@ module.exports = {
 				]
 			}
 		},
+		"propertyNames": {
+			"$ref": "#"
+		},
+		"const": {},
 		"enum": {
 			"type": "array",
 			"minItems": 1,
@@ -6183,6 +6210,9 @@ module.exports = {
 				}
 			]
 		},
+		"format": {
+			"type": "string"
+		},
 		"allOf": {
 			"$ref": "#/definitions/schemaArray"
 		},
@@ -6195,586 +6225,19 @@ module.exports = {
 		"not": {
 			"$ref": "#"
 		}
-	},
-	"dependencies": {
-		"exclusiveMaximum": [
-			"maximum"
-		],
-		"exclusiveMinimum": [
-			"minimum"
-		]
 	},
 	"default": {}
 };
 
 /***/ }),
 /* 45 */
-/***/ (function(module, exports) {
-
-module.exports = {
-	"id": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"description": "Core schema meta-schema (v5 proposals)",
-	"definitions": {
-		"schemaArray": {
-			"type": "array",
-			"minItems": 1,
-			"items": {
-				"$ref": "#"
-			}
-		},
-		"positiveInteger": {
-			"type": "integer",
-			"minimum": 0
-		},
-		"positiveIntegerDefault0": {
-			"allOf": [
-				{
-					"$ref": "#/definitions/positiveInteger"
-				},
-				{
-					"default": 0
-				}
-			]
-		},
-		"simpleTypes": {
-			"enum": [
-				"array",
-				"boolean",
-				"integer",
-				"null",
-				"number",
-				"object",
-				"string"
-			]
-		},
-		"stringArray": {
-			"type": "array",
-			"items": {
-				"type": "string"
-			},
-			"minItems": 1,
-			"uniqueItems": true
-		},
-		"$data": {
-			"type": "object",
-			"required": [
-				"$data"
-			],
-			"properties": {
-				"$data": {
-					"type": "string",
-					"anyOf": [
-						{
-							"format": "relative-json-pointer"
-						},
-						{
-							"format": "json-pointer"
-						}
-					]
-				}
-			},
-			"additionalProperties": false
-		}
-	},
-	"type": "object",
-	"properties": {
-		"id": {
-			"type": "string",
-			"format": "uri"
-		},
-		"$schema": {
-			"type": "string",
-			"format": "uri"
-		},
-		"title": {
-			"type": "string"
-		},
-		"description": {
-			"type": "string"
-		},
-		"default": {},
-		"multipleOf": {
-			"anyOf": [
-				{
-					"type": "number",
-					"minimum": 0,
-					"exclusiveMinimum": true
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"maximum": {
-			"anyOf": [
-				{
-					"type": "number"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"exclusiveMaximum": {
-			"anyOf": [
-				{
-					"type": "boolean",
-					"default": false
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"minimum": {
-			"anyOf": [
-				{
-					"type": "number"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"exclusiveMinimum": {
-			"anyOf": [
-				{
-					"type": "boolean",
-					"default": false
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"maxLength": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveInteger"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"minLength": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveIntegerDefault0"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"pattern": {
-			"anyOf": [
-				{
-					"type": "string",
-					"format": "regex"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"additionalItems": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"$ref": "#"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			],
-			"default": {}
-		},
-		"items": {
-			"anyOf": [
-				{
-					"$ref": "#"
-				},
-				{
-					"$ref": "#/definitions/schemaArray"
-				}
-			],
-			"default": {}
-		},
-		"maxItems": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveInteger"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"minItems": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveIntegerDefault0"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"uniqueItems": {
-			"anyOf": [
-				{
-					"type": "boolean",
-					"default": false
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"maxProperties": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveInteger"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"minProperties": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/positiveIntegerDefault0"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"required": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/stringArray"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"additionalProperties": {
-			"anyOf": [
-				{
-					"type": "boolean"
-				},
-				{
-					"$ref": "#"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			],
-			"default": {}
-		},
-		"definitions": {
-			"type": "object",
-			"additionalProperties": {
-				"$ref": "#"
-			},
-			"default": {}
-		},
-		"properties": {
-			"type": "object",
-			"additionalProperties": {
-				"$ref": "#"
-			},
-			"default": {}
-		},
-		"patternProperties": {
-			"type": "object",
-			"additionalProperties": {
-				"$ref": "#"
-			},
-			"default": {}
-		},
-		"dependencies": {
-			"type": "object",
-			"additionalProperties": {
-				"anyOf": [
-					{
-						"$ref": "#"
-					},
-					{
-						"$ref": "#/definitions/stringArray"
-					}
-				]
-			}
-		},
-		"enum": {
-			"anyOf": [
-				{
-					"type": "array",
-					"minItems": 1,
-					"uniqueItems": true
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"type": {
-			"anyOf": [
-				{
-					"$ref": "#/definitions/simpleTypes"
-				},
-				{
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/simpleTypes"
-					},
-					"minItems": 1,
-					"uniqueItems": true
-				}
-			]
-		},
-		"allOf": {
-			"$ref": "#/definitions/schemaArray"
-		},
-		"anyOf": {
-			"$ref": "#/definitions/schemaArray"
-		},
-		"oneOf": {
-			"$ref": "#/definitions/schemaArray"
-		},
-		"not": {
-			"$ref": "#"
-		},
-		"format": {
-			"anyOf": [
-				{
-					"type": "string"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"formatMaximum": {
-			"anyOf": [
-				{
-					"type": "string"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"formatMinimum": {
-			"anyOf": [
-				{
-					"type": "string"
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"formatExclusiveMaximum": {
-			"anyOf": [
-				{
-					"type": "boolean",
-					"default": false
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"formatExclusiveMinimum": {
-			"anyOf": [
-				{
-					"type": "boolean",
-					"default": false
-				},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"constant": {
-			"anyOf": [
-				{},
-				{
-					"$ref": "#/definitions/$data"
-				}
-			]
-		},
-		"contains": {
-			"$ref": "#"
-		},
-		"patternGroups": {
-			"type": "object",
-			"additionalProperties": {
-				"type": "object",
-				"required": [
-					"schema"
-				],
-				"properties": {
-					"maximum": {
-						"anyOf": [
-							{
-								"$ref": "#/definitions/positiveInteger"
-							},
-							{
-								"$ref": "#/definitions/$data"
-							}
-						]
-					},
-					"minimum": {
-						"anyOf": [
-							{
-								"$ref": "#/definitions/positiveIntegerDefault0"
-							},
-							{
-								"$ref": "#/definitions/$data"
-							}
-						]
-					},
-					"schema": {
-						"$ref": "#"
-					}
-				},
-				"additionalProperties": false
-			},
-			"default": {}
-		},
-		"switch": {
-			"type": "array",
-			"items": {
-				"required": [
-					"then"
-				],
-				"properties": {
-					"if": {
-						"$ref": "#"
-					},
-					"then": {
-						"anyOf": [
-							{
-								"type": "boolean"
-							},
-							{
-								"$ref": "#"
-							}
-						]
-					},
-					"continue": {
-						"type": "boolean"
-					}
-				},
-				"additionalProperties": false,
-				"dependencies": {
-					"continue": [
-						"if"
-					]
-				}
-			}
-		}
-	},
-	"dependencies": {
-		"exclusiveMaximum": [
-			"maximum"
-		],
-		"exclusiveMinimum": [
-			"minimum"
-		],
-		"formatMaximum": [
-			"format"
-		],
-		"formatMinimum": [
-			"format"
-		],
-		"formatExclusiveMaximum": [
-			"formatMaximum"
-		],
-		"formatExclusiveMinimum": [
-			"formatMinimum"
-		]
-	},
-	"default": {}
-};
-
-/***/ }),
-/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var META_SCHEMA_ID = 'https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json';
-
-module.exports = {
-  enable: enableV5,
-  META_SCHEMA_ID: META_SCHEMA_ID
-};
-
-
-function enableV5(ajv) {
-  var inlineFunctions = {
-    'switch': __webpack_require__(41),
-    'constant': __webpack_require__(27),
-    '_formatLimit': __webpack_require__(24),
-    'patternRequired': __webpack_require__(37)
-  };
-
-  if (ajv._opts.meta !== false) {
-    var metaSchema = __webpack_require__(45);
-    ajv.addMetaSchema(metaSchema, META_SCHEMA_ID);
-  }
-  _addKeyword('constant');
-  ajv.addKeyword('contains', { type: 'array', macro: containsMacro });
-
-  _addKeyword('formatMaximum', 'string', inlineFunctions._formatLimit);
-  _addKeyword('formatMinimum', 'string', inlineFunctions._formatLimit);
-  ajv.addKeyword('formatExclusiveMaximum');
-  ajv.addKeyword('formatExclusiveMinimum');
-
-  ajv.addKeyword('patternGroups'); // implemented in properties.jst
-  _addKeyword('patternRequired', 'object');
-  _addKeyword('switch');
-
-
-  function _addKeyword(keyword, types, inlineFunc) {
-    var definition = {
-      inline: inlineFunc || inlineFunctions[keyword],
-      statements: true,
-      errors: 'full'
-    };
-    if (types) definition.type = types;
-    ajv.addKeyword(keyword, definition);
-  }
-}
-
-
-function containsMacro(schema) {
-  return {
-    not: { items: { not: schema } }
-  };
-}
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var schemaModel = __webpack_require__(2);
-var validator = __webpack_require__(15);
+var schemaModel = __webpack_require__(4);
+var validator = __webpack_require__(13);
 
 module.exports = {
   schemaModel: schemaModel,
@@ -6782,7 +6245,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 48 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6859,7 +6322,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 49 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7028,7 +6491,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 50 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7092,7 +6555,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 51 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7131,7 +6594,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 52 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7215,7 +6678,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 53 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7321,7 +6784,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 54 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7378,7 +6841,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 55 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7409,7 +6872,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 56 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7440,7 +6903,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 57 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7494,7 +6957,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 58 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7582,13 +7045,13 @@ module.exports = {
 };
 
 /***/ }),
-/* 59 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var mData = __webpack_require__(58);
+var mData = __webpack_require__(56);
 /**
  * Contains data pertaining to video assets.
  */
@@ -7649,7 +7112,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 60 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7699,7 +7162,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 61 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7728,8 +7191,8 @@ module.exports = {
         var msg = ' \uD83D\uDC49  [' + e.keyword + ' error]: ' + formatDataPath(e.dataPath) + ' ' + e.message;
 
         if (e.keyword === 'additionalProperties') {
-          msg += ' (it had ' + Object.values(e.params).map(function (p) {
-            return '\'' + p + '\'';
+          msg += ' (it had ' + Object.keys(e.params).map(function (p) {
+            return '\'' + e.params[p] + '\'';
           }).join(', ') + ')';
         }
 
@@ -7747,15 +7210,15 @@ module.exports = {
 };
 
 /***/ }),
-/* 62 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.parse = __webpack_require__(63);
-exports.stringify = __webpack_require__(64);
+exports.parse = __webpack_require__(61);
+exports.stringify = __webpack_require__(62);
 
 
 /***/ }),
-/* 63 */
+/* 61 */
 /***/ (function(module, exports) {
 
 var at, // The index of the current character
@@ -8034,7 +7497,7 @@ module.exports = function (source, reviver) {
 
 
 /***/ }),
-/* 64 */
+/* 62 */
 /***/ (function(module, exports) {
 
 var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
@@ -8194,7 +7657,7 @@ module.exports = function (value, replacer, space) {
 
 
 /***/ }),
-/* 65 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -8730,10 +8193,10 @@ module.exports = function (value, replacer, space) {
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(72)(module), __webpack_require__(71)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(70)(module), __webpack_require__(69)))
 
 /***/ }),
-/* 66 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8824,7 +8287,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 67 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8916,18 +8379,18 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ }),
-/* 68 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.decode = exports.parse = __webpack_require__(66);
-exports.encode = exports.stringify = __webpack_require__(67);
+exports.decode = exports.parse = __webpack_require__(64);
+exports.encode = exports.stringify = __webpack_require__(65);
 
 
 /***/ }),
-/* 69 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8954,8 +8417,8 @@ exports.encode = exports.stringify = __webpack_require__(67);
 
 
 
-var punycode = __webpack_require__(65);
-var util = __webpack_require__(70);
+var punycode = __webpack_require__(63);
+var util = __webpack_require__(68);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -9030,7 +8493,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(68);
+    querystring = __webpack_require__(66);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -9666,7 +9129,7 @@ Url.prototype.parseHost = function() {
 
 
 /***/ }),
-/* 70 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9689,7 +9152,7 @@ module.exports = {
 
 
 /***/ }),
-/* 71 */
+/* 69 */
 /***/ (function(module, exports) {
 
 var g;
@@ -9716,7 +9179,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 72 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
