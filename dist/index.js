@@ -7170,7 +7170,7 @@ module.exports = {
 
 /* eslint-disable no-console */
 
-var group = console.group || console.log;
+var group = console.groupCollapsed || console.group || console.log;
 
 var formatDataPath = function formatDataPath(dataPath) {
   if (dataPath.startsWith('.') || dataPath === '') {
