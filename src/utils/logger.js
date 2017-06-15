@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-const group = console.group || console.log;
+const group = console.groupCollapsed || console.group || console.log;
 
 const formatDataPath = (dataPath) => {
   if (dataPath.startsWith('.') || dataPath === '') {
