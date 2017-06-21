@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
 const Ajv = require('ajv');
-const schemaModel = require('../index').schemaModel;
+const schemaModel = require('../development').schemaModel;
 
 const ajv = new Ajv({
   allErrors: true,

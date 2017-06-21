@@ -1,19 +1,37 @@
-const validator = require('../index').validator;
+/* eslint-disable global-require */
 const example = require('../example');
 
 describe('index', () => {
-  it('validates against example data', () => {
-    const result = validator(example);
+  describe('in development', () => {
+    let validator;
+    beforeAll(() => {
+      jest.resetModules();
+      global.process.env.NODE_ENV = 'development';
+      validator = require('../index').validator;
+    });
+    it('validates against example data', () => {
+      const result = validator(example);
 
-    expect(!result.errors).toBe(true, result.errors);
+      expect(!result.errors).toBe(true, result.errors);
+    });
+
+    it('validates individual video event data', () => {
+      const result = validator({ video: example.video }, { individualEvents: true });
+
+      expect(!result.errors).toBe(true, result.errors);
+    });
   });
 
-  it('validates individual video event data', () => {
-    const result = validator(
-      { video: example.video },
-      { individualEvents: true },
-    );
+  describe('in production', () => {
+    let validator;
+    beforeAll(() => {
+      jest.resetModules();
+      global.process.env.NODE_ENV = 'production';
+      validator = require('../index').validator;
+    });
 
-    expect(!result.errors).toBe(true, result.errors);
+    it('exports an empty function', () => {
+      expect(validator()).toBe(undefined);
+    });
   });
 });
