@@ -1,6 +1,8 @@
 # tracking-schema
-  
-The following illustrates an ideal data layer object as implemented in new NYT Web applications. The overall goal is to have the front-end application team create and maintain this object through the lifecycle of a user's visit. In addition, there will be several events pushed into the data layer that will update the data found in the object as well as be used for triggering tags in GTM.
+
+Version: 2.1.0
+
+Tracking object schema and validation
 
 ## Schema Current Taxonomy
 
