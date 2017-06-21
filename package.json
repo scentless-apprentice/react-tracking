@@ -7,7 +7,7 @@
     "lint": "eslint .",
     "test": "jest",
     "test-watch": "jest --watch",
-    "build": "babel --out-dir build src --ignore src/__tests__ --ignore src/documentation",
+    "build": "rm -rf build && babel src --out-dir build --ignore **/__tests__,src/documentation,src/example",
     "documentation": "node src/documentation/index.js"
   },
   "repository": {
