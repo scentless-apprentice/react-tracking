@@ -6,36 +6,40 @@
  * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
  */
 
-const event = require('./event');
 const application = require('./application');
-const user = require('./user');
-const referrer = require('./referrer');
-const interaction = require('./interaction');
 const asset = require('./asset');
-const presentation = require('./presentation');
-const marketing = require('./marketing');
-const viewport = require('./viewport');
-const session = require('./session');
-const video = require('./video');
+const block = require('./block');
+const card = require('./card');
+const event = require('./event');
 const heartbeat = require('./heartbeat');
-
+const interaction = require('./interaction');
+const marketing = require('./marketing');
+const pageModule = require('./module'); // to avoid overlap with reserved word 'module'
+const presentation = require('./presentation');
+const referrer = require('./referrer');
+const session = require('./session');
+const trigger = require('./trigger');
+const user = require('./user');
+const viewport = require('./viewport');
+const video = require('./video');
 
 const allProps = { // main "dataLayer" starts here
-  event,
   application,
-  user,
-  referrer,
-  interaction,
   asset,
-  presentation,
+  block,
+  card,
+  event,
+  heartbeat,
+  interaction,
   marketing,
+  module: pageModule,
+  presentation,
+  referrer,
+  session, // TODO: this is mostly empty
+  trigger,
+  user,
   viewport,
   video,
-  heartbeat,
-
-  // TODO: this is mostly empty
-  session,
-  
 };
 
 module.exports = {

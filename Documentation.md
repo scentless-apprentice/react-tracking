@@ -12,18 +12,6 @@ Data Type: **Object**
 
 Required Fields: event, application, user, referrer
 
-### datalayer.event
-
-Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
-
-Data Type: **String**. It must match one of these:
-* pageDataReady
-* scrollComplete
-* heartbeat
-* moduleInteraction
-* dynamicElementsLoaded
-* videoEvent
-
 ### datalayer.application
 
 Description: Describes basics attributes of the NYT Web application where the data layer is constructed. For example, it provides the application's version and release number.
@@ -71,213 +59,6 @@ Data Type: **String**. It must match one of these:
 ### datalayer.application.name
 
 Description: The name of the application where the data was collected.
-
-Data Type: **String**
-
-### datalayer.user
-
-Description: Describes basic attributes of the NYT user.
-
-Data Type: **Object**
-
-Required Fields: type
-
-### datalayer.user.regiId
-
-Description: The NYT registration ID of the NYT user.
-
-Data Type: **String**
-
-### datalayer.user.type
-
-Description: A value that indicates the type of NYT user
-
-Data Type: **String**. It must match one of these:
-* anon
-* regi
-* sub
-
-### datalayer.user.subscriptions
-
-Description: TBD
-
-Data Type: **Array of Objects**
-
-### datalayer.user.watSeg
-
-Description: segments under ‘wat’ in the NYT-D cookie
-
-Data Type: **String**
-
-### datalayer.referrer
-
-Description: Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.
-
-Data Type: **Object**
-
-Required Fields: url
-
-### datalayer.referrer.url
-
-Description: A URL of previous page or document.referrer
-
-Data format: uri
-
-### datalayer.interaction
-
-Description: module behavioral/click tracking will have additional fields as we refine the the specifications for that effort
-
-Data Type: **Object**
-
-Required Fields: type
-
-### datalayer.interaction.module
-
-Description: TBD
-
-Data Type: **Object**
-
-### datalayer.interaction.module.name
-
-Description: see more
-
-Data Type: **String**
-
-### datalayer.interaction.module.context
-
-Description: block
-
-Data Type: **String**
-
-### datalayer.interaction.module.label
-
-Description: Top News|Featured|Opinion|News|Culture|etc...
-
-Data Type: **String**
-
-### datalayer.interaction.block
-
-Description: No description found
-
-Data Type: **Object**
-
-### datalayer.interaction.block.label
-
-Description: Top Stories
-
-Data Type: **String**
-
-### datalayer.interaction.block.rendition
-
-Description: Overflow
-
-Data Type: **String**
-
-### datalayer.interaction.block.name
-
-Description: mobile-home/1
-
-Data Type: **String**
-
-### datalayer.interaction.block.index
-
-Description: The ordinal rank of a block within a program (zero-indexed)
-
-Data Type: **Integer**
-
-### datalayer.interaction.block.version
-
-Description: 1fjei9
-
-Data Type: **String**
-
-### datalayer.interaction.block.list
-
-Description: No description found
-
-Data Type: **Object**
-
-### datalayer.interaction.block.list.name
-
-Description: No description found
-
-Data Type: **String**
-
-### datalayer.interaction.block.list.uri
-
-Description: No description found
-
-Data Type: **String**
-
-### datalayer.interaction.card
-
-Description: No description found
-
-Data Type: **Object**
-
-### datalayer.interaction.card.region
-
-Data Type: **String**
-
-### datalayer.interaction.card.index
-
-Description: An integer representing the ordinal rank of a card within a block
-
-Data Type: **Integer**
-
-### datalayer.interaction.card.type
-
-Description: visual
-
-Data Type: **String**
-
-### datalayer.interaction.card.rendition
-
-Description: whole
-
-Data Type: **String**. It must match one of these:
-* whole
-* skim
-
-### datalayer.interaction.card.url
-
-Description: https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html
-
-Data Type: **String**
-
-### datalayer.interaction.card.label
-
-Description: headline
-
-Data Type: **String**
-
-### datalayer.interaction.card.id
-
-Description: 100000005090678
-
-Data Type: **String**
-
-### datalayer.interaction.type
-
-Description: click
-
-Data Type: **String**
-
-### datalayer.interaction.status
-
-Description: used to pass success/failure or other status messaging eg. log in success or failure. Many interactions won’t have a status. Those should set an empty string.
-
-Data Type: **String**
-
-### datalayer.interaction.pagetype
-
-Description: pagetype when the interaction occurred
-
-Data Type: **String**
-
-### datalayer.interaction.page_view_id
-
-Description: for advertising 
 
 Data Type: **String**
 
@@ -388,6 +169,221 @@ Description: The current number of words in the content asset's body text.
 
 Data Type: **Number**
 
+### datalayer.block
+
+Description: Describes basic attributes of the NYT user.
+
+Data Type: **Object**
+
+Required Fields: type
+
+### datalayer.block.label
+
+Description: Top Stories
+
+Data Type: **String**
+
+### datalayer.block.template
+
+Description: Overflow
+
+Data Type: **String**
+
+### datalayer.block.name
+
+Description: mobile-home/1
+
+Data Type: **String**
+
+### datalayer.block.index
+
+Description: The ordinal rank of a block within a program (zero-indexed)
+
+Data Type: **Integer**
+
+### datalayer.block.version
+
+Description: 1fjei9
+
+Data Type: **String**
+
+### datalayer.block.list
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.block.list.uri
+
+Description: Unique identifier for the list powering a block
+
+Data Type: **String**
+
+### datalayer.card
+
+Description: Describes basic attributes of the NYT user.
+
+Data Type: **Object**
+
+Required Fields: type
+
+### datalayer.card.index
+
+Description: An integer representing the ordinal rank of a card within a block
+
+Data Type: **Integer**
+
+### datalayer.card.type
+
+Description: visual
+
+Data Type: **String**
+
+### datalayer.card.rendition
+
+Description: whole
+
+Data Type: **String**
+
+### datalayer.card.url
+
+Description: https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html
+
+Data Type: **String**
+
+### datalayer.card.label
+
+Description: headline
+
+Data Type: **String**
+
+### datalayer.card.id
+
+Description: 100000005090678
+
+Data Type: **String**
+
+### datalayer.event
+
+Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
+
+Data Type: **String**. It must match one of these:
+* pageDataReady
+* scrollComplete
+* heartbeat
+* moduleInteraction
+* dynamicElementsLoaded
+* videoEvent
+* impression
+
+### datalayer.heartbeat
+
+Description: This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.
+
+Data Type: **Object**
+
+Required Fields: timeSincePageDataReady, heartbeatInterval
+
+### datalayer.heartbeat.timeSincePageDataReady
+
+Description: The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
+
+Data Type: **Integer**
+
+### datalayer.heartbeat.heartbeatInterval
+
+Description: The frequency of heartbeat event object pushes, in milliseconds.
+
+Data Type: **Integer**
+
+### datalayer.interaction
+
+Description: module behavioral/click tracking will have additional fields as we refine the the specifications for that effort
+
+Data Type: **Object**
+
+Required Fields: type
+
+### datalayer.interaction.module
+
+Description: TBD
+
+Data Type: **Object**
+
+### datalayer.interaction.module.name
+
+Description: see more
+
+Data Type: **String**
+
+### datalayer.interaction.module.context
+
+Description: block
+
+Data Type: **String**
+
+### datalayer.interaction.module.label
+
+Description: Top News|Featured|Opinion|News|Culture|etc...
+
+Data Type: **String**
+
+### datalayer.interaction.region
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.interaction.type
+
+Description: click
+
+Data Type: **String**
+
+### datalayer.interaction.status
+
+Description: used to pass success/failure or other status messaging eg. log in success or failure. Many interactions won’t have a status. Those should set an empty string.
+
+Data Type: **String**
+
+### datalayer.interaction.pagetype
+
+Description: pagetype when the interaction occurred
+
+Data Type: **String**
+
+### datalayer.interaction.page_view_id
+
+Description: for advertising 
+
+Data Type: **String**
+
+### datalayer.marketing
+
+Description: Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.
+
+Data Type: **Object**
+
+### datalayer.marketing.flow
+
+Description: TBD
+
+### datalayer.marketing.campaign
+
+Description: TBD
+
+### datalayer.marketing.product
+
+Description: TBD
+
+### datalayer.module
+
+Description: Describes basic attributes of the NYT user.
+
+Data Type: **Object**
+
+Required Fields: type
+
 ### datalayer.presentation
 
 Description: Describes basic attributes of the page design layout.
@@ -444,19 +440,17 @@ Description: home
 
 Data Type: **String**
 
-### datalayer.presentation.program.rendition
+### datalayer.presentation.program.breakpoint
 
-Description: desktop
+Description: 1 column
 
 Data Type: **String**
 
 ### datalayer.presentation.program.type
 
-Description: tbd
+Description: home
 
-Data Type: **String**. It must match one of these:
-* home
-* story
+Data Type: **String**
 
 ### datalayer.presentation.program.version
 
@@ -464,23 +458,78 @@ Description: 12309239
 
 Data Type: **String**
 
-### datalayer.marketing
+### datalayer.referrer
 
-Description: Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.
+Description: Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.
 
 Data Type: **Object**
 
-### datalayer.marketing.flow
+Required Fields: url
+
+### datalayer.referrer.url
+
+Description: A URL of previous page or document.referrer
+
+Data format: uri
+
+### datalayer.session
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.session.meterCount
+
+Description: A value that indicates the total number of metered NYT content assets consumed during the user session.
+
+Data Type: **Number**
+
+### datalayer.session.isLoggedIn
+
+Description: A flag that indicates whether a user session is authenticated.
+
+Data Type: **Boolean**
+
+### datalayer.trigger
+
+Description: The front-end component that triggered the event push - e.g., a card
+
+Data Type: **String**
+
+### datalayer.user
+
+Description: Describes basic attributes of the NYT user.
+
+Data Type: **Object**
+
+Required Fields: type
+
+### datalayer.user.regiId
+
+Description: The NYT registration ID of the NYT user.
+
+Data Type: **String**
+
+### datalayer.user.type
+
+Description: A value that indicates the type of NYT user
+
+Data Type: **String**. It must match one of these:
+* anon
+* regi
+* sub
+
+### datalayer.user.subscriptions
 
 Description: TBD
 
-### datalayer.marketing.campaign
+Data Type: **Array of Objects**
 
-Description: TBD
+### datalayer.user.watSeg
 
-### datalayer.marketing.product
+Description: segments under ‘wat’ in the NYT-D cookie
 
-Description: TBD
+Data Type: **String**
 
 ### datalayer.viewport
 
@@ -684,44 +733,6 @@ Data Type: **String**. It must match one of these:
 * video
 * ad
 * 360video
-
-### datalayer.heartbeat
-
-Description: This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.
-
-Data Type: **Object**
-
-Required Fields: timeSincePageDataReady, heartbeatInterval
-
-### datalayer.heartbeat.timeSincePageDataReady
-
-Description: The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
-
-Data Type: **Integer**
-
-### datalayer.heartbeat.heartbeatInterval
-
-Description: The frequency of heartbeat event object pushes, in milliseconds.
-
-Data Type: **Integer**
-
-### datalayer.session
-
-Description: No description found
-
-Data Type: **Object**
-
-### datalayer.session.meterCount
-
-Description: A value that indicates the total number of metered NYT content assets consumed during the user session.
-
-Data Type: **Number**
-
-### datalayer.session.isLoggedIn
-
-Description: A flag that indicates whether a user session is authenticated.
-
-Data Type: **Boolean**
 
 ## Contributing
 
