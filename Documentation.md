@@ -175,8 +175,6 @@ Description: Describes basic attributes of the NYT user.
 
 Data Type: **Object**
 
-Required Fields: type
-
 ### datalayer.block.label
 
 Description: Top Stories
@@ -224,8 +222,6 @@ Data Type: **String**
 Description: Describes basic attributes of the NYT user.
 
 Data Type: **Object**
-
-Required Fields: type
 
 ### datalayer.card.index
 
@@ -381,8 +377,6 @@ Description: TBD
 Description: Describes basic attributes of the NYT user.
 
 Data Type: **Object**
-
-Required Fields: type
 
 ### datalayer.presentation
 
