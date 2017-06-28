@@ -11,14 +11,14 @@ const asset = require('./asset');
 const block = require('./block');
 const card = require('./card');
 const event = require('./event');
-const heartbeat = require('./heartbeat');
+const eventData = require('./eventData');
 const interaction = require('./interaction');
 const marketing = require('./marketing');
 const pageModule = require('./module'); // to avoid overlap with reserved word 'module'
+const pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
 const presentation = require('./presentation');
 const referrer = require('./referrer');
 const session = require('./session');
-const trigger = require('./trigger');
 const user = require('./user');
 const viewport = require('./viewport');
 const video = require('./video');
@@ -29,14 +29,14 @@ const allProps = { // main "dataLayer" starts here
   block,
   card,
   event,
-  heartbeat,
+  eventData,
   interaction,
   marketing,
   module: pageModule,
+  pageview,
   presentation,
   referrer,
   session, // TODO: this is mostly empty
-  trigger,
   user,
   viewport,
   video,

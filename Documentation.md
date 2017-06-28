@@ -272,25 +272,23 @@ Data Type: **String**. It must match one of these:
 * videoEvent
 * impression
 
-### datalayer.heartbeat
+### datalayer.eventData
 
-Description: This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.
+Description: Describes metadata related to a specific event
 
 Data Type: **Object**
 
-Required Fields: timeSincePageDataReady, heartbeatInterval
+### datalayer.eventData.success
 
-### datalayer.heartbeat.timeSincePageDataReady
+Description: Indicates whether the attempted action was successful. Default will be true. May be false in the case of a failed newsletter sign-up attempt, for example
 
-Description: The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
+Data Type: **Boolean**
 
-Data Type: **Integer**
+### datalayer.eventData.trigger
 
-### datalayer.heartbeat.heartbeatInterval
+Description: The front-end component that triggered the event push - e.g., a card
 
-Description: The frequency of heartbeat event object pushes, in milliseconds.
-
-Data Type: **Integer**
+Data Type: **String**
 
 ### datalayer.interaction
 
@@ -299,30 +297,6 @@ Description: module behavioral/click tracking will have additional fields as we 
 Data Type: **Object**
 
 Required Fields: type
-
-### datalayer.interaction.module
-
-Description: TBD
-
-Data Type: **Object**
-
-### datalayer.interaction.module.name
-
-Description: see more
-
-Data Type: **String**
-
-### datalayer.interaction.module.context
-
-Description: block
-
-Data Type: **String**
-
-### datalayer.interaction.module.label
-
-Description: Top News|Featured|Opinion|News|Culture|etc...
-
-Data Type: **String**
 
 ### datalayer.interaction.region
 
@@ -374,9 +348,81 @@ Description: TBD
 
 ### datalayer.module
 
+Description: Describes attributes of a module on the page
+
+Data Type: **Object**
+
+### datalayer.module.name
+
+Description: see more
+
+Data Type: **String**
+
+### datalayer.module.context
+
+Description: block
+
+Data Type: **String**
+
+### datalayer.module.label
+
+Description: Top News|Featured|Opinion|News|Culture|etc...
+
+Data Type: **String**
+
+### datalayer.pageview
+
 Description: Describes basic attributes of the NYT user.
 
 Data Type: **Object**
+
+### datalayer.pageview.id
+
+Description: The ID for a given page - most useful for tracking advertising impressions
+
+Data Type: **String**
+
+### datalayer.pageview.performance
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.pageview.performance.domInteractive
+
+Description: Total DOM interactive time (in ms), as calculated by timing.domInteractive - timing.navigationStart
+
+Data Type: **Number**
+
+### datalayer.pageview.performance.pageLoadTime
+
+Description: Total page load time (in ms), as calculated by timing.loadEventEnd - timing.navigationStart
+
+Data Type: **Number**
+
+### datalayer.pageview.performance.domContentLoaded
+
+Description: Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart
+
+Data Type: **Number**
+
+### datalayer.pageview.heartbeat
+
+Description: TBD
+
+Data Type: **Object**
+
+### datalayer.pageview.heartbeat.timeSincePageDataReady
+
+Description: The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
+
+Data Type: **Integer**
+
+### datalayer.pageview.heartbeat.heartbeatInterval
+
+Description: The frequency of heartbeat event object pushes, in milliseconds.
+
+Data Type: **Integer**
 
 ### datalayer.presentation
 
@@ -483,12 +529,6 @@ Data Type: **Number**
 Description: A flag that indicates whether a user session is authenticated.
 
 Data Type: **Boolean**
-
-### datalayer.trigger
-
-Description: The front-end component that triggered the event push - e.g., a card
-
-Data Type: **String**
 
 ### datalayer.user
 
