@@ -22,25 +22,25 @@ module.exports = {
     wordCount: 1173
   },
 
-  interaction: {
-    type: 'click',
-    card: {
-      region: '',
-      index: 1,
-      type: 'visual',
-      rendition: 'whole',
-      label: 'Donald Trump, Australia, Betsy DeVos: Your Thursday Briefing',
-      contentId: '100000004906353',
-    },
-    block: {
-      label: 'Top Stories',
-      rendition: 'Overflow',
-      name:
-      index: 1,
-      version:
-      list: {
-        uri: 'nyt:/list/scoop/list/home-special-a'
-      }
+  event: 'impression',
+
+  card: {
+    region: '',
+    index: 1,
+    type: 'visual',
+    rendition: 'whole',
+    label: 'Donald Trump, Australia, Betsy DeVos: Your Thursday Briefing',
+    contentId: '100000004906353',
+  },
+
+  block: {
+    label: 'Top Stories',
+    rendition: 'Overflow',
+    name:
+    index: 1,
+    version:
+    list: {
+      uri: 'nyt:/list/scoop/list/home-special-a'
     }
   },
 
