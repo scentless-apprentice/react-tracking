@@ -51,6 +51,12 @@ module.exports = {
       type: 'string',
       description: 'headline'
     },
+
+    // Region to be defined
+    region: {
+      properties: {}
+    },
+
     /**
      * The scoop ID for the asset behind the card
      * PROVIDED BY: Samizdat data

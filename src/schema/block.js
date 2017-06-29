@@ -53,6 +53,12 @@ module.exports = {
       type: 'string',
       description: '1fjei9',
     },
+
+    // Region to be defined
+    region: {
+      properties: {}
+    },
+
     /**
      * The list powering a block
      * PROVIDED BY: Program manager (block.dataSource)

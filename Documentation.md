@@ -205,6 +205,12 @@ Description: 1fjei9
 
 Data Type: **String**
 
+### datalayer.block.region
+
+Description: No description found
+
+Data Type: **Object**
+
 ### datalayer.block.list
 
 Description: No description found
@@ -253,6 +259,12 @@ Description: headline
 
 Data Type: **String**
 
+### datalayer.card.region
+
+Description: No description found
+
+Data Type: **Object**
+
 ### datalayer.card.id
 
 Description: 100000005090678
@@ -290,41 +302,9 @@ Description: The front-end component that triggered the event push - e.g., a car
 
 Data Type: **String**
 
-### datalayer.interaction
-
-Description: module behavioral/click tracking will have additional fields as we refine the the specifications for that effort
-
-Data Type: **Object**
-
-Required Fields: type
-
-### datalayer.interaction.region
-
-Description: No description found
-
-Data Type: **Object**
-
-### datalayer.interaction.type
-
-Description: click
-
-Data Type: **String**
-
-### datalayer.interaction.status
-
-Description: used to pass success/failure or other status messaging eg. log in success or failure. Many interactions won’t have a status. Those should set an empty string.
-
-Data Type: **String**
-
-### datalayer.interaction.pagetype
+### datalayer.eventData.pagetype
 
 Description: pagetype when the interaction occurred
-
-Data Type: **String**
-
-### datalayer.interaction.page_view_id
-
-Description: for advertising 
 
 Data Type: **String**
 
@@ -369,6 +349,12 @@ Data Type: **String**
 Description: Top News|Featured|Opinion|News|Culture|etc...
 
 Data Type: **String**
+
+### datalayer.module.region
+
+Description: No description found
+
+Data Type: **Object**
 
 ### datalayer.pageview
 

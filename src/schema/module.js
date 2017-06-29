@@ -35,5 +35,10 @@ module.exports = {
       description: 'Top News|Featured|Opinion|News|Culture|etc...',
     },
 
+    // Region to be defined
+    region: {
+      properties: {}
+    },
+
   }, // end module.properties
 };

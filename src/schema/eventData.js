@@ -19,5 +19,10 @@ module.exports = {
       description: 'The front-end component that triggered the event push - e.g., a card',
     },
 
+    pagetype:{
+      type: 'string',
+      description: 'pagetype when the interaction occurred'
+    },
+
   }, // end pageview.properties
 };
