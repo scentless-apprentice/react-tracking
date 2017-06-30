@@ -23,13 +23,13 @@ module.exports = {
 
     /**
   	 * This event should fire when a user has stopped scrolling for 250ms.
-  	 * It should push new viewport values into the dataLayer. 
+  	 * It should push new viewport values into the dataLayer.
   	 */
     'scrollComplete',
 
     /**
   	 * This event should fire every n seconds where n varies by application and page type.
-  	 * This event push new heartbeat values into the dataLayer.  
+  	 * This event push new heartbeat values into the dataLayer.
   	 */
     'heartbeat',
 
@@ -53,5 +53,10 @@ module.exports = {
   	 * the video object.
   	 */
     'videoEvent',
+
+    /**
+     * This event should fire for when a module / card / block comes into view. This should push new values into the corresponding module / card /block object.
+     */
+    'impression',
   ],
 };
