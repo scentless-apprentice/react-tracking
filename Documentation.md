@@ -108,6 +108,16 @@ Description: The unique ID of the NYT content asset
 
 Data Type: **String**
 
+### datalayer.user.propensity
+
+Description: Metadata about the user's propensity to subscribe
+
+Data Type: **Object**
+
+### datalayer.user.tracking
+
+Description: Metadata about the users latest behavior on our site
+
 ### datalayer.asset.publishedTimestamp
 
 Description: The UNIX timestamp value that indicates when the NYT content asset was first digitally published.
@@ -547,7 +557,7 @@ Description: TBD
 
 Data Type: **Array of Objects**
 
-### datalayer.user.watSeg
+### datalayer.user.watSegs
 
 Description: segments under ‘wat’ in the NYT-D cookie
 
