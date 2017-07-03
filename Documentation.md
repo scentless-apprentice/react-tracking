@@ -108,16 +108,6 @@ Description: The unique ID of the NYT content asset
 
 Data Type: **String**
 
-### datalayer.user.propensity
-
-Description: Metadata about the user's propensity to subscribe
-
-Data Type: **Object**
-
-### datalayer.user.tracking
-
-Description: Metadata about the users latest behavior on our site
-
 ### datalayer.asset.publishedTimestamp
 
 Description: The UNIX timestamp value that indicates when the NYT content asset was first digitally published.
@@ -368,6 +358,30 @@ Description: No description found
 
 Data Type: **Object**
 
+### datalayer.module.element
+
+Description: Specific link or tool interacted with in the module
+
+Data Type: **Object**
+
+### datalayer.module.element.name
+
+Description: permanent value / slug / id
+
+Data Type: **String**
+
+### datalayer.module.element.url
+
+Description: URL associated with the element, eg. article being shared or linked to
+
+Data Type: **String**
+
+### datalayer.module.element.label
+
+Description: text displayed to the user for this element
+
+Data Type: **String**
+
 ### datalayer.pageview
 
 Description: Describes basic attributes of the NYT user.
@@ -562,6 +576,18 @@ Data Type: **Array of Objects**
 Description: segments under ‘wat’ in the NYT-D cookie
 
 Data Type: **String**
+
+### datalayer.user.propensity
+
+Description: Metadata about the user's propensity to subscribe
+
+Data Type: **Object**
+
+### datalayer.user.tracking
+
+Description: Metadata about the users latest behavior on our site
+
+Data Type: **Object**
 
 ### datalayer.viewport
 
