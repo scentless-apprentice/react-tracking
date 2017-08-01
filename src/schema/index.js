@@ -21,7 +21,6 @@ const session = require('./session');
 const user = require('./user');
 const viewport = require('./viewport');
 const video = require('./video');
-const interaction = require('./interaction');
 const version = require('./version');
 
 const allProps = { // main "dataLayer" starts here
@@ -31,7 +30,6 @@ const allProps = { // main "dataLayer" starts here
   card,
   event,
   eventData,
-  interaction,
   marketing,
   module: pageModule,
   pageview,
