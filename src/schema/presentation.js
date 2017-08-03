@@ -58,7 +58,7 @@ module.exports = {
          * E.g., "1 column" or "2 column"
          */
         breakpoint: {
-          type: 'string',
+          type: 'array',
           description: '1 column'
         },
         /**

@@ -21,6 +21,7 @@ const session = require('./session');
 const user = require('./user');
 const viewport = require('./viewport');
 const video = require('./video');
+const version = require('./version');
 
 const allProps = { // main "dataLayer" starts here
   application,
@@ -36,6 +37,7 @@ const allProps = { // main "dataLayer" starts here
   referrer,
   session, // TODO: this is mostly empty
   user,
+  version,
   viewport,
   video,
 };
