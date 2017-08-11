@@ -44,6 +44,20 @@ module.exports = {
           type: 'number',
           description: 'Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart'
         },
+        /**
+         * Time until the browser starts requesting the current document from the server
+         */
+        requestStart: {
+          type: 'number',
+          description: 'Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart'
+        },
+        /**
+         * Time until the first byte of the response from the server (TTFB)
+         */
+        responseStart: {
+          type: 'number',
+          description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart'
+        },
       },
     },
 
