@@ -124,7 +124,7 @@ Data format: date-time
 
 Description: The name of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.
 
-Data Type: **String**
+Data Type: **Array**
 
 ### datalayer.asset.collectionType
 
@@ -134,6 +134,7 @@ Data Type: **String**. It must match one of these:
 * column
 * series
 * issue
+* sectioncollection
 
 ### datalayer.asset.desk
 
@@ -170,6 +171,138 @@ Data Type: **Number**
 Description: The current number of words in the content asset's body text.
 
 Data Type: **Number**
+
+### datalayer.asset.orgFacets
+
+Description: ???
+
+Data Type: **Array**
+
+### datalayer.asset.desFacets
+
+Description: ????
+
+Data Type: **Array**
+
+### datalayer.asset.geoFacets
+
+Description: ???
+
+Data Type: **Array**
+
+### datalayer.asset.storyElements
+
+Description: ???
+
+Data Type: **Array**
+
+### datalayer.asset.commentsDisplayed
+
+Description: True if comments are displayed
+
+Data Type: **Boolean**
+
+### datalayer.asset.commentsActive
+
+Description: True if comments are ???
+
+Data Type: **Boolean**
+
+### datalayer.asset.commentsEnabled
+
+Description: True if comments are enabled
+
+Data Type: **Boolean**
+
+### datalayer.asset.newsSource
+
+Description: ??
+
+Data Type: **String**
+
+### datalayer.asset.contentTone
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.asset.originalDesk
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.printPage
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.printSection
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.publishDatePrint
+
+Description: ?
+
+Data format: date-time
+
+### datalayer.asset.publishedDate
+
+Description: ?
+
+Data format: date-time
+
+### datalayer.asset.publishedTimeStamp
+
+Description: ?
+
+Data format: date-time
+
+### datalayer.asset.source
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.type
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.typeOfMaterial
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.language
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.derivedDesk
+
+Description: ?
+
+Data Type: **String**
+
+### datalayer.asset.gaParams
+
+Description: ?
+
+Data Type: **Object**
+
+### datalayer.asset.storyPatterns
+
+Description: ?
+
+Data Type: **Array**
 
 ### datalayer.block
 
@@ -285,12 +418,20 @@ Data Type: **String**. It must match one of these:
 * dynamicElementsLoaded
 * videoEvent
 * impression
+* performance
+* error
 
 ### datalayer.eventData
 
 Description: Describes metadata related to a specific event
 
 Data Type: **Object**
+
+### datalayer.eventData.type
+
+Description: type of interaction: click, submit, swipe...
+
+Data Type: **String**
 
 ### datalayer.eventData.success
 
@@ -418,6 +559,18 @@ Description: Total page load time (in ms), as calculated by timing.domContentLoa
 
 Data Type: **Number**
 
+### datalayer.pageview.performance.requestStart
+
+Description: Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart
+
+Data Type: **Number**
+
+### datalayer.pageview.performance.responseStart
+
+Description: Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart
+
+Data Type: **Number**
+
 ### datalayer.pageview.heartbeat
 
 Description: TBD
@@ -496,7 +649,7 @@ Data Type: **String**
 
 Description: 1 column
 
-Data Type: **String**
+Data Type: **Array**
 
 ### datalayer.presentation.program.type
 
@@ -588,6 +741,12 @@ Data Type: **Object**
 Description: Metadata about the users latest behavior on our site
 
 Data Type: **Object**
+
+### datalayer.version
+
+Description: Version
+
+Data Type: **String**
 
 ### datalayer.viewport
 
