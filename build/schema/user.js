@@ -39,9 +39,21 @@ module.exports = {
     /**
      * Segments under 'wat' in NYT-D cookie
      */
-    watSeg: {
+    watSegs: {
       type: 'string',
       description: 'segments under ‘wat’ in the NYT-D cookie'
+    },
+
+    propensity: {
+      description: 'Metadata about the user\'s propensity to subscribe',
+      type: 'object',
+      properties: {}
+    },
+
+    tracking: {
+      description: 'Metadata about the user\s latest behavior on our site',
+      type: 'object',
+      properties: {}
     }
 
   } // end user.properties

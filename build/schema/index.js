@@ -8,35 +8,40 @@
  * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
  */
 
-var event = require('./event');
 var application = require('./application');
-var user = require('./user');
-var referrer = require('./referrer');
-var interaction = require('./interaction');
 var asset = require('./asset');
-var presentation = require('./presentation');
+var block = require('./block');
+var card = require('./card');
+var event = require('./event');
+var eventData = require('./eventData');
 var marketing = require('./marketing');
-var viewport = require('./viewport');
+var pageModule = require('./module'); // to avoid overlap with reserved word 'module'
+var pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
+var presentation = require('./presentation');
+var referrer = require('./referrer');
 var session = require('./session');
+var user = require('./user');
+var viewport = require('./viewport');
 var video = require('./video');
-var heartbeat = require('./heartbeat');
+var version = require('./version');
 
 var allProps = { // main "dataLayer" starts here
-  event: event,
   application: application,
-  user: user,
-  referrer: referrer,
-  interaction: interaction,
   asset: asset,
-  presentation: presentation,
+  block: block,
+  card: card,
+  event: event,
+  eventData: eventData,
   marketing: marketing,
+  module: pageModule,
+  pageview: pageview,
+  presentation: presentation,
+  referrer: referrer,
+  session: session, // TODO: this is mostly empty
+  user: user,
+  version: version,
   viewport: viewport,
-  video: video,
-  heartbeat: heartbeat,
-
-  // TODO: this is mostly empty
-  session: session
-
+  video: video
 };
 
 module.exports = {
