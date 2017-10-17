@@ -6,4 +6,7 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = require('./development');
 }
 
-module.exports.version = require('../package.json').version;
+module.exports.version = preval`
+  const pkg = require('../package.json');
+  module.exports = pkg.version;
+`;

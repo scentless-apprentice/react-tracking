@@ -97,7 +97,7 @@ module.exports = {
      * journalistic intent.
      */
     collectionName: {
-      type: 'string',
+      type: 'array',
       description: 'The name of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.'
     },
 
@@ -106,7 +106,7 @@ module.exports = {
      */
     collectionType: {
       description: 'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.',
-      enum: ['column', 'series', 'issue']
+      enum: ['column', 'series', 'issue', 'sectioncollection']
     },
 
     /**
@@ -158,6 +158,116 @@ module.exports = {
     wordCount: {
       type: 'number',
       description: 'The current number of words in the content asset\'s body text.'
+    },
+
+    orgFacets: {
+      type: 'array',
+      description: '???'
+    },
+
+    desFacets: {
+      type: 'array',
+      description: '????'
+    },
+
+    geoFacets: {
+      type: 'array',
+      description: '???'
+    },
+
+    storyElements: {
+      type: 'array',
+      description: '???'
+    },
+
+    commentsDisplayed: {
+      type: 'boolean',
+      description: 'True if comments are displayed'
+    },
+
+    commentsActive: {
+      type: 'boolean',
+      description: 'True if comments are ???'
+    },
+
+    commentsEnabled: {
+      type: 'boolean',
+      description: 'True if comments are enabled'
+    },
+
+    newsSource: {
+      type: 'string',
+      description: '??'
+    },
+
+    contentTone: {
+      type: 'string', // TODO: prob should be enum
+      descrition: '?'
+    },
+
+    originalDesk: {
+      type: 'string',
+      description: '?'
+    },
+
+    printPage: {
+      type: 'string',
+      description: '?'
+    },
+
+    printSection: {
+      type: 'string',
+      description: '?'
+    },
+
+    publishDatePrint: {
+      format: 'date-time',
+      description: '?'
+    },
+
+    publishedDate: {
+      format: 'date-time',
+      description: '?'
+    },
+
+    publishedTimeStamp: {
+      format: 'date-time',
+      description: '?'
+    },
+
+    source: {
+      type: 'string',
+      description: '?'
+    },
+
+    type: {
+      type: 'string',
+      description: '?'
+    },
+
+    typeOfMaterial: {
+      type: 'string',
+      description: '?'
+    },
+
+    language: {
+      type: 'string',
+      description: '?'
+    },
+
+    derivedDesk: {
+      type: 'string',
+      description: '?'
+    },
+
+    gaParams: {
+      type: 'object',
+      description: '?'
+    },
+
+    storyPatterns: {
+      type: 'array',
+      description: '?'
     }
   }
 };
