@@ -58,75 +58,46 @@ module.exports = {
           type: 'number',
           description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart'
         },
-        adDefined: {
-          slotId: {
-            type: 'string',
-            description: 'Id of ad container'
-          },
-          pageViewId: {
-            type: 'string',
-            description: 'Unique id for page view session'
-          },
-          adSize: {
-            type: 'array',
-            description: 'An array containing the width and height of the ad'
-          },
-          timeDefined: {
-            type: 'number',
-            description: 'Time from responseStart until ad defined'
-          }
-        },
-        adRendered: {
-          slotId: {
-            type: 'string',
-            description: 'Id of ad container'
-          },
-          pageViewId: {
-            type: 'string',
-            description: 'Unique id for page view session'
-          },
-          creativeId: {
-            type: 'string',
-            description: 'Id of the ad creative'
-          },
-          lineItemId: {
-            type: 'string',
-            description: 'Id of the line item for the ad'
-          },
-          isEmpty: {
-            type: 'boolean',
-            description: 'Flag for when the ad server returned an ad'
-          },
-          timeRendered: {
-            type: 'number',
-            description: 'Time from responseStart until ad rendered'
-          }
-        },
-        adViewable: {
-          slotId: {
-            type: 'string',
-            description: 'Id of ad container'
-          },
-          pageViewId: {
-            type: 'string',
-            description: 'Unique id for page view session'
-          },
-          creativeId: {
-            type: 'string',
-            description: 'Id of the ad creative'
-          },
-          lineItemId: {
-            type: 'string',
-            description: 'Id of the line item for the ad'
-          },
-          timeViewed: {
-            type: 'number',
-            description: 'Time from responseStart until ad was viewed'
-          }
-        },
       },
+      ad: {
+        slotId: {
+          type: 'string',
+          description: 'Id of ad container'
+        },
+        pageViewId: {
+          type: 'string',
+          description: 'Unique id for page view session'
+        },
+        creativeId: {
+          type: 'string',
+          description: 'Id of the ad creative'
+        },
+        lineItemId: {
+          type: 'string',
+          description: 'Id of the line item for the ad'
+        },
+        isEmpty: {
+          type: 'boolean',
+          description: 'Flag for when the ad server returned an ad'
+        },
+        timeDefined: {
+           type: 'number',
+           description: 'Time from responseStart until ad defined'
+        },
+        timeCalled: {
+           type: 'number',
+           description: 'Time from responseStart until ad called'
+        },
+        timeRendered: {
+          type: 'number',
+          description: 'Time from responseStart until ad rendered'
+        },
+        timeViewed: {
+          type: 'number',
+          description: 'Time from responseStart until ad was viewed'
+        }
+      }
     },
-
     heartbeat: {
       description: 'TBD',
       properties: {
