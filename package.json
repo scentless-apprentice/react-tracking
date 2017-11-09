@@ -14,7 +14,11 @@
 		"type": "git",
 		"url": "git+https://github.com/nytm/tracking-schema.git"
 	},
-	"keywords": [ "nyt", "tracking", "schema" ],
+	"keywords": [
+		"nyt",
+		"tracking",
+		"schema"
+	],
 	"author": "The New York Times",
 	"license": "ISC",
 	"bugs": {
