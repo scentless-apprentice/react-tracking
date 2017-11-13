@@ -571,6 +571,66 @@ Description: Time until the first byte of the response from the server (in ms), 
 
 Data Type: **Number**
 
+### datalayer.pageview.ad
+
+Description: ad slot behavior and performance tracking
+
+Data Type: **Object**
+
+### datalayer.pageview.ad.slotId
+
+Description: Id of ad container
+
+Data Type: **String**
+
+### datalayer.pageview.ad.pageViewId
+
+Description: Unique id for page view session
+
+Data Type: **String**
+
+### datalayer.pageview.ad.creativeId
+
+Description: Id of the ad creative
+
+Data Type: **String**
+
+### datalayer.pageview.ad.lineItemId
+
+Description: Id of the line item for the ad
+
+Data Type: **String**
+
+### datalayer.pageview.ad.isEmpty
+
+Description: Flag for when the ad server returned an ad
+
+Data Type: **Boolean**
+
+### datalayer.pageview.ad.timeDefined
+
+Description: Time from responseStart until ad defined
+
+Data Type: **Number**
+
+### datalayer.pageview.ad.timeCalled
+
+Description: Time from responseStart until ad called
+
+Data Type: **Number**
+
+### datalayer.pageview.ad.timeRendered
+
+Description: Time from responseStart until ad rendered
+
+Data Type: **Number**
+
+### datalayer.pageview.ad.timeViewed
+
+Description: Time from responseStart until ad was viewed
+
+Data Type: **Number**
+
 ### datalayer.pageview.heartbeat
 
 Description: TBD

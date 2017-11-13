@@ -58,8 +58,11 @@ module.exports = {
           type: 'number',
           description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart'
         },
+      }
       },
-      ad: {
+    ad: {
+      description: 'ad slot behavior and performance tracking',
+      properties: {
         slotId: {
           type: 'string',
           description: 'Id of ad container'
