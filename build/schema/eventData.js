@@ -29,6 +29,16 @@ module.exports = {
     pagetype: {
       type: 'string',
       description: 'pagetype when the interaction occurred'
+    },
+
+    timeRendered: {
+      type: 'number',
+      description: 'Time from responseStart until module is rendered'
+    },
+
+    timeViewed: {
+      type: 'number',
+      description: 'Time from responseStart until module was viewed'
     }
 
   } // end pageview.properties
