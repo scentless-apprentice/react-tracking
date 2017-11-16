@@ -67,6 +67,10 @@ module.exports = {
           type: 'string',
           description: 'Id of ad container'
         },
+        position: {
+          type: 'string',
+          description: 'position of ad container'
+        },
         pageViewId: {
           type: 'string',
           description: 'Unique id for page view session'
