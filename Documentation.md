@@ -583,6 +583,12 @@ Description: Id of ad container
 
 Data Type: **String**
 
+### datalayer.pageview.ad.position
+
+Description: position of ad container
+
+Data Type: **String**
+
 ### datalayer.pageview.ad.pageViewId
 
 Description: Unique id for page view session
