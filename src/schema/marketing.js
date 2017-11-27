@@ -13,11 +13,11 @@ module.exports = {
         type: 'string'
     },
     isAuthor: {
-      description: 'TBD'
+      description: 'TBD',
       type: 'boolean'
     },
     isPreview: {
-      description: 'TBD'
+      description: 'TBD',
       type: 'boolean'
     },
     templateBuildId: {
@@ -29,12 +29,13 @@ module.exports = {
         type: 'string'
     },
     offers: {
-      type: 'array'
+      type: 'array',
       items: {
         type: 'object',
         properties: {
+            type: 'object',
             promoOptions: {
-              type: 'array'
+              type: 'array',
               items: {
                 productCode: {type: 'string'}, // "XPASS"
                 segmentId: {type: 'number'},
@@ -48,8 +49,8 @@ module.exports = {
                     type: 'object',
                     properties: {
                         durationDays: {type: 'number'},
-                        recurrence: {type: 'number'},,
-                        totalPrice: {type: 'number'},,
+                        recurrence: {type: 'number'},
+                        totalPrice: {type: 'number'},
                         tierNumber: {type: 'number'}, 
                     } 
                   }

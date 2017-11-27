@@ -457,17 +457,41 @@ Description: Describes attributes related to NYT Marketing-related Campaign/Prom
 
 Data Type: **Object**
 
-### datalayer.marketing.flow
+### datalayer.marketing.env
+
+Description: Indicates the magnolia page environment, example: "prod"
+
+Data Type: **String**
+
+### datalayer.marketing.isAuthor
 
 Description: TBD
 
-### datalayer.marketing.campaign
+Data Type: **Boolean**
+
+### datalayer.marketing.isPreview
 
 Description: TBD
 
-### datalayer.marketing.product
+Data Type: **Boolean**
 
-Description: TBD
+### datalayer.marketing.templateBuildId
+
+Description: TBD , ex: "1070"
+
+Data Type: **String**
+
+### datalayer.marketing.creativeUuid
+
+Description: TBD , ex: "5a8bcb34-b6d0-41a6-b089-5aa3a932d1bd"
+
+Data Type: **String**
+
+### datalayer.marketing.offers
+
+Description: No description found
+
+Data Type: **Array**
 
 ### datalayer.module
 
