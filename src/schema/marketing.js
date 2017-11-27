@@ -37,24 +37,27 @@ module.exports = {
             promoOptions: {
               type: 'array',
               items: {
-                productCode: {type: 'string'}, // "XPASS"
-                segmentId: {type: 'number'},
-                promoCode: {type: 'string'}, //"20000138860",
-                currencyCode: {type: 'string'}, //"USD",
-                productType: {type: 'string'}, //"DIGI",
-                productName: {type: 'string'}, //"Basic Digital Access"
-                billingTiers: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                        durationDays: {type: 'number'},
-                        recurrence: {type: 'number'},
-                        totalPrice: {type: 'number'},
-                        tierNumber: {type: 'number'}, 
-                    } 
-                  }
-                } // closes billing tiers
+                type: 'object',
+                properties: {
+                  productCode: {type: 'string'}, // "XPASS"
+                  segmentId: {type: 'number'},
+                  promoCode: {type: 'string'}, //"20000138860",
+                  currencyCode: {type: 'string'}, //"USD",
+                  productType: {type: 'string'}, //"DIGI",
+                  productName: {type: 'string'}, //"Basic Digital Access"
+                  billingTiers: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                          durationDays: {type: 'number'},
+                          recurrence: {type: 'number'},
+                          totalPrice: {type: 'number'},
+                          tierNumber: {type: 'number'}, 
+                      } 
+                    }
+                  } // closes billing tiers
+                }
               } 
             }
         }
