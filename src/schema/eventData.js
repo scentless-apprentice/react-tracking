@@ -13,7 +13,7 @@ module.exports = {
       type: 'string',
       description: 'type of interaction: click, submit, swipe...'
     },
-    
+
     success: {
       type: 'boolean',
       description: 'Indicates whether the attempted action was successful. Default will be true. May be false in the case of a failed newsletter sign-up attempt, for example',
@@ -28,6 +28,16 @@ module.exports = {
       type: 'string',
       description: 'pagetype when the interaction occurred'
     },
+
+    timeRendered: {
+      type: 'number',
+      description: 'Time from responseStart until module is rendered'
+    },
+
+    timeViewed: {
+      type: 'number',
+      description: 'Time from responseStart until module was viewed'
+    }
 
   }, // end pageview.properties
 };

@@ -451,6 +451,18 @@ Description: pagetype when the interaction occurred
 
 Data Type: **String**
 
+### datalayer.eventData.timeRendered
+
+Description: Time from responseStart until module is rendered
+
+Data Type: **Number**
+
+### datalayer.eventData.timeViewed
+
+Description: Time from responseStart until module was viewed
+
+Data Type: **Number**
+
 ### datalayer.marketing
 
 Description: Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.
