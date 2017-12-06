@@ -40,12 +40,6 @@ module.exports = {
       description: 'TBD',
     },
 
-    // TODO: Why is this here?
-    documentHeight: {
-      type: 'number',
-      description: 'integer height of the entire page in pixels',
-    },
-
     program: {
       properties: {
         name: {

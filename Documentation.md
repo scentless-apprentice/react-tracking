@@ -729,12 +729,6 @@ Data Type: **String**. It must match one of these:
 * whole
 * skim
 
-### datalayer.presentation.documentHeight
-
-Description: integer height of the entire page in pixels
-
-Data Type: **Number**
-
 ### datalayer.presentation.program
 
 Description: No description found
@@ -873,6 +867,12 @@ Data Type: **Integer**
 Description: The width, in pixels, of the viewport.
 
 Data Type: **Integer**
+
+### datalayer.viewport.documentHeight
+
+Description: integer height of the entire page in pixels
+
+Data Type: **Number**
 
 ### datalayer.viewport.modules
 

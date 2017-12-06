@@ -34,7 +34,7 @@ module.exports = {
     },
 
     /**
-     * for future use - comma-separated list of modules in the viewport 
+     * for future use - comma-separated list of modules in the viewport
      */
     modules: {
       type: 'string',
