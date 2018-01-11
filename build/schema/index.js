@@ -1,4 +1,4 @@
-
+'use strict';
 
 /**
  * Tracking Data schema, based off:
@@ -8,49 +8,49 @@
  * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
  */
 
-const application = require('./application');
-const asset = require('./asset');
-const block = require('./block');
-const card = require('./card');
-const event = require('./event');
-const eventData = require('./eventData');
-const marketing = require('./marketing');
-const pageModule = require('./module'); // to avoid overlap with reserved word 'module'
-const pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
-const presentation = require('./presentation');
-const referrer = require('./referrer');
-const session = require('./session');
-const user = require('./user');
-const viewport = require('./viewport');
-const video = require('./video');
-const version = require('./version');
+var application = require('./application');
+var asset = require('./asset');
+var block = require('./block');
+var card = require('./card');
+var event = require('./event');
+var eventData = require('./eventData');
+var marketing = require('./marketing');
+var pageModule = require('./module'); // to avoid overlap with reserved word 'module'
+var pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
+var presentation = require('./presentation');
+var referrer = require('./referrer');
+var session = require('./session');
+var user = require('./user');
+var viewport = require('./viewport');
+var video = require('./video');
+var version = require('./version');
 
-const allProps = { // main "dataLayer" starts here
-  application,
-  asset,
-  block,
-  card,
-  event,
-  eventData,
-  marketing,
+var allProps = { // main "dataLayer" starts here
+  application: application,
+  asset: asset,
+  block: block,
+  card: card,
+  event: event,
+  eventData: eventData,
+  marketing: marketing,
   module: pageModule,
-  pageview,
-  presentation,
-  referrer,
-  session, // TODO: this is mostly empty
-  user,
-  version,
-  viewport,
-  video,
+  pageview: pageview,
+  presentation: presentation,
+  referrer: referrer,
+  session: session, // TODO: this is mostly empty
+  user: user,
+  version: version,
+  viewport: viewport,
+  video: video
 };
 
 module.exports = {
 
   get: function get(individualEvents) {
-    const schema = {
+    var schema = {
       additionalProperties: false,
       // top-level properties
-      properties: allProps,
+      properties: allProps
     };
 
     if (!individualEvents) {
@@ -59,6 +59,6 @@ module.exports = {
     }
 
     return schema;
-  },
+  }
 
 };

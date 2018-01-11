@@ -1,8 +1,8 @@
-
+'use strict';
 
 /**
-* User specific data.
-*/
+ * User specific data.
+ */
 module.exports = {
   description: 'Describes basic attributes of the NYT user.',
 
@@ -18,7 +18,7 @@ module.exports = {
      */
     regiId: {
       type: 'string',
-      description: 'The NYT registration ID of the NYT user.',
+      description: 'The NYT registration ID of the NYT user.'
     },
 
     /**
@@ -26,14 +26,14 @@ module.exports = {
      */
     type: {
       enum: ['anon', 'regi', 'sub'],
-      description: 'A value that indicates the type of NYT user',
+      description: 'A value that indicates the type of NYT user'
     },
 
     subscriptions: {
       description: 'TBD',
       items: {
-        type: 'object',
-      },
+        type: 'object'
+      }
     },
 
     /**
@@ -41,20 +41,19 @@ module.exports = {
      */
     watSegs: {
       type: 'string',
-      description: 'segments under ‘wat’ in the NYT-D cookie',
+      description: 'segments under ‘wat’ in the NYT-D cookie'
     },
 
     propensity: {
-      description: 'Metadata about the user\'s propensity to subscribe',
+      description: "Metadata about the user's propensity to subscribe",
       type: 'object',
-      properties: {},
+      properties: {}
     },
 
     tracking: {
-      description: 'Metadata about the user\s latest behavior on our site',
+      description: 'Metadata about the users latest behavior on our site',
       type: 'object',
-      properties: {},
-    },
-
-  }, // end user.properties
+      properties: {}
+    }
+  } // end user.properties
 };

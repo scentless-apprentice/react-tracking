@@ -1,9 +1,9 @@
+'use strict';
 
-
-const schemaModel = require('./schema');
-const validator = require('./validate');
+var schemaModel = require('./schema');
+var validator = require('./validate');
 
 module.exports = {
-  schemaModel,
-  validator,
+  schemaModel: schemaModel,
+  validator: validator
 };

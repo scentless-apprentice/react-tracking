@@ -1,4 +1,4 @@
-
+'use strict';
 
 /**
  * Describes attributes related to NYT Marketing landing pages
@@ -12,30 +12,28 @@ module.exports = {
   properties: {
     env: {
       description: 'Indicates the magnolia page environment, example: "prod"',
-      type: 'string',
+      type: 'string'
     },
     isAuthor: {
       description: 'TBD',
-      type: 'boolean',
+      type: 'boolean'
     },
     isPreview: {
       description: 'TBD',
-      type: 'boolean',
+      type: 'boolean'
     },
     templateBuildId: {
       description: 'TBD , ex: "1070"',
-      type: 'string',
+      type: 'string'
     },
     creativeUuid: {
       description: 'TBD , ex: "5a8bcb34-b6d0-41a6-b089-5aa3a932d1bd"',
-      type: 'string',
+      type: 'string'
     },
     offers: {
-      type: 'array',
       items: {
         type: 'object',
         properties: {
-          type: 'object',
           promoOptions: {
             type: 'array',
             items: {
@@ -55,14 +53,15 @@ module.exports = {
                       durationDays: { type: 'number' },
                       recurrence: { type: 'number' },
                       totalPrice: { type: 'number' },
-                      tierNumber: { type: 'number' },
-                    },
-                  }, // closes billing tiers
-                } },
-            },
-          },
-        },
-      },
-    },
-  },
+                      tierNumber: { type: 'number' }
+                    }
+                  }
+                } // closes billing tiers
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 };

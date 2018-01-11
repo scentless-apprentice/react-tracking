@@ -1,8 +1,8 @@
-
+'use strict';
 
 /**
-* Module specific data.
-*/
+ * Module specific data.
+ */
 module.exports = {
   description: 'Describes attributes of a module on the page',
 
@@ -16,7 +16,7 @@ module.exports = {
      */
     name: {
       type: 'string',
-      description: 'see more',
+      description: 'see more'
     },
 
     /**
@@ -25,7 +25,7 @@ module.exports = {
      */
     context: {
       type: 'string',
-      description: 'block',
+      description: 'block'
     },
 
     /**
@@ -34,12 +34,12 @@ module.exports = {
      */
     label: {
       type: 'string',
-      description: 'Top News|Featured|Opinion|News|Culture|etc...',
+      description: 'Top News|Featured|Opinion|News|Culture|etc...'
     },
 
     // Region to be defined
     region: {
-      properties: {},
+      properties: {}
     },
 
     /**
@@ -52,25 +52,25 @@ module.exports = {
       properties: {
         name: {
           type: 'string',
-          description: 'permanent value / slug / id',
+          description: 'permanent value / slug / id'
         },
 
         /**
-        * URL of an asset associated with the link
-        */
+         * URL of an asset associated with the link
+         */
         url: {
           type: 'string',
-          description: 'URL associated with the element, eg. article being shared or linked to',
+          description: 'URL associated with the element, eg. article being shared or linked to'
         },
 
         /**
-        * The text or displayed to the user for this element
-        */
+         * The text or displayed to the user for this element
+         */
         label: {
           type: 'string',
-          description: 'text displayed to the user for this element',
-        },
-      },
-    },
-  }, // end module.properties
+          description: 'text displayed to the user for this element'
+        }
+      }
+    }
+  } // end module.properties
 };
