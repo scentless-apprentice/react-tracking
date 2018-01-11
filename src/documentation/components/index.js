@@ -1,6 +1,7 @@
-'use strict';
+const author = require('./author');
+const schemaGenerator = require('./schema');
 
 module.exports = {
-  author: require('./author'),
-  schemaGenerator: require('./schema')
+  author,
+  schemaGenerator,
 };

@@ -1,4 +1,4 @@
-'use strict';
+
 
 /* eslint-disable global-require */
 
@@ -8,4 +8,4 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = require('./development');
 }
 
-module.exports.version = "2.1.2";
+module.exports.version = '2.1.2';

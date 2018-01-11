@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Describes basic attributes of the page design layout.
@@ -19,40 +19,34 @@ module.exports = {
     **/
     pageType: {
       type: 'string',
-      description: 'The type of NYT content asset as presented to the user during the session.'
+      description: 'The type of NYT content asset as presented to the user during the session.',
     },
 
     pageSubtype: {
       type: 'string',
-      description: 'TBD'
+      description: 'TBD',
     },
 
     cardId: {
       type: 'string',
-      description: 'TBD'
+      description: 'TBD',
     },
 
     cardType: {
       type: 'string',
-      description: 'TBD'
+      description: 'TBD',
     },
 
     cardRendition: {
       enum: ['whole', 'skim'],
-      description: 'TBD'
-    },
-
-    // TODO: Why is this here?
-    documentHeight: {
-      type: 'number',
-      description: 'integer height of the entire page in pixels'
+      description: 'TBD',
     },
 
     program: {
       properties: {
         name: {
           type: 'string',
-          description: 'home'
+          description: 'home',
         },
         /**
          * PROVIDED BY: Vi platform
@@ -61,7 +55,7 @@ module.exports = {
          */
         breakpoint: {
           type: 'array',
-          description: '1 column'
+          description: '1 column',
         },
         /**
          * PROVIDED BY: Program manager
@@ -70,7 +64,7 @@ module.exports = {
          */
         type: {
           type: 'string',
-          description: 'home'
+          description: 'home',
         },
         /**
          * PROVIDED BY: Program manager
@@ -80,9 +74,9 @@ module.exports = {
          */
         version: {
           type: 'string',
-          description: '12309239'
-        }
-      }
-    }
-  }
+          description: '12309239',
+        },
+      },
+    },
+  },
 };

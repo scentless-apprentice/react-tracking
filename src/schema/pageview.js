@@ -2,7 +2,7 @@
 * Pageview specific data.
 */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -28,82 +28,82 @@ module.exports = {
          */
         domInteractive: {
           type: 'number',
-          description: 'Total DOM interactive time (in ms), as calculated by timing.domInteractive - timing.navigationStart'
+          description: 'Total DOM interactive time (in ms), as calculated by timing.domInteractive - timing.navigationStart',
         },
         /**
          * Time until the load event fires for the DOM
          */
         pageLoadTime: {
           type: 'number',
-          description: 'Total page load time (in ms), as calculated by timing.loadEventEnd - timing.navigationStart'
+          description: 'Total page load time (in ms), as calculated by timing.loadEventEnd - timing.navigationStart',
         },
         /**
          * Time until the DOM content loads
          */
         domContentLoaded: {
           type: 'number',
-          description: 'Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart'
+          description: 'Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart',
         },
         /**
          * Time until the browser starts requesting the current document from the server
          */
         requestStart: {
           type: 'number',
-          description: 'Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart'
+          description: 'Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart',
         },
         /**
          * Time until the first byte of the response from the server (TTFB)
          */
         responseStart: {
           type: 'number',
-          description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart'
+          description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart',
         },
-      }
       },
+    },
     ad: {
       description: 'ad slot behavior and performance tracking',
       properties: {
         slotId: {
           type: 'string',
-          description: 'Id of ad container'
+          description: 'Id of ad container',
         },
         position: {
           type: 'string',
-          description: 'position of ad container'
+          description: 'position of ad container',
         },
         pageViewId: {
           type: 'string',
-          description: 'Unique id for page view session'
+          description: 'Unique id for page view session',
         },
         creativeId: {
           type: 'string',
-          description: 'Id of the ad creative'
+          description: 'Id of the ad creative',
         },
         lineItemId: {
           type: 'string',
-          description: 'Id of the line item for the ad'
+          description: 'Id of the line item for the ad',
         },
         isEmpty: {
           type: 'boolean',
-          description: 'Flag for when the ad server returned an ad'
+          description: 'Flag for when the ad server returned an ad',
         },
         timeDefined: {
-           type: 'number',
-           description: 'Time from responseStart until ad defined'
+          type: 'number',
+          description: 'Time from responseStart until ad defined',
         },
         timeCalled: {
-           type: 'number',
-           description: 'Time from responseStart until ad called'
+          type: 'number',
+          description: 'Time from responseStart until ad called',
         },
         timeRendered: {
           type: 'number',
-          description: 'Time from responseStart until ad rendered'
+          description: 'Time from responseStart until ad rendered',
         },
         timeViewed: {
           type: 'number',
-          description: 'Time from responseStart until ad was viewed'
-        }
-      }
+          description: 'Time from responseStart until ad was viewed',
+        },
+      },
     },
     heartbeat: {
       description: 'TBD',

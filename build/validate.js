@@ -1,22 +1,22 @@
-'use strict';
+
 
 /* eslint-disable no-console */
-var Ajv = require('ajv');
-var schemaGenerator = require('./schema');
-var logger = require('./utils/logger');
+const Ajv = require('ajv');
+const schemaGenerator = require('./schema');
+const logger = require('./utils/logger');
 
-var ajv = new Ajv({
-  allErrors: true
+const ajv = new Ajv({
+  allErrors: true,
 });
 
-var getValidator = function getValidator(individualEvents) {
-  var schema = schemaGenerator.get(individualEvents);
-  var validator = ajv.compile(schema);
+const getValidator = function getValidator(individualEvents) {
+  const schema = schemaGenerator.get(individualEvents);
+  const validator = ajv.compile(schema);
   return validator;
 };
 
-var validation = function validation(data, individualEvents) {
-  var validate = getValidator(individualEvents);
+const validation = function validation(data, individualEvents) {
+  const validate = getValidator(individualEvents);
 
   validate.isValid = validate(data); // returns a boolean for convinience
 
@@ -26,12 +26,14 @@ var validation = function validation(data, individualEvents) {
 };
 
 module.exports = function () {
-  var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  const options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!Object.keys(data).length) {
-    var error = logger.emptyDataError;
-    logger.error(error);
+    const error = logger.emptyDataError;
+    logger.error(error, () => {
+      console.log('Data: ', data);
+    });
 
     return error;
   }

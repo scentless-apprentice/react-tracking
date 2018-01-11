@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Contains data about external referrers, internal referrers and module
@@ -12,7 +12,7 @@ module.exports = {
   // required: ['url'],
 
   description: 'Version',
-  type: 'string'
+  type: 'string',
 
   // properties: {
   //   /**

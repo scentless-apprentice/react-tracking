@@ -43,5 +43,5 @@ module.exports = {
       type: 'string',
       description: 'for future use - comma-separated list of modules in the viewport',
     },
-  }
+  },
 };

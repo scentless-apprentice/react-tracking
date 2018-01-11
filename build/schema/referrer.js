@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
 * Contains data about external referrers, internal referrers and module
@@ -19,7 +19,7 @@ module.exports = {
      */
     url: {
       format: 'uri',
-      description: 'A URL of previous page or document.referrer'
-    }
-  } // end referrer.properties
+      description: 'A URL of previous page or document.referrer',
+    },
+  }, // end referrer.properties
 };

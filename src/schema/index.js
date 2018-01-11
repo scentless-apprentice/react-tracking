@@ -45,7 +45,6 @@ const allProps = { // main "dataLayer" starts here
 module.exports = {
 
   get: (individualEvents) => {
-
     const schema = {
       additionalProperties: false,
       // top-level properties

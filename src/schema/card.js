@@ -1,15 +1,18 @@
 /**
-* Card specific data.
-*/
+ * Card specific data.
+ */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
 
   properties: {
     /**
-     * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
+     * TO-DO: This is the ordinal rank of a card within a block, right?
+     * I.e., does not dictate visual order of a card in a block - e.g.,
+     * at desktop viewports, a card with a higher index may appear "above"
+     * a card with a lower index in the same block due to multi-column design
      * PROVIDED BY: Vi platform
      */
     index: {
@@ -23,7 +26,7 @@ module.exports = {
      */
     type: {
       type: 'string',
-      description: 'visual'
+      description: 'visual',
     },
     /**
      * The rendition on a card. Should capture any block-level overrides (e.g., packages)
@@ -39,7 +42,8 @@ module.exports = {
      */
     url: {
       type: 'string',
-      description: 'https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html',
+      description:
+        'https://www.nytimes.com/2017/05/23/world/europe/manchester-arena-attack-ariana-grande.html',
     },
     /**
      * The primary user-facing label on the card - should be headline or summary.
@@ -49,12 +53,12 @@ module.exports = {
      */
     label: {
       type: 'string',
-      description: 'headline'
+      description: 'headline',
     },
 
     // Region to be defined
     region: {
-      properties: {}
+      properties: {},
     },
 
     /**
@@ -64,7 +68,7 @@ module.exports = {
      */
     id: {
       type: 'string',
-      description: '100000005090678'
+      description: '100000005090678',
     },
   }, // end card.properties
 };

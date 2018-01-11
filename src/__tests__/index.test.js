@@ -20,6 +20,11 @@ describe('index', () => {
 
       expect(!result.errors).toBe(true, result.errors);
     });
+    it('validates individual card data', () => {
+      const result = validator({ card: example.card }, { individualEvents: true });
+
+      expect(!result.errors).toBe(true, result.errors);
+    });
   });
 
   describe('in production', () => {
@@ -34,13 +39,4 @@ describe('index', () => {
       expect(validator()).toBe(undefined);
     });
   });
-
-  it('validates individual card data', () => {
-    const result = validator(
-      { card: example.card },
-      { individualEvents: true },
-    );
-
-    expect(!result.errors).toBe(true, result.errors);
-  })
 });

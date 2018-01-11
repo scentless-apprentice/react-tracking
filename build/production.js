@@ -1,5 +1,5 @@
-"use strict";
+
 
 module.exports = {
-  validator: function validator() {}
+  validator: function validator() {},
 };

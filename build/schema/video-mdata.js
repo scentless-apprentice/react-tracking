@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Contains data pertaining to video mdata assets.
@@ -8,75 +8,75 @@ module.exports = {
 
   properties: {
     device: {
-      enum: ['desktop', 'mobile']
+      enum: ['desktop', 'mobile'],
     },
 
     playerMode: {
-      type: 'string'
+      type: 'string',
     },
 
     playerType: {
-      type: 'string'
+      type: 'string',
     },
 
     playerUsage: {
-      type: 'string'
+      type: 'string',
     },
 
     playerVersion: {
-      type: 'string'
+      type: 'string',
     },
 
     tech: {
-      type: 'string'
+      type: 'string',
     },
 
     videoDeliveryMethod: {
-      enum: ['vod', 'live']
+      enum: ['vod', 'live'],
     },
 
     // duration in seconds
     videoDuration: {
-      type: 'number'
+      type: 'number',
     },
 
     // series
     videoFranchise: {
-      type: 'string'
+      type: 'string',
     },
 
     // headline
     videoName: {
-      type: 'string'
+      type: 'string',
     },
 
     // scoop playlist
     videoPrimaryPlaylistId: {
-      type: 'number'
+      type: 'number',
     },
 
     videoPrimaryPlaylistName: {
-      type: 'string'
+      type: 'string',
     },
 
     // section
     videoSection: {
-      type: 'string'
+      type: 'string',
     },
 
     // subsection
     videoSubSection: {
-      type: 'string'
+      type: 'string',
     },
 
     // timecode of event
     videoTimeOfEvent: {
-      type: 'number'
+      type: 'number',
     },
 
     // video || ad || 360video
     videoType: {
-      enum: ['video', 'ad', '360video']
-    }
-  }
+      enum: ['video', 'ad', '360video'],
+    },
+  },
 };

@@ -10,7 +10,7 @@ module.exports = {
   // required: ['url'],
 
   description: 'Version',
-  type: 'string'
+  type: 'string',
 
   // properties: {
   //   /**

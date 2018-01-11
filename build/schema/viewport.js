@@ -1,4 +1,4 @@
-'use strict';
+
 
 /**
  * Describes the current page position within the user agent browser’s viewport
@@ -14,7 +14,7 @@ module.exports = {
      */
     scrollTop: {
       type: 'integer',
-      description: 'The offset, in pixels, from the top of the document at the top of the viewport,'
+      description: 'The offset, in pixels, from the top of the document at the top of the viewport,',
     },
 
     /**
@@ -22,7 +22,7 @@ module.exports = {
      */
     height: {
       type: 'integer',
-      description: 'The height, in pixels, of the viewport.'
+      description: 'The height, in pixels, of the viewport.',
     },
 
     /**
@@ -30,7 +30,12 @@ module.exports = {
      */
     width: {
       type: 'integer',
-      description: 'The width, in pixels, of the viewport.'
+      description: 'The width, in pixels, of the viewport.',
+    },
+
+    documentHeight: {
+      type: 'number',
+      description: 'integer height of the entire page in pixels',
     },
 
     /**
@@ -38,7 +43,7 @@ module.exports = {
      */
     modules: {
       type: 'string',
-      description: 'for future use - comma-separated list of modules in the viewport'
-    }
-  }
+      description: 'for future use - comma-separated list of modules in the viewport',
+    },
+  },
 };

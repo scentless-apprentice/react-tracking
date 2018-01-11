@@ -1,6 +1,6 @@
-'use strict';
 
-var mData = require('./video-mdata');
+
+const mData = require('./video-mdata');
 /**
  * Contains data pertaining to video assets.
  */
@@ -16,46 +16,46 @@ module.exports = {
   properties: {
 
     action: {
-      type: 'string'
+      type: 'string',
     },
 
     region: {
-      type: 'string'
+      type: 'string',
     },
 
     state: {
-      enum: ['player', 'paused']
+      enum: ['player', 'paused'],
     },
 
     // section
     contentCollection: {
-      type: 'string'
+      type: 'string',
     },
 
     // scoop id
     contentId: {
-      type: 'number'
+      type: 'number',
     },
 
-    //auto-play-start, user-play, etc...
+    // auto-play-start, user-play, etc...
     eventName: {
-      type: 'string'
+      type: 'string',
     },
 
-    //timestamp
+    // timestamp
     eventTimestamp: {
-      format: 'date-time'
+      format: 'date-time',
     },
 
     module: {
-      type: 'string'
+      type: 'string',
     },
 
-    //player type string
+    // player type string
     version: {
-      type: 'string'
+      type: 'string',
     },
 
-    mData: mData
-  }
+    mData,
+  },
 };

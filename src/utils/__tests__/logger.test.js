@@ -25,28 +25,27 @@ const errors = [
 ];
 
 describe('logger', () => {
-  beforeEach(() => {
+  afterEach(() => {
     jest.resetModules();
     global.console.log.mockClear();
   });
 
   it('logs errors to console.log', () => {
-    const logger = require('../logger');
+    const logger = require('../logger'); // eslint-disable-line global-require
     logger.error(errors);
 
-    expect(console.log).toHaveBeenCalled();
-
+    expect(global.console.log).toHaveBeenCalled();
     expect(global.console.log.mock.calls).toMatchSnapshot();
   });
 
   it('uses console.group when available', () => {
-    global.console.group = jest.fn();
+    global.console.groupCollapsed = jest.fn();
     global.console.groupEnd = jest.fn();
-    const logger = require('../logger');
+    const logger = require('../logger'); // eslint-disable-line global-require
 
     logger.error(errors);
 
-    expect(global.console.group).toHaveBeenCalledTimes(1);
+    expect(global.console.groupCollapsed).toHaveBeenCalledTimes(1);
     expect(global.console.groupEnd).toHaveBeenCalledTimes(1);
   });
 });
