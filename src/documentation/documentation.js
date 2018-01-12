@@ -8,11 +8,12 @@ const pkg = require('../../package.json');
 const toMarkdown = (templateContents, schemaData = {}) => {
   // bind all functions in ./macros and pass the current scope (data + macros)
   const scope = Object.keys(components).reduce((sData, key) => {
-    sData[key] = options => (components[key] || (() => ''))(options, sData);
+    const d = Object.assign(sData, {});
+    d[key] = options => (components[key] || (() => ''))(options, sData);
 
-    return sData;
+    return d;
   }, schemaData);
-  
+
   const markdown = template(templateContents, scope);
   return markdown;
 };
