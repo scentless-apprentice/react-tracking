@@ -5,13 +5,13 @@ const components = require('./components');
 const schemaModel = require('../schema');
 const pkg = require('../../package.json');
 
-const toMarkdown = (templateContents, data = {}) => {
+const toMarkdown = (templateContents, schemaData = {}) => {
   // bind all functions in ./macros and pass the current scope (data + macros)
-  const scope = Object.keys(components).reduce((scope, key) => {
-    scope[key] = options => (components[key] || (() => ''))(options, scope);
+  const scope = Object.keys(components).reduce((sData, key) => {
+    sData[key] = options => (components[key] || (() => ''))(options, sData);
 
-    return scope;
-  }, data);
+    return sData;
+  }, schemaData);
   
   const markdown = template(templateContents, scope);
   return markdown;
