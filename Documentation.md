@@ -503,7 +503,7 @@ Data Type: **String**
 
 Description: No description found
 
-Data Type: **Array**
+Data Type: **Array of Objects**
 
 ### datalayer.module
 
