@@ -1,21 +1,24 @@
 {
   "name": "tracking-schema",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Tracking object schema and validation",
   "main": "build/index.js",
   "scripts": {
     "lint": "eslint ./src",
     "test": "jest",
     "test-watch": "jest --watch",
-    "build":
-      "rm -rf build && babel src --out-dir build --ignore **/__tests__,src/documentation,src/example",
+    "build": "rm -rf build && babel src --out-dir build --ignore **/__tests__,src/documentation,src/example",
     "documentation": "node src/documentation/index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nytm/tracking-schema.git"
   },
-  "keywords": ["nyt", "tracking", "schema"],
+  "keywords": [
+    "nyt",
+    "tracking",
+    "schema"
+  ],
   "author": "The New York Times",
   "license": "ISC",
   "bugs": {
