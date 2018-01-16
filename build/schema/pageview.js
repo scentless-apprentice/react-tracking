@@ -4,7 +4,7 @@
 * Pageview specific data.
 */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -62,7 +62,51 @@ module.exports = {
         }
       }
     },
-
+    ad: {
+      description: 'ad slot behavior and performance tracking',
+      properties: {
+        slotId: {
+          type: 'string',
+          description: 'Id of ad container'
+        },
+        position: {
+          type: 'string',
+          description: 'position of ad container'
+        },
+        pageViewId: {
+          type: 'string',
+          description: 'Unique id for page view session'
+        },
+        creativeId: {
+          type: 'string',
+          description: 'Id of the ad creative'
+        },
+        lineItemId: {
+          type: 'string',
+          description: 'Id of the line item for the ad'
+        },
+        isEmpty: {
+          type: 'boolean',
+          description: 'Flag for when the ad server returned an ad'
+        },
+        timeDefined: {
+          type: 'number',
+          description: 'Time from responseStart until ad defined'
+        },
+        timeCalled: {
+          type: 'number',
+          description: 'Time from responseStart until ad called'
+        },
+        timeRendered: {
+          type: 'number',
+          description: 'Time from responseStart until ad rendered'
+        },
+        timeViewed: {
+          type: 'number',
+          description: 'Time from responseStart until ad was viewed'
+        }
+      }
+    },
     heartbeat: {
       description: 'TBD',
       properties: {

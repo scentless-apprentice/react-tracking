@@ -1,10 +1,10 @@
 'use strict';
 
 /**
-* User specific data.
-*/
+ * User specific data.
+ */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -45,16 +45,15 @@ module.exports = {
     },
 
     propensity: {
-      description: 'Metadata about the user\'s propensity to subscribe',
+      description: "Metadata about the user's propensity to subscribe",
       type: 'object',
       properties: {}
     },
 
     tracking: {
-      description: 'Metadata about the user\s latest behavior on our site',
+      description: 'Metadata about the users latest behavior on our site',
       type: 'object',
       properties: {}
     }
-
   } // end user.properties
 };

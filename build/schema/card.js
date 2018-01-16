@@ -1,17 +1,20 @@
 'use strict';
 
 /**
-* Card specific data.
-*/
+ * Card specific data.
+ */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
 
   properties: {
     /**
-     * TO-DO: This is the ordinal rank of a card within a block, right? I.e., does not dictate visual order of a card in a block - e.g., at desktop viewports, a card with a higher index may appear "above" a card with a lower index in the same block due to multi-column design
+     * TO-DO: This is the ordinal rank of a card within a block, right?
+     * I.e., does not dictate visual order of a card in a block - e.g.,
+     * at desktop viewports, a card with a higher index may appear "above"
+     * a card with a lower index in the same block due to multi-column design
      * PROVIDED BY: Vi platform
      */
     index: {

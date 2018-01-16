@@ -2,16 +2,16 @@
 * Event-related metadata
 */
 module.exports = {
-  'description': 'Describes metadata related to a specific event',
+  description: 'Describes metadata related to a specific event',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
 
   properties: {
 
-    type:{
+    type: {
       type: 'string',
-      description: 'type of interaction: click, submit, swipe...'
+      description: 'type of interaction: click, submit, swipe...',
     },
 
     success: {
@@ -24,20 +24,20 @@ module.exports = {
       description: 'The front-end component that triggered the event push - e.g., a card',
     },
 
-    pagetype:{
+    pagetype: {
       type: 'string',
-      description: 'pagetype when the interaction occurred'
+      description: 'pagetype when the interaction occurred',
     },
 
     timeRendered: {
       type: 'number',
-      description: 'Time from responseStart until module is rendered'
+      description: 'Time from responseStart until module is rendered',
     },
 
     timeViewed: {
       type: 'number',
-      description: 'Time from responseStart until module was viewed'
-    }
+      description: 'Time from responseStart until module was viewed',
+    },
 
   }, // end pageview.properties
 };

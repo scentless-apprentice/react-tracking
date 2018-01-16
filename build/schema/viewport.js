@@ -33,6 +33,11 @@ module.exports = {
       description: 'The width, in pixels, of the viewport.'
     },
 
+    documentHeight: {
+      type: 'number',
+      description: 'integer height of the entire page in pixels'
+    },
+
     /**
      * for future use - comma-separated list of modules in the viewport
      */

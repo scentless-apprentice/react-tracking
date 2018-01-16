@@ -44,7 +44,7 @@ module.exports = {
       properties: {
         name: {
           type: 'string',
-          description: 'home'
+          description: 'home',
         },
         /**
          * PROVIDED BY: Vi platform
@@ -53,7 +53,7 @@ module.exports = {
          */
         breakpoint: {
           type: 'array',
-          description: '1 column'
+          description: '1 column',
         },
         /**
          * PROVIDED BY: Program manager

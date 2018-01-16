@@ -13,11 +13,9 @@ var formatDataPath = function formatDataPath(dataPath) {
 };
 
 module.exports = {
-  error: function error(errors) {
+  error: function error(errors, beforeEnd) {
     if (errors) {
       group('[tracking-schema] 🚫 tracking data is invalid 🚫');
-
-      // console.log(errors);
 
       errors.forEach(function (e) {
         var msg = ' \uD83D\uDC49  [' + e.keyword + ' error]: ' + formatDataPath(e.dataPath) + ' ' + e.message;
@@ -30,6 +28,8 @@ module.exports = {
 
         console.log(msg);
       });
+
+      if (beforeEnd) beforeEnd();
 
       if (console.groupEnd) console.groupEnd();
     }

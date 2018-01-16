@@ -26,7 +26,9 @@ const validation = (data, individualEvents) => {
 module.exports = (data = {}, options = {}) => {
   if (!Object.keys(data).length) {
     const error = logger.emptyDataError;
-    logger.error(error);
+    logger.error(error, () => {
+      console.log('Data: ', data);
+    });
 
     return error;
   }

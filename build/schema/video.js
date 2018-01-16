@@ -37,12 +37,12 @@ module.exports = {
       type: 'number'
     },
 
-    //auto-play-start, user-play, etc...
+    // auto-play-start, user-play, etc...
     eventName: {
       type: 'string'
     },
 
-    //timestamp
+    // timestamp
     eventTimestamp: {
       format: 'date-time'
     },
@@ -51,7 +51,7 @@ module.exports = {
       type: 'string'
     },
 
-    //player type string
+    // player type string
     version: {
       type: 'string'
     },

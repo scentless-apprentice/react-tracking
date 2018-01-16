@@ -9,7 +9,7 @@ module.exports = {
   // TODO: What else should be required?
   required: ['id'],
 
-  'description': 'Describes attributes of NYT content assets. For example,',
+  description: 'Describes attributes of NYT content assets. For example,',
 
   properties: {
     /**

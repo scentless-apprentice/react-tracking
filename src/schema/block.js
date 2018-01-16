@@ -2,7 +2,7 @@
 * Block specific data.
 */
 module.exports = {
-  'description': 'Describes basic attributes of the NYT user.',
+  description: 'Describes basic attributes of the NYT user.',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -32,7 +32,7 @@ module.exports = {
      */
     name: {
       type: 'string',
-      description: 'mobile-home/1'
+      description: 'mobile-home/1',
     },
     /**
      * The order in which a block appears in a program
@@ -56,7 +56,7 @@ module.exports = {
 
     // Region to be defined
     region: {
-      properties: {}
+      properties: {},
     },
 
     /**
@@ -76,7 +76,7 @@ module.exports = {
          */
         uri: {
           type: 'string',
-          description: 'Unique identifier for the list powering a block'
+          description: 'Unique identifier for the list powering a block',
         },
       },
     },

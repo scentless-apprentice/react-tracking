@@ -31,7 +31,9 @@ module.exports = function () {
 
   if (!Object.keys(data).length) {
     var error = logger.emptyDataError;
-    logger.error(error);
+    logger.error(error, function () {
+      console.log('Data: ', data);
+    });
 
     return error;
   }

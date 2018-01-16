@@ -1,6 +1,4 @@
 module.exports = {
-  event: 'heartbeat',
-
   application: {
     dlVersion: '1.0.1',
     releaseVersion: '1.0.0',
@@ -19,7 +17,7 @@ module.exports = {
     lastUpdatedTimestamp: 1486045904,
     desk: 'NYTNow',
     originatingDesk: 'NYTNow',
-    wordCount: 1173
+    wordCount: 1173,
   },
 
   event: 'impression',
@@ -30,31 +28,30 @@ module.exports = {
     type: 'visual',
     rendition: 'whole',
     label: 'Donald Trump, Australia, Betsy DeVos: Your Thursday Briefing',
-    contentId: '100000004906353',
   },
 
   block: {
     label: 'Top Stories',
-    rendition: 'Overflow',
-    name:
+    name: 'name',
     index: 1,
-    version:
+    version: '5',
     list: {
-      uri: 'nyt:/list/scoop/list/home-special-a'
-    }
+      uri: 'nyt:/list/scoop/list/home-special-a',
+    },
   },
 
   presentation: {
-    pageType: 'article'
+    pageType: 'article',
   },
 
   user: {
     type: 'regi',
     regiId: '11100023',
-    subscriptions: [{
-      test: 1
-    }],
-    watSeg: '{ test: "true" }',
+    subscriptions: [
+      {
+        test: 1,
+      },
+    ],
   },
 
   referrer: {
@@ -87,7 +84,7 @@ module.exports = {
       videoPrimaryPlaylistName: 'The Daily 360',
       videoSection: 'arts',
       videoSubSection: '',
-      videoTimeOfEvent: 0
-    }
-  }
+      videoTimeOfEvent: 0,
+    },
+  },
 };

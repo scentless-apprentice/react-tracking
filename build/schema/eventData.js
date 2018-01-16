@@ -4,7 +4,7 @@
 * Event-related metadata
 */
 module.exports = {
-  'description': 'Describes metadata related to a specific event',
+  description: 'Describes metadata related to a specific event',
 
   // disallow properties not explicilty listed
   additionalProperties: false,

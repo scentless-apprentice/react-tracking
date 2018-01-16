@@ -1,8 +1,8 @@
 /**
-* Module specific data.
-*/
+ * Module specific data.
+ */
 module.exports = {
-  'description': 'Describes attributes of a module on the page',
+  description: 'Describes attributes of a module on the page',
 
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -37,38 +37,38 @@ module.exports = {
 
     // Region to be defined
     region: {
-      properties: {}
+      properties: {},
     },
 
     /**
      * Module element
-     * Specific link or tool interacted with in the module 
+     * Specific link or tool interacted with in the module
      */
-	element: {
-	    type: 'object',
-        description: 'Specific link or tool interacted with in the module',
-        properties: {
-            name: {
-                type: 'string',
-                description: 'permanent value / slug / id',
-            },
-
-            /**
-            * URL of an asset associated with the link
-            */
-            url: {
-                type: 'string',
-                description: 'URL associated with the element, eg. article being shared or linked to',
-            },
-
-            /**
-            * The text or displayed to the user for this element
-            */
-            label: {
-                type: 'string',
-                description: 'text displayed to the user for this element',
-            },
+    element: {
+      type: 'object',
+      description: 'Specific link or tool interacted with in the module',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'permanent value / slug / id',
         },
+
+        /**
+         * URL of an asset associated with the link
+         */
+        url: {
+          type: 'string',
+          description: 'URL associated with the element, eg. article being shared or linked to',
+        },
+
+        /**
+         * The text or displayed to the user for this element
+         */
+        label: {
+          type: 'string',
+          description: 'text displayed to the user for this element',
+        },
+      },
     },
   }, // end module.properties
 };
