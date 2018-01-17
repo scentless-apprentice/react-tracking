@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.1.2
+Version: 2.2.0
 
 Tracking object schema and validation
 
