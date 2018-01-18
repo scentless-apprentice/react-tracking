@@ -10,7 +10,7 @@ module.exports = {
   handleEnum(_enum) {
     if (_enum) {
       return `${this.dataTypeLabel(typeof _enum[0])}. It must match one of these:\n* ${_enum.join(
-        '\n* ',
+        '\n* '
       )}`;
     }
 

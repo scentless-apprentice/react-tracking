@@ -21,7 +21,7 @@ const toMarkdown = (templateContents, schemaData = {}) => {
 const compile = (userPath, fallbackPath, cb) => {
   const userTemplate = path.join(process.cwd(), userPath);
 
-  fs.exists(userTemplate, (exists) => {
+  fs.exists(userTemplate, exists => {
     const sourceTemplate = (exists && userTemplate) || (fallbackPath || null);
 
     if (sourceTemplate) {
@@ -44,14 +44,14 @@ const compile = (userPath, fallbackPath, cb) => {
 };
 
 const createDocumentation = (overwrite = true) => {
-  compile('.documentation.tmpl.md', path.join(__dirname, '.documentation.tmpl.md'), (markdown) => {
+  compile('.documentation.tmpl.md', path.join(__dirname, '.documentation.tmpl.md'), markdown => {
     const destination = './Documentation.md';
 
-    fs.exists(destination, (exists) => {
+    fs.exists(destination, exists => {
       if (exists && !overwrite) {
         throw new Error(`${destination} already exists`);
       }
-      fs.writeFile(destination, markdown, (err) => {
+      fs.writeFile(destination, markdown, err => {
         if (err) throw err;
         console.log('Documentation.md created');
       });

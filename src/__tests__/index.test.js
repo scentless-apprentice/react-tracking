@@ -1,4 +1,4 @@
-/* eslint-disable global-require */
+/* eslint-disable global-require, prefer-destructuring */
 const example = require('../example');
 
 describe('index', () => {

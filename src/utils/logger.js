@@ -2,7 +2,7 @@
 
 const group = console.groupCollapsed || console.group || console.log;
 
-const formatDataPath = (dataPath) => {
+const formatDataPath = dataPath => {
   if (dataPath.startsWith('.') || dataPath === '') {
     return `ROOT${dataPath}`;
   }
@@ -15,7 +15,7 @@ module.exports = {
     if (errors) {
       group('[tracking-schema] 🚫 tracking data is invalid 🚫');
 
-      errors.forEach((e) => {
+      errors.forEach(e => {
         let msg = ` 👉  [${e.keyword} error]: ${formatDataPath(e.dataPath)} ${e.message}`;
 
         if (e.keyword === 'additionalProperties') {

@@ -23,7 +23,8 @@ const viewport = require('./viewport');
 const video = require('./video');
 const version = require('./version');
 
-const allProps = { // main "dataLayer" starts here
+const allProps = {
+  // main "dataLayer" starts here
   application,
   asset,
   block,
@@ -43,8 +44,7 @@ const allProps = { // main "dataLayer" starts here
 };
 
 module.exports = {
-
-  get: (individualEvents) => {
+  get: individualEvents => {
     const schema = {
       additionalProperties: false,
       // top-level properties
@@ -58,5 +58,4 @@ module.exports = {
 
     return schema;
   },
-
 };

@@ -105,9 +105,9 @@ module.exports = {
      * The type of collection.
      */
     collectionType: {
-      type: 'array',
       description:
         'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.',
+      enum: ['column', 'series', 'issue', 'sectioncollection'],
     },
 
     /**

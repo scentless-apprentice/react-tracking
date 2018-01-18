@@ -1,6 +1,6 @@
 /**
-* Pageview specific data.
-*/
+ * Pageview specific data.
+ */
 module.exports = {
   description: 'Describes basic attributes of the NYT user.',
 
@@ -28,35 +28,40 @@ module.exports = {
          */
         domInteractive: {
           type: 'number',
-          description: 'Total DOM interactive time (in ms), as calculated by timing.domInteractive - timing.navigationStart',
+          description:
+            'Total DOM interactive time (in ms), as calculated by timing.domInteractive - timing.navigationStart',
         },
         /**
          * Time until the load event fires for the DOM
          */
         pageLoadTime: {
           type: 'number',
-          description: 'Total page load time (in ms), as calculated by timing.loadEventEnd - timing.navigationStart',
+          description:
+            'Total page load time (in ms), as calculated by timing.loadEventEnd - timing.navigationStart',
         },
         /**
          * Time until the DOM content loads
          */
         domContentLoaded: {
           type: 'number',
-          description: 'Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart',
+          description:
+            'Total page load time (in ms), as calculated by timing.domContentLoadedEventEnd - timing.navigationStart',
         },
         /**
          * Time until the browser starts requesting the current document from the server
          */
         requestStart: {
           type: 'number',
-          description: 'Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart',
+          description:
+            'Time until the browser starts requesting the current document from the server (in ms), as calculated by timing.requestStart - timing.navigationStart',
         },
         /**
          * Time until the first byte of the response from the server (TTFB)
          */
         responseStart: {
           type: 'number',
-          description: 'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart',
+          description:
+            'Time until the first byte of the response from the server (in ms), as calculated by timing.responseStart - timing.navigationStart',
         },
       },
     },
@@ -108,13 +113,13 @@ module.exports = {
     heartbeat: {
       description: 'TBD',
       properties: {
-
         /**
          * The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.
-        **/
+         * */
         timeSincePageDataReady: {
           type: 'integer',
-          description: 'The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.',
+          description:
+            'The time elapsed, in milliseconds, since the `pageDataReady` event was emitted.',
         },
 
         /**
@@ -126,6 +131,5 @@ module.exports = {
         },
       },
     },
-
   }, // end pageview.properties
 };

@@ -30,7 +30,7 @@ const generator = {
       // additional properties
       core.buildSegnment(
         properties && additionalProperties,
-        `Accepts Additional Properties: ${!!additionalProperties}`,
+        `Accepts Additional Properties: ${!!additionalProperties}`
       ),
       // sub properties
       this.buildPropertiesSegment(properties, propNameSpace),

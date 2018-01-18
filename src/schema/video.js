@@ -12,7 +12,6 @@ module.exports = {
   description: 'external documentation - video keys documented separately',
 
   properties: {
-
     action: {
       type: 'string',
     },

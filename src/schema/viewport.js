@@ -3,16 +3,17 @@
  * and the modules currently in view.
  */
 module.exports = {
-  description: 'Describes the current page position within the user agent browser’s viewport and the modules currently in view.',
+  description:
+    'Describes the current page position within the user agent browser’s viewport and the modules currently in view.',
 
   properties: {
-
     /**
      * The offset, in pixels, from the top of the document at the top of the viewport,
      */
     scrollTop: {
       type: 'integer',
-      description: 'The offset, in pixels, from the top of the document at the top of the viewport,',
+      description:
+        'The offset, in pixels, from the top of the document at the top of the viewport,',
     },
 
     /**

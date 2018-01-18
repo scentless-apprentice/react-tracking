@@ -25,7 +25,8 @@ var viewport = require('./viewport');
 var video = require('./video');
 var version = require('./version');
 
-var allProps = { // main "dataLayer" starts here
+var allProps = {
+  // main "dataLayer" starts here
   application: application,
   asset: asset,
   block: block,
@@ -41,16 +42,15 @@ var allProps = { // main "dataLayer" starts here
   user: user,
   version: version,
   viewport: viewport,
-  video: video
+  video: video,
 };
 
 module.exports = {
-
   get: function get(individualEvents) {
     var schema = {
       additionalProperties: false,
       // top-level properties
-      properties: allProps
+      properties: allProps,
     };
 
     if (!individualEvents) {
@@ -59,6 +59,5 @@ module.exports = {
     }
 
     return schema;
-  }
-
+  },
 };

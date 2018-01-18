@@ -6,7 +6,7 @@ var schemaGenerator = require('./schema');
 var logger = require('./utils/logger');
 
 var ajv = new Ajv({
-  allErrors: true
+  allErrors: true,
 });
 
 var getValidator = function getValidator(individualEvents) {
@@ -20,18 +20,20 @@ var validation = function validation(data, individualEvents) {
 
   validate.isValid = validate(data); // returns a boolean for convinience
 
-  logger.error(validate.errors);
+  logger.error(validate.errors, function() {
+    return console.log(data);
+  });
 
   return validate; // validate.errors contains the errors list
 };
 
-module.exports = function () {
+module.exports = function() {
   var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   if (!Object.keys(data).length) {
     var error = logger.emptyDataError;
-    logger.error(error, function () {
+    logger.error(error, function() {
       console.log('Data: ', data);
     });
 

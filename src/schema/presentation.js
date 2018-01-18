@@ -10,11 +10,10 @@ module.exports = {
   description: 'Describes basic attributes of the page design layout.',
 
   properties: {
-
     /**
      * The type of NYT content asset as presented to the user during
      * the session.
-    **/
+     * */
     pageType: {
       type: 'string',
       description: 'The type of NYT content asset as presented to the user during the session.',

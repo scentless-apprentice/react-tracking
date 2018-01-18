@@ -1,6 +1,6 @@
 /**
-* Block specific data.
-*/
+ * Block specific data.
+ */
 module.exports = {
   description: 'Describes basic attributes of the NYT user.',
 

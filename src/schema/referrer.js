@@ -1,7 +1,7 @@
 /**
-* Contains data about external referrers, internal referrers and module
-* interactions pertaining to the NYT user's session.
-*/
+ * Contains data about external referrers, internal referrers and module
+ * interactions pertaining to the NYT user's session.
+ */
 module.exports = {
   // disallow properties not explicilty listed
   additionalProperties: false,
@@ -9,7 +9,8 @@ module.exports = {
   // properties that are required (for `referrer`)
   required: ['url'],
 
-  description: 'Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user\'s session.',
+  description:
+    "Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.",
 
   properties: {
     /**

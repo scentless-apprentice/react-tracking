@@ -14,48 +14,47 @@ module.exports = {
   description: 'external documentation - video keys documented separately',
 
   properties: {
-
     action: {
-      type: 'string'
+      type: 'string',
     },
 
     region: {
-      type: 'string'
+      type: 'string',
     },
 
     state: {
-      enum: ['player', 'paused']
+      enum: ['player', 'paused'],
     },
 
     // section
     contentCollection: {
-      type: 'string'
+      type: 'string',
     },
 
     // scoop id
     contentId: {
-      type: 'number'
+      type: 'number',
     },
 
     // auto-play-start, user-play, etc...
     eventName: {
-      type: 'string'
+      type: 'string',
     },
 
     // timestamp
     eventTimestamp: {
-      format: 'date-time'
+      format: 'date-time',
     },
 
     module: {
-      type: 'string'
+      type: 'string',
     },
 
     // player type string
     version: {
-      type: 'string'
+      type: 'string',
     },
 
-    mData: mData
-  }
+    mData: mData,
+  },
 };

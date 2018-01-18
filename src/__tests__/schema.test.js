@@ -1,5 +1,5 @@
 const Ajv = require('ajv');
-const schemaModel = require('../development').schemaModel;
+const { schemaModel } = require('../development');
 
 const ajv = new Ajv({
   allErrors: true,

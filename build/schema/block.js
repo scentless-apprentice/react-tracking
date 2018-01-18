@@ -1,8 +1,8 @@
 'use strict';
 
 /**
-* Block specific data.
-*/
+ * Block specific data.
+ */
 module.exports = {
   description: 'Describes basic attributes of the NYT user.',
 
@@ -17,7 +17,7 @@ module.exports = {
      */
     label: {
       type: 'string',
-      description: 'Top Stories'
+      description: 'Top Stories',
     },
     /**
      * PROVIDED BY: Program manager (maps to block.template)
@@ -25,7 +25,7 @@ module.exports = {
      */
     template: {
       type: 'string',
-      description: 'Overflow'
+      description: 'Overflow',
     },
     /**
      * The name of the block interacted with.
@@ -34,7 +34,7 @@ module.exports = {
      */
     name: {
       type: 'string',
-      description: 'mobile-home/1'
+      description: 'mobile-home/1',
     },
     /**
      * The order in which a block appears in a program
@@ -43,7 +43,7 @@ module.exports = {
      */
     index: {
       type: 'integer',
-      description: 'The ordinal rank of a block within a program (zero-indexed)'
+      description: 'The ordinal rank of a block within a program (zero-indexed)',
     },
     /**
      * The version of a block's front-end view implementation
@@ -53,12 +53,12 @@ module.exports = {
      */
     version: {
       type: 'string',
-      description: '1fjei9'
+      description: '1fjei9',
     },
 
     // Region to be defined
     region: {
-      properties: {}
+      properties: {},
     },
 
     /**
@@ -78,9 +78,9 @@ module.exports = {
          */
         uri: {
           type: 'string',
-          description: 'Unique identifier for the list powering a block'
-        }
-      }
-    }
-  } // end card.properties
+          description: 'Unique identifier for the list powering a block',
+        },
+      },
+    },
+  }, // end card.properties
 };
