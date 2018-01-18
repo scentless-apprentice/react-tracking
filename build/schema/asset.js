@@ -4,11 +4,6 @@
  * Describes attributes of the NYT content asset.
  */
 module.exports = {
-  additionalProperties: false,
-
-  // TODO: What else should be required?
-  required: ['id'],
-
   description: 'Describes attributes of NYT content assets. For example,',
 
   properties: {
@@ -29,7 +24,7 @@ module.exports = {
      */
     section: {
       type: 'string',
-      description: 'The NYT content asset\'s public-facing label for site navigation that is meant to reflect a core, permanent category of the NYT report.'
+      description: "The NYT content asset's public-facing label for site navigation that is meant to reflect a core, permanent category of the NYT report."
     },
 
     /**
@@ -39,7 +34,7 @@ module.exports = {
      */
     subSection: {
       type: 'string',
-      description: 'The NYT content asset\'s public-facing label for site navigation that sits hierarchically under a section and is meant to reflect a core, permanent category of the NYT report.'
+      description: "The NYT content asset's public-facing label for site navigation that sits hierarchically under a section and is meant to reflect a core, permanent category of the NYT report."
     },
 
     /**
@@ -47,7 +42,7 @@ module.exports = {
      */
     headline: {
       type: 'string',
-      description: 'The NYT content asset\'s public-facing title'
+      description: "The NYT content asset's public-facing title"
     },
 
     /**
@@ -105,8 +100,8 @@ module.exports = {
      * The type of collection.
      */
     collectionType: {
-      description: 'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.',
-      enum: ['column', 'series', 'issue', 'sectioncollection']
+      type: 'array',
+      description: 'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.'
     },
 
     /**
@@ -149,7 +144,7 @@ module.exports = {
      */
     characterCount: {
       type: 'number',
-      description: 'The current number of characters in the context asset\'s body text'
+      description: "The current number of characters in the context asset's body text"
     },
 
     /**
@@ -157,7 +152,7 @@ module.exports = {
      */
     wordCount: {
       type: 'number',
-      description: 'The current number of words in the content asset\'s body text.'
+      description: "The current number of words in the content asset's body text."
     },
 
     orgFacets: {
@@ -268,6 +263,35 @@ module.exports = {
     storyPatterns: {
       type: 'array',
       description: '?'
+    },
+
+    ad: {
+      properties: {
+        capacity: {
+          type: 'number'
+        },
+        threshold: {
+          type: 'number'
+        },
+        stride: {
+          type: 'number'
+        }
+      }
+    },
+
+    is_refresh: {
+      type: 'boolean',
+      description: '?'
+    },
+
+    perFacets: {
+      type: 'array',
+      description: '?'
+    },
+
+    headerType: {
+      type: 'string',
+      description: 'The type of header used on a piece of content (e.g., legacy headers on Scoop articles)'
     }
   }
 };
