@@ -8,7 +8,7 @@ module.exports = {
   additionalProperties: false,
 
   // properties that are required (for `user`)
-  required: ['type'],
+  required: [],
 
   properties: {
     /**

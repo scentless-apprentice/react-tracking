@@ -70,8 +70,6 @@ Description: Describes attributes of NYT content assets. For example,
 
 Data Type: **Object**
 
-Required Fields: id
-
 ### datalayer.asset.url
 
 Description: The canonical URL of the NYT content asset. This value is null for certain "embedded-only" content types like “image slideshow” and some “interactive graphics” assets.
@@ -130,11 +128,7 @@ Data Type: **Array**
 
 Description: The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.
 
-Data Type: **String**. It must match one of these:
-* column
-* series
-* issue
-* sectioncollection
+Data Type: **Array**
 
 ### datalayer.asset.desk
 
@@ -303,6 +297,48 @@ Data Type: **Object**
 Description: ?
 
 Data Type: **Array**
+
+### datalayer.asset.ad
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.asset.ad.capacity
+
+Description: No description found
+
+Data Type: **Number**
+
+### datalayer.asset.ad.threshold
+
+Description: No description found
+
+Data Type: **Number**
+
+### datalayer.asset.ad.stride
+
+Description: No description found
+
+Data Type: **Number**
+
+### datalayer.asset.is_refresh
+
+Description: ?
+
+Data Type: **Boolean**
+
+### datalayer.asset.perFacets
+
+Description: ?
+
+Data Type: **Array**
+
+### datalayer.asset.headerType
+
+Description: The type of header used on a piece of content (e.g., legacy headers on Scoop articles)
+
+Data Type: **String**
 
 ### datalayer.block
 
@@ -745,7 +781,19 @@ Data Type: **String**
 
 Description: 1 column
 
-Data Type: **Array**
+Data Type: **Object**
+
+### datalayer.presentation.program.breakpoint.initial
+
+Description: the initial breakpoint that the app assumes
+
+Data Type: **String**
+
+### datalayer.presentation.program.breakpoint.rendered
+
+Description: the final breakpoint after the app calculates the proper device type
+
+Data Type: **String**
 
 ### datalayer.presentation.program.type
 
@@ -796,8 +844,6 @@ Data Type: **Boolean**
 Description: Describes basic attributes of the NYT user.
 
 Data Type: **Object**
-
-Required Fields: type
 
 ### datalayer.user.regiId
 

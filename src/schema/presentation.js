@@ -52,8 +52,18 @@ module.exports = {
          * E.g., "1 column" or "2 column"
          */
         breakpoint: {
-          type: 'array',
+          type: 'object',
           description: '1 column',
+          properties: {
+            initial: {
+              type: 'string',
+              description: 'the initial breakpoint that the app assumes',
+            },
+            rendered: {
+              type: 'string',
+              description: 'the final breakpoint after the app calculates the proper device type',
+            },
+          },
         },
         /**
          * PROVIDED BY: Program manager
