@@ -12,7 +12,7 @@ module.exports = {
     section: 'briefing',
     headline: 'Donald Trump, Australia, Betsy DeVos: Your Thursday Briefing',
     authors: 'Sean Alfano',
-    id: '100000004906353',
+    id: 100000004906353,
     publishedTimestamp: 1486032632,
     lastUpdatedTimestamp: 1486045904,
     desk: 'NYTNow',
@@ -46,7 +46,7 @@ module.exports = {
 
   user: {
     type: 'regi',
-    regiId: '11100023',
+    regiId: 11100023,
     subscriptions: [
       {
         test: 1,

@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.3.0
+Version: 2.4.0
 
 Tracking object schema and validation
 
@@ -105,7 +105,7 @@ Data Type: **Array of Strings**
 
 Description: The unique ID of the NYT content asset
 
-Data Type: **String**
+Data Type: **String**, or **Number**
 
 ### datalayer.asset.publishedTimestamp
 
@@ -134,7 +134,13 @@ Data Type: **String**. It must match one of these:
 * column
 * series
 * issue
+* section
 * sectioncollection
+* COLUMN
+* SERIES
+* ISSUE
+* SECTION
+* SECTIONCOLLECTION
 
 ### datalayer.asset.desk
 
@@ -857,7 +863,7 @@ Data Type: **Object**
 
 Description: The NYT registration ID of the NYT user.
 
-Data Type: **String**
+Data Type: **String**, or **Number**
 
 ### datalayer.user.type
 
@@ -890,6 +896,36 @@ Data Type: **Object**
 ### datalayer.user.tracking
 
 Description: Metadata about the users latest behavior on our site
+
+Data Type: **Object**
+
+### datalayer.user.jkidd-l
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.user.jkidd-s
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.user.jkidd-p
+
+Description: No description found
+
+Data Type: **String**
+
+### datalayer.user.subscriberInfo
+
+Description: No description found
+
+Data Type: **Object**
+
+### datalayer.user.nytdOtherData
+
+Description: No description found
 
 Data Type: **Object**
 

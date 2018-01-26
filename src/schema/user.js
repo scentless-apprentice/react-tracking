@@ -15,7 +15,7 @@ module.exports = {
      * The NYT Registration ID of the user.
      */
     regiId: {
-      type: 'string',
+      type: ['string', 'number'],
       description: 'The NYT registration ID of the NYT user.',
     },
 
@@ -50,6 +50,25 @@ module.exports = {
 
     tracking: {
       description: 'Metadata about the users latest behavior on our site',
+      type: 'object',
+      properties: {},
+    },
+
+    // JKIDD stuff
+    'jkidd-l': {
+      type: 'string',
+    },
+    'jkidd-s': {
+      type: 'string',
+    },
+    'jkidd-p': {
+      type: 'string',
+    },
+    subscriberInfo: {
+      type: 'object',
+      properties: {},
+    },
+    nytdOtherData: {
       type: 'object',
       properties: {},
     },

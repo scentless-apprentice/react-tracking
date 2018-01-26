@@ -29,6 +29,10 @@ module.exports = {
   },
 
   dataTypeLabel(label) {
+    if (Array.isArray(label)) {
+      return label.map(l => `**${this.capitalizeSentence(l)}**`).join(', or ');
+    }
+
     return `**${this.capitalizeSentence(label)}**`;
   },
 };

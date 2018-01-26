@@ -69,7 +69,7 @@ module.exports = {
      * SCOOP id.
      */
     id: {
-      type: 'string',
+      type: ['string', 'number'],
       description: 'The unique ID of the NYT content asset',
     },
 
@@ -109,7 +109,18 @@ module.exports = {
     collectionType: {
       description:
         'The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.',
-      enum: ['column', 'series', 'issue', 'sectioncollection'],
+      enum: [
+        'column',
+        'series',
+        'issue',
+        'section',
+        'sectioncollection',
+        'COLUMN',
+        'SERIES',
+        'ISSUE',
+        'SECTION',
+        'SECTIONCOLLECTION',
+      ],
     },
 
     /**
