@@ -12,6 +12,7 @@ const block = require('./block');
 const card = require('./card');
 const event = require('./event');
 const eventData = require('./eventData');
+const interaction = require('./interaction');
 const marketing = require('./marketing');
 const pageModule = require('./module'); // to avoid overlap with reserved word 'module'
 const pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
@@ -33,6 +34,7 @@ const allProps = {
   eventData,
   marketing,
   module: pageModule,
+  interaction,
   pageview,
   presentation,
   referrer,

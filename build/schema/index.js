@@ -14,6 +14,7 @@ var block = require('./block');
 var card = require('./card');
 var event = require('./event');
 var eventData = require('./eventData');
+var interaction = require('./interaction');
 var marketing = require('./marketing');
 var pageModule = require('./module'); // to avoid overlap with reserved word 'module'
 var pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
@@ -35,6 +36,7 @@ var allProps = {
   eventData: eventData,
   marketing: marketing,
   module: pageModule,
+  interaction: interaction,
   pageview: pageview,
   presentation: presentation,
   referrer: referrer,
