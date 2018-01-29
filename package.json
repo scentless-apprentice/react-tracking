@@ -9,6 +9,8 @@
     "test-watch": "jest --watch",
     "build":
       "rm -rf build && babel src --out-dir build --ignore **/__tests__,src/documentation,src/example",
+    "build-watch":
+      "babel src --out-dir build --ignore **/__tests__,src/documentation,src/example -w",
     "documentation": "node src/documentation/index.js",
     "prettier": "prettier \"src/**/*.js\" --write",
     "precommit": "npm run build; npm run documentation; lint-staged"

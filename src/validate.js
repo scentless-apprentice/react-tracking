@@ -27,7 +27,13 @@ module.exports = (data = {}, options = {}) => {
   if (!Object.keys(data).length) {
     const error = logger.emptyDataError;
     logger.error(error, () => {
-      console.log('Data: ', data);
+      console.log(data);
+
+      if (console.groupCollapsed) {
+        console.groupCollapsed('Expand to view stack trace');
+        console.trace();
+        console.groupEnd();
+      }
     });
 
     return error;
