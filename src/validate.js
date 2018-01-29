@@ -13,12 +13,22 @@ const getValidator = individualEvents => {
   return validator;
 };
 
+const logEnd = data => {
+  console.log(data);
+
+  if (console.groupCollapsed) {
+    console.groupCollapsed('Expand to view stack trace');
+    console.trace();
+    console.groupEnd();
+  }
+};
+
 const validation = (data, individualEvents) => {
   const validate = getValidator(individualEvents);
 
   validate.isValid = validate(data); // returns a boolean for convinience
 
-  logger.error(validate.errors, () => console.log(data));
+  logger.error(validate.errors, () => logEnd(data));
 
   return validate; // validate.errors contains the errors list
 };
@@ -26,16 +36,7 @@ const validation = (data, individualEvents) => {
 module.exports = (data = {}, options = {}) => {
   if (!Object.keys(data).length) {
     const error = logger.emptyDataError;
-    logger.error(error, () => {
-      console.log(data);
-
-      if (console.groupCollapsed) {
-        console.groupCollapsed('Expand to view stack trace');
-        console.trace();
-        console.groupEnd();
-      }
-    });
-
+    logger.error(error, () => logEnd(data));
     return error;
   }
 

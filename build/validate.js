@@ -15,13 +15,23 @@ var getValidator = function getValidator(individualEvents) {
   return validator;
 };
 
+var logEnd = function logEnd(data) {
+  console.log(data);
+
+  if (console.groupCollapsed) {
+    console.groupCollapsed('Expand to view stack trace');
+    console.trace();
+    console.groupEnd();
+  }
+};
+
 var validation = function validation(data, individualEvents) {
   var validate = getValidator(individualEvents);
 
   validate.isValid = validate(data); // returns a boolean for convinience
 
   logger.error(validate.errors, function() {
-    return console.log(data);
+    return logEnd(data);
   });
 
   return validate; // validate.errors contains the errors list
@@ -34,15 +44,8 @@ module.exports = function() {
   if (!Object.keys(data).length) {
     var error = logger.emptyDataError;
     logger.error(error, function() {
-      console.log(data);
-
-      if (console.groupCollapsed) {
-        console.groupCollapsed('Expand to view stack trace');
-        console.trace();
-        console.groupEnd();
-      }
+      return logEnd(data);
     });
-
     return error;
   }
 
