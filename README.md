@@ -103,7 +103,7 @@ Would output something similar to:
 
 To create a "release": 
 
-1. Bump the version in package.json and then
+1. Bump the version in package.json
 1. Then commit (or run `npm run precommit`). As you might have guessed, this is tied to a pre-commit hook so you shouldn't need to worry about running it manually, but it doesn't hurt to do so anyway.
 1. Once merged to `master`, tag a [Draft a New Release via the Github UI](https://github.com/nytm/tracking-schema/releases).
 
