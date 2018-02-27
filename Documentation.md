@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.4.0
+Version: 2.5.0
 
 Tracking object schema and validation
 
@@ -51,6 +51,7 @@ Data format: date-time
 Description: A value that indicates the location or status of the application.
 
 Data Type: **String**. It must match one of these:
+
 * production
 * staging
 * local
@@ -150,7 +151,7 @@ Data Type: **String**
 
 ### datalayer.asset.slug
 
-Description: The short name used internally by the newsroom to indicate the content of a story and name an asset while it is in production.This data is not  intended to be exposed or relied upon for public facing-purposes.
+Description: The short name used internally by the newsroom to indicate the content of a story and name an asset while it is in production.This data is not intended to be exposed or relied upon for public facing-purposes.
 
 Data Type: **String**
 
@@ -444,9 +445,10 @@ Data Type: **String**
 
 ### datalayer.event
 
-Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
+Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. \* Please note: Each time an event fires. The application should perform a dataLayer.push
 
 Data Type: **String**. It must match one of these:
+
 * pageDataReady
 * scrollComplete
 * heartbeat
@@ -609,7 +611,7 @@ Data Type: **String**
 
 ### datalayer.newsletter
 
-Description: Describes attributes of a newsletter module 
+Description: Describes attributes of a newsletter module
 
 Data Type: **Object**
 
@@ -794,6 +796,7 @@ Data Type: **String**
 Description: TBD
 
 Data Type: **String**. It must match one of these:
+
 * whole
 * skim
 
@@ -888,6 +891,7 @@ Data Type: **String**, or **Number**
 Description: A value that indicates the type of NYT user
 
 Data Type: **String**. It must match one of these:
+
 * anon
 * regi
 * sub
@@ -1013,6 +1017,7 @@ Data Type: **String**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * player
 * paused
 
@@ -1063,6 +1068,7 @@ Data Type: **Object**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * desktop
 * mobile
 
@@ -1101,6 +1107,7 @@ Data Type: **String**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * vod
 * live
 
@@ -1157,6 +1164,7 @@ Data Type: **Number**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * video
 * ad
 * 360video

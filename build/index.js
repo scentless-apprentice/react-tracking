@@ -8,4 +8,4 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = require('./development');
 }
 
-module.exports.version = "2.4.0";
+module.exports.version = '2.5.0';
