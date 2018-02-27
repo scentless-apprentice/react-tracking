@@ -128,17 +128,7 @@ Data Type: **Array**
 
 Description: The type of the NYT content asset collection. A collection is a grouping of two or more NYT content assets collected together based on journalistic intent.
 
-Data Type: **String**. It must match one of these:
-* column
-* series
-* issue
-* section
-* sectioncollection
-* COLUMN
-* SERIES
-* ISSUE
-* SECTION
-* SECTIONCOLLECTION
+Data Type: **Array**
 
 ### datalayer.asset.desk
 
@@ -509,6 +499,18 @@ Description: Time from responseStart until module was viewed
 
 Data Type: **Number**
 
+### datalayer.interaction
+
+Description: Describes basic attributes of the NYT user.
+
+Data Type: **Object**
+
+### datalayer.interaction.dfp_page_view_id
+
+Description: The ID for a given page - most useful for tracking advertising impressions
+
+Data Type: **String**
+
 ### datalayer.marketing
 
 Description: Describes attributes related to NYT Marketing-related Campaign/Promotion and Product.
@@ -605,15 +607,23 @@ Description: text displayed to the user for this element
 
 Data Type: **String**
 
-### datalayer.interaction
+### datalayer.newsletter
 
-Description: Describes basic attributes of the NYT user.
+Description: Describes attributes of a newsletter module 
 
 Data Type: **Object**
 
-### datalayer.interaction.dfp_page_view_id
+Accepts Additional Properties: true
 
-Description: The ID for a given page - most useful for tracking advertising impressions
+### datalayer.newsletter.product
+
+Description: Identifier code for a newsletter
+
+Data Type: **String**
+
+### datalayer.newsletter.productName
+
+Description: block
 
 Data Type: **String**
 

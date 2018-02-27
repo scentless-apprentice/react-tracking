@@ -18,34 +18,34 @@ module.exports = {
      * */
     pageType: {
       type: 'string',
-      description: 'The type of NYT content asset as presented to the user during the session.',
+      description: 'The type of NYT content asset as presented to the user during the session.'
     },
 
     pageSubtype: {
       type: 'string',
-      description: 'TBD',
+      description: 'TBD'
     },
 
     cardId: {
       type: 'string',
-      description: 'TBD',
+      description: 'TBD'
     },
 
     cardType: {
       type: 'string',
-      description: 'TBD',
+      description: 'TBD'
     },
 
     cardRendition: {
       enum: ['whole', 'skim'],
-      description: 'TBD',
+      description: 'TBD'
     },
 
     program: {
       properties: {
         name: {
           type: 'string',
-          description: 'home',
+          description: 'home'
         },
         /**
          * PROVIDED BY: Vi platform
@@ -58,13 +58,13 @@ module.exports = {
           properties: {
             initial: {
               type: 'string',
-              description: 'the initial breakpoint that the app assumes',
+              description: 'the initial breakpoint that the app assumes'
             },
             rendered: {
               type: 'string',
-              description: 'the final breakpoint after the app calculates the proper device type',
-            },
-          },
+              description: 'the final breakpoint after the app calculates the proper device type'
+            }
+          }
         },
         /**
          * PROVIDED BY: Program manager
@@ -73,7 +73,7 @@ module.exports = {
          */
         type: {
           type: 'string',
-          description: 'home',
+          description: 'home'
         },
         /**
          * PROVIDED BY: Program manager
@@ -83,9 +83,9 @@ module.exports = {
          */
         version: {
           type: 'string',
-          description: '12309239',
-        },
-      },
-    },
-  },
+          description: '12309239'
+        }
+      }
+    }
+  }
 };

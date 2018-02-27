@@ -18,7 +18,7 @@ module.exports = {
      */
     regiId: {
       type: ['string', 'number'],
-      description: 'The NYT registration ID of the NYT user.',
+      description: 'The NYT registration ID of the NYT user.'
     },
 
     /**
@@ -26,14 +26,14 @@ module.exports = {
      */
     type: {
       enum: ['anon', 'regi', 'sub'],
-      description: 'A value that indicates the type of NYT user',
+      description: 'A value that indicates the type of NYT user'
     },
 
     subscriptions: {
       description: 'TBD',
       items: {
-        type: 'object',
-      },
+        type: 'object'
+      }
     },
 
     /**
@@ -41,38 +41,38 @@ module.exports = {
      */
     watSegs: {
       type: 'string',
-      description: 'segments under ‘wat’ in the NYT-D cookie',
+      description: 'segments under ‘wat’ in the NYT-D cookie'
     },
 
     propensity: {
       description: "Metadata about the user's propensity to subscribe",
       type: 'object',
-      properties: {},
+      properties: {}
     },
 
     tracking: {
       description: 'Metadata about the users latest behavior on our site',
       type: 'object',
-      properties: {},
+      properties: {}
     },
 
     // JKIDD stuff
     'jkidd-l': {
-      type: 'string',
+      type: 'string'
     },
     'jkidd-s': {
-      type: 'string',
+      type: 'string'
     },
     'jkidd-p': {
-      type: 'string',
+      type: 'string'
     },
     subscriberInfo: {
       type: 'object',
-      properties: {},
+      properties: {}
     },
     nytdOtherData: {
       type: 'object',
-      properties: {},
-    },
-  }, // end user.properties
+      properties: {}
+    }
+  } // end user.properties
 };

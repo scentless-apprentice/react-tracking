@@ -11,8 +11,7 @@ module.exports = {
   // properties that are required (for `referrer`)
   required: ['url'],
 
-  description:
-    "Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.",
+  description: "Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.",
 
   properties: {
     /**
@@ -20,7 +19,7 @@ module.exports = {
      */
     url: {
       format: 'uri',
-      description: 'A URL of previous page or document.referrer',
-    },
-  }, // end referrer.properties
+      description: 'A URL of previous page or document.referrer'
+    }
+  } // end referrer.properties
 };

@@ -16,7 +16,7 @@ module.exports = {
      */
     dfp_page_view_id: {
       type: 'string',
-      description: 'The ID for a given page - most useful for tracking advertising impressions',
-    },
-  }, // end pageview.properties
+      description: 'The ID for a given page - most useful for tracking advertising impressions'
+    }
+  } // end pageview.properties
 };

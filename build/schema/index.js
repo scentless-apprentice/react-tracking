@@ -16,6 +16,7 @@ var event = require('./event');
 var eventData = require('./eventData');
 var interaction = require('./interaction');
 var marketing = require('./marketing');
+var newsletter = require('./newsletter');
 var pageModule = require('./module'); // to avoid overlap with reserved word 'module'
 var pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
 var presentation = require('./presentation');
@@ -34,9 +35,10 @@ var allProps = {
   card: card,
   event: event,
   eventData: eventData,
+  interaction: interaction,
   marketing: marketing,
   module: pageModule,
-  interaction: interaction,
+  newsletter: newsletter,
   pageview: pageview,
   presentation: presentation,
   referrer: referrer,
@@ -44,7 +46,7 @@ var allProps = {
   user: user,
   version: version,
   viewport: viewport,
-  video: video,
+  video: video
 };
 
 module.exports = {
@@ -52,7 +54,7 @@ module.exports = {
     var schema = {
       additionalProperties: false,
       // top-level properties
-      properties: allProps,
+      properties: allProps
     };
 
     if (!individualEvents) {
@@ -61,5 +63,5 @@ module.exports = {
     }
 
     return schema;
-  },
+  }
 };
