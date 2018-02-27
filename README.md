@@ -1,8 +1,10 @@
 # tracking-schema
 
+## [📕 View Schema Documentation](https://github.com/nytm/tracking-schema/blob/master/Documentation.md)
+
 Tracking schema for NYT apps, based off [this Google Doc by DS&E](https://docs.google.com/document/d/1o0zbXibJlqmqk9ScYZGx0iq4jZ6IR8H_OdLU-8gZRlI/edit) with [JSON Schema v5 semantics via ajv](https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md).
 
-### *PRO TIP:* Best used with [nyt-react-tracking](https://github.com/nytm/nyt-react-tracking).
+#### *PRO TIP:* Best used with [react-tracking](https://github.com/NYTimes/react-tracking).
 
 ## Motivation
 
@@ -96,3 +98,13 @@ Would output something similar to:
     params: { format: 'date-time' },
     message: 'should match format "date-time"' } ]
 ```
+
+## Release
+
+To create a "release": 
+
+1. Bump the version in package.json and then
+1. Then commit (or run `npm run precommit`). As you might have guessed, this is tied to a pre-commit hook so you shouldn't need to worry about running it manually, but it doesn't hurt to do so anyway.
+1. Once merged to `master`, tag a [Draft a New Release via the Github UI](https://github.com/nytm/tracking-schema/releases).
+
+> **NOTE**: We will eventually be publishing this module to Artifactory. Stay tuned...
