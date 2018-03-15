@@ -13,13 +13,14 @@ module.exports = {
     heartbeat:
       'This event should fire every n seconds where n varies by application and page type. This event push new heartbeat values into the dataLayer.  ',
     moduleInteraction:
-      'This event should fire when a user interacts with a module triggering a page update, dialogue box, etc. This should push new referrer and interaction values into the dataLayer.',
-    dynamicElementsLoaded:
-      'If there are elements that get loaded after the pageDataReady event, push this event and be sure to set presentation.documentHeight since the new elements will likely impact that value. If the new elements include tracked module(s) that appear in the viewport immediately, it should push a new value into viewport.modules. ',
+      'This event should fire when a user interacts with a module triggering a page update, dialogue box, etc. This should push new eventData and module/block/card values into the dataLayer.',
+    impression:
+      'This event fires when an element enters the viewport. It should only be used when there is a specific case for tracking the occurence of that element',
     videoEvent:
       'This event should fire for any video related event. This should push new values into the video object. ',
     performance: 'This is the first event that fires when a page loads, tracks page load time',
     error: 'This event triggers when an error is thrown on the page',
+    trackVirtualPage: '',
   },
 
   // TODO: Are these all of them?

@@ -16,7 +16,7 @@ module.exports = {
      */
     name: {
       type: 'string',
-      description: 'see more'
+      description: 'The name of the module interacted with. Also used as GA Event Category',
     },
 
     /**
@@ -25,7 +25,7 @@ module.exports = {
      */
     context: {
       type: 'string',
-      description: 'block'
+      description: 'block',
     },
 
     /**
@@ -34,12 +34,12 @@ module.exports = {
      */
     label: {
       type: 'string',
-      description: 'Top News|Featured|Opinion|News|Culture|etc...'
+      description: 'Top News|Featured|Opinion|News|Culture|etc...',
     },
 
     // Region to be defined
     region: {
-      properties: {}
+      properties: {},
     },
 
     /**
@@ -52,7 +52,7 @@ module.exports = {
       properties: {
         name: {
           type: 'string',
-          description: 'permanent value / slug / id'
+          description: 'Permanent value / slug / id. Also used as the GA Event Action',
         },
 
         /**
@@ -60,7 +60,7 @@ module.exports = {
          */
         url: {
           type: 'string',
-          description: 'URL associated with the element, eg. article being shared or linked to'
+          description: 'URL associated with the element, eg. article being shared or linked to',
         },
 
         /**
@@ -68,9 +68,47 @@ module.exports = {
          */
         label: {
           type: 'string',
-          description: 'text displayed to the user for this element'
-        }
-      }
-    }
-  } // end module.properties
+          description: 'Text displayed to the user for this element.  Also used as GA Event Label.',
+        },
+      },
+    },
+    /**
+     * ga - Optional
+     * Values specified here will override the default values derived from the module data
+     */
+    ga: {
+      type: 'object',
+      description: 'Optionally override default values for GA Event Tracking',
+      properties: {
+        eventCategory: {
+          type: 'string',
+          description: 'Sets the event category for GA event overriding the default module.name',
+        },
+        eventAction: {
+          type: 'string',
+          description:
+            'Sets the event action for GA event overriding the default module.element.name',
+        },
+        eventLabel: {
+          type: 'string',
+          description:
+            'Sets the event label for GA event overriding the default module.element.label',
+        },
+        eventValue: {
+          type: 'string',
+          description: 'Sets the event value for GA event',
+        },
+        customMetrics: {
+          type: 'array',
+          description:
+            'Array of objects in the format ```{"index": 123, "value": 1 }``` where *index* is the integer index of the custom metric and *value* is the value to set',
+        },
+        customDimensions: {
+          type: 'array',
+          description:
+            'Array of objects in the format ```{"index": 1, "value": "http://www.nytimes.com/" }``` where *index* is the integer index of the custom dimension and *value* is the value to set',
+        },
+      },
+    },
+  }, // end module.properties
 };
