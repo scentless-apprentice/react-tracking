@@ -881,6 +881,80 @@ Description: 12309239
 
 Data Type: **String**
 
+### datalayer.realestate
+
+Description: Contains data about custom dimesnsions for the realestate application
+
+Data Type: **Object**
+
+Required Fields:
+
+### datalayer.realestate.channel
+
+Description: CD109 - This describes the page channel, either rent or buy.
+
+Data format: string
+
+### datalayer.realestate.pageType
+
+Description: CD110 - Not used
+
+Data format: string
+
+### datalayer.realestate.moduleId
+
+Description: CD111 - Used to identify modules for the real estate CMS
+
+Data format: string
+
+### datalayer.realestate.moduleType
+
+Description: CD112 - Not used
+
+Data format: string
+
+### datalayer.realestate.moduleItemId
+
+Description: CD113 - Not used
+
+Data format: string
+
+### datalayer.realestate.listingId
+
+Description: CD143 - The unique listing identifier
+
+Data format: string
+
+### datalayer.realestate.listingPrice
+
+Description: CD144 - The price of the listing
+
+Data format: string
+
+### datalayer.realestate.buildingId
+
+Description: CD144 - The unique building identifier
+
+Data format: string
+
+### datalayer.realestate.new
+
+Description: CD145 - 1 if the listing is new, null if not
+
+Data format: string
+
+### datalayer.realestate.reduced
+
+Description: CD146 - 1 if the listing is reduced, null if not
+
+Data format: string
+
+### datalayer.realestate.openHouse
+
+Description: CD147 - 1 if the listing has an open house, null if not
+
+Data format: string
+
 ### datalayer.referrer
 
 Description: Contains data about external referrers, internal referrers and module interactions pertaining to the NYT user's session.

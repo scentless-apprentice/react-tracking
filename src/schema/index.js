@@ -18,6 +18,7 @@ const newsletter = require('./newsletter');
 const pageModule = require('./module'); // to avoid overlap with reserved word 'module'
 const pageview = require('./pageview'); // to avoid overlap with reserved word 'module'
 const presentation = require('./presentation');
+const realestate = require('./realestate');
 const referrer = require('./referrer');
 const session = require('./session');
 const user = require('./user');
@@ -39,6 +40,7 @@ const allProps = {
   newsletter,
   pageview,
   presentation,
+  realestate,
   referrer,
   session, // TODO: this is mostly empty
   user,
