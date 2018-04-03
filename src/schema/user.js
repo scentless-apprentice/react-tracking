@@ -34,6 +34,16 @@ module.exports = {
       },
     },
 
+    lastUpdate: {
+      description: 'It will return the timestamp if last update in milliseconds.',
+      type: 'number',      
+    },
+
+    isNewsSubscriber: {
+      description: 'This flag returns either 0 or 1 to identify new subscribers.',
+      enum: [0, 1],
+    },
+
     /**
      * Segments under 'wat' in NYT-D cookie
      */
