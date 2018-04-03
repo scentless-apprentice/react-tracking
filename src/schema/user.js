@@ -36,7 +36,7 @@ module.exports = {
 
     lastUpdate: {
       description: 'It will return the timestamp if last update in milliseconds.',
-      type: 'number',      
+      type: 'number',
     },
 
     isNewsSubscriber: {
