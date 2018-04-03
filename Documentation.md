@@ -887,7 +887,7 @@ Description: Contains data about custom dimesnsions for the realestate applicati
 
 Data Type: **Object**
 
-Required Fields:
+Required Fields: 
 
 ### datalayer.realestate.channel
 
@@ -1013,6 +1013,20 @@ Data Type: **String**. It must match one of these:
 Description: TBD
 
 Data Type: **Array of Objects**
+
+### datalayer.user.lastUpdate
+
+Description: It will return the timestamp if last update in milliseconds.
+
+Data Type: **Number**
+
+### datalayer.user.isNewsSubscriber
+
+Description: This flag returns either 0 or 1 to identify new subscribers.
+
+Data Type: **Number**. It must match one of these:
+* 0
+* 1
 
 ### datalayer.user.watSegs
 
