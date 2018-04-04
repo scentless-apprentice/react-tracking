@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.5.0
+Version: 2.5.1
 
 Tracking object schema and validation
 
@@ -51,6 +51,7 @@ Data format: date-time
 Description: A value that indicates the location or status of the application.
 
 Data Type: **String**. It must match one of these:
+
 * production
 * staging
 * local
@@ -150,7 +151,7 @@ Data Type: **String**
 
 ### datalayer.asset.slug
 
-Description: The short name used internally by the newsroom to indicate the content of a story and name an asset while it is in production.This data is not  intended to be exposed or relied upon for public facing-purposes.
+Description: The short name used internally by the newsroom to indicate the content of a story and name an asset while it is in production.This data is not intended to be exposed or relied upon for public facing-purposes.
 
 Data Type: **String**
 
@@ -444,9 +445,10 @@ Data Type: **String**
 
 ### datalayer.event
 
-Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. * Please note: Each time an event fires. The application should perform a dataLayer.push
+Description: The “event” value set with each push into the dataLayer triggers the relevant tracking behavior. \* Please note: Each time an event fires. The application should perform a dataLayer.push
 
 Data Type: **String**. It must match one of these:
+
 * pageDataReady
 * scrollComplete
 * heartbeat
@@ -603,7 +605,7 @@ Data Type: **String**
 
 ### datalayer.module.element.label
 
-Description: Text displayed to the user for this element.  Also used as GA Event Label.
+Description: Text displayed to the user for this element. Also used as GA Event Label.
 
 Data Type: **String**
 
@@ -639,19 +641,19 @@ Data Type: **String**
 
 ### datalayer.module.ga.customMetrics
 
-Description: Array of objects in the format ```{"index": 123, "value": 1 }``` where *index* is the integer index of the custom metric and *value* is the value to set
+Description: Array of objects in the format `{"index": 123, "value": 1 }` where _index_ is the integer index of the custom metric and _value_ is the value to set
 
 Data Type: **Array**
 
 ### datalayer.module.ga.customDimensions
 
-Description: Array of objects in the format ```{"index": 1, "value": "http://www.nytimes.com/" }``` where *index* is the integer index of the custom dimension and *value* is the value to set
+Description: Array of objects in the format `{"index": 1, "value": "http://www.nytimes.com/" }` where _index_ is the integer index of the custom dimension and _value_ is the value to set
 
 Data Type: **Array**
 
 ### datalayer.newsletter
 
-Description: Describes attributes of a newsletter module 
+Description: Describes attributes of a newsletter module
 
 Data Type: **Object**
 
@@ -836,6 +838,7 @@ Data Type: **String**
 Description: TBD
 
 Data Type: **String**. It must match one of these:
+
 * whole
 * skim
 
@@ -887,73 +890,73 @@ Description: Contains data about custom dimesnsions for the realestate applicati
 
 Data Type: **Object**
 
-Required Fields: 
+Required Fields:
 
 ### datalayer.realestate.channel
 
 Description: CD109 - This describes the page channel, either rent or buy.
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.pageType
 
 Description: CD110 - Not used
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.moduleId
 
 Description: CD111 - Used to identify modules for the real estate CMS
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.moduleType
 
 Description: CD112 - Not used
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.moduleItemId
 
 Description: CD113 - Not used
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.listingId
 
 Description: CD143 - The unique listing identifier
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.listingPrice
 
 Description: CD144 - The price of the listing
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.buildingId
 
 Description: CD144 - The unique building identifier
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.new
 
 Description: CD145 - 1 if the listing is new, null if not
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.reduced
 
 Description: CD146 - 1 if the listing is reduced, null if not
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.realestate.openHouse
 
 Description: CD147 - 1 if the listing has an open house, null if not
 
-Data format: string
+Data Type: **String**
 
 ### datalayer.referrer
 
@@ -1004,6 +1007,7 @@ Data Type: **String**, or **Number**
 Description: A value that indicates the type of NYT user
 
 Data Type: **String**. It must match one of these:
+
 * anon
 * regi
 * sub
@@ -1025,6 +1029,7 @@ Data Type: **Number**
 Description: This flag returns either 0 or 1 to identify new subscribers.
 
 Data Type: **Number**. It must match one of these:
+
 * 0
 * 1
 
@@ -1143,6 +1148,7 @@ Data Type: **String**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * player
 * paused
 
@@ -1193,6 +1199,7 @@ Data Type: **Object**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * desktop
 * mobile
 
@@ -1231,6 +1238,7 @@ Data Type: **String**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * vod
 * live
 
@@ -1287,6 +1295,7 @@ Data Type: **Number**
 Description: No description found
 
 Data Type: **String**. It must match one of these:
+
 * video
 * ad
 * 360video
