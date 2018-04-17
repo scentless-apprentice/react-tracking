@@ -1194,6 +1194,8 @@ Description: No description found
 
 Data Type: **Object**
 
+Accepts Additional Properties: true
+
 ### datalayer.video.mData.device
 
 Description: No description found
