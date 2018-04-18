@@ -31,7 +31,7 @@ module.exports = {
 
     // scoop id
     contentId: {
-      type: 'number',
+      type: ['number', 'string'],
     },
 
     // auto-play-start, user-play, etc...

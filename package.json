@@ -1,6 +1,6 @@
 {
   "name": "tracking-schema",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Tracking object schema and validation",
   "main": "build/index.js",
   "scripts": {

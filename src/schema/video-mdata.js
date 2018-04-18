@@ -2,7 +2,7 @@
  * Contains data pertaining to video mdata assets.
  */
 module.exports = {
-  additionalProperties: false,
+  additionalProperties: true,
 
   properties: {
     device: {
