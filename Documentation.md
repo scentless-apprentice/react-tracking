@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.5.1
+Version: 2.5.3
 
 Tracking object schema and validation
 
@@ -1187,7 +1187,7 @@ Data Type: **String**
 
 Description: No description found
 
-Data Type: **Number**
+Data Type: **Number**, or **String**
 
 ### datalayer.video.eventName
 
@@ -1218,6 +1218,8 @@ Data Type: **String**
 Description: No description found
 
 Data Type: **Object**
+
+Accepts Additional Properties: true
 
 ### datalayer.video.mData.device
 
