@@ -20,7 +20,7 @@ module.exports = {
       description: 'variant id',
     },
     url: {
-      type: 'string',
+      type: 'uri',
       description: 'page url',
     },
   }, // end abtest.properties

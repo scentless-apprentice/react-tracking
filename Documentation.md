@@ -36,7 +36,7 @@ Data Type: **Integer**
 
 Description: page url
 
-Data Type: **String**
+Data Type: **Uri**
 
 ### datalayer.application
 
@@ -482,6 +482,7 @@ Data Type: **String**. It must match one of these:
 * impression
 * performance
 * error
+* allocation
 
 ### datalayer.eventData
 
