@@ -21,6 +21,7 @@ module.exports = {
     performance: 'This is the first event that fires when a page loads, tracks page load time',
     error: 'This event triggers when an error is thrown on the page',
     trackVirtualPage: '',
+    allocation: '',
   },
 
   // TODO: Are these all of them?
@@ -72,5 +73,6 @@ module.exports = {
 
     'performance',
     'error',
+    'allocation',
   ],
 };
