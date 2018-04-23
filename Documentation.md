@@ -14,6 +14,30 @@ Data Type: **Object**
 
 Required Fields: event, application, user, referrer
 
+### datalayer.abtest
+
+Description: Describes attributes of NYT abtests.
+
+Data Type: **Object**
+
+### datalayer.abtest.test
+
+Description: test name
+
+Data Type: **String**
+
+### datalayer.abtest.variant
+
+Description: variant id
+
+Data Type: **Integer**
+
+### datalayer.abtest.url
+
+Description: page url
+
+Data format: uri
+
 ### datalayer.application
 
 Description: Describes basics attributes of the NYT Web application where the data layer is constructed. For example, it provides the application's version and release number.
@@ -458,6 +482,7 @@ Data Type: **String**. It must match one of these:
 * impression
 * performance
 * error
+* allocation
 
 ### datalayer.eventData
 

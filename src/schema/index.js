@@ -6,6 +6,7 @@
  * https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md
  */
 
+const abtest = require('./abtest');
 const application = require('./application');
 const asset = require('./asset');
 const block = require('./block');
@@ -28,6 +29,7 @@ const version = require('./version');
 
 const allProps = {
   // main "dataLayer" starts here
+  abtest,
   application,
   asset,
   block,
