@@ -50,7 +50,7 @@ module.exports = {
 
     // scoop playlist
     videoPrimaryPlaylistId: {
-      type: 'number',
+      type: ['number', 'string'],
     },
 
     videoPrimaryPlaylistName: {
