@@ -1,6 +1,6 @@
 # tracking-schema
 
-Version: 2.5.3
+Version: 2.5.6
 
 Tracking object schema and validation
 
@@ -1176,6 +1176,7 @@ Data Type: **String**. It must match one of these:
 
 * player
 * paused
+* playing
 
 ### datalayer.video.contentCollection
 
