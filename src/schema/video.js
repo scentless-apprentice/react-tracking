@@ -21,7 +21,7 @@ module.exports = {
     },
 
     state: {
-      enum: ['player', 'paused'],
+      enum: ['player', 'paused', 'playing'],
     },
 
     // section
