@@ -18,7 +18,7 @@ module.exports = {
       description: 'variant id',
     },
     url: {
-      type: 'uri',
+      format: 'uri',
       description: 'page url',
     },
   }, // end abtest.properties
