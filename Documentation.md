@@ -1291,7 +1291,7 @@ Data Type: **String**
 
 Description: No description found
 
-Data Type: **Number**
+Data Type: **Number**, or **String**
 
 ### datalayer.video.mData.videoPrimaryPlaylistName
 
