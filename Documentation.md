@@ -36,7 +36,7 @@ Data Type: **Integer**
 
 Description: page url
 
-Data Type: **Uri**
+Data format: uri
 
 ### datalayer.application
 
