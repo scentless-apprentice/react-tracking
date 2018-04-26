@@ -22,6 +22,7 @@ const presentation = require('./presentation');
 const realestate = require('./realestate');
 const referrer = require('./referrer');
 const session = require('./session');
+const slideshow = require('./slideshow');
 const user = require('./user');
 const viewport = require('./viewport');
 const video = require('./video');
@@ -45,6 +46,7 @@ const allProps = {
   realestate,
   referrer,
   session, // TODO: this is mostly empty
+  slideshow,
   user,
   version,
   viewport,
